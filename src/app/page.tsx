@@ -92,7 +92,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cosmic-navy via-slate-900 to-black">
+          <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-slate-900 to-black">
       {/* Floating Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="floating-star top-20 left-10 opacity-30" />
