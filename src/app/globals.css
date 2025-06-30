@@ -1,3 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cosmic-navy: #1a1a2e;
+  --color-aurora-green: #34d399;
+  --color-starlight-blue: #60a5fa;
+  --color-coral-glow: #ff6b6b;
+  --color-nebula-purple: #a855f7;
+  --color-solar-orange: #fb923c;
+  
+  --font-family-space: var(--font-space-grotesk), sans-serif;
+  --font-family-noto: var(--font-noto-sans), sans-serif;
+  
+  --background-image-cosmic-gradient: linear-gradient(to right, #1a1a2e, #60a5fa);
+  --background-image-nebula-gradient: linear-gradient(45deg, #1a1a2e, #a855f7, #60a5fa);
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-twinkle: twinkle 2s ease-in-out infinite alternate;
+  --animate-orbit: orbit 20s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
