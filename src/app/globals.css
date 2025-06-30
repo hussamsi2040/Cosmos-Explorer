@@ -1,29 +1,83 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #111418;
-  --foreground: #ffffff;
-  --border: #292f38;
-  --muted: #9da9b8;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --font-sans: var(--font-space-grotesk), var(--font-noto-sans), sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f172a 100%);
+    min-height: 100vh;
+    color: white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Space Grotesk", "Noto Sans", sans-serif;
+@layer components {
+  .cosmic-card {
+    @apply bg-gradient-to-br from-cosmic-navy to-gray-900 border border-starlight-blue/20 rounded-2xl shadow-2xl backdrop-blur-sm;
+  }
+  
+  .cosmic-button {
+    @apply bg-gradient-to-r from-starlight-blue to-aurora-green text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-starlight-blue/25;
+  }
+  
+  .cosmic-button-secondary {
+    @apply bg-gradient-to-r from-coral-glow to-nebula-purple text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-coral-glow/25;
+  }
+  
+  .tab-active {
+    @apply bg-gradient-to-r from-starlight-blue to-aurora-green text-white;
+  }
+  
+  .tab-inactive {
+    @apply bg-cosmic-navy/50 text-gray-300 hover:text-white hover:bg-cosmic-navy/80;
+  }
+  
+  .cosmic-input {
+    @apply bg-cosmic-navy/80 border border-starlight-blue/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-aurora-green focus:ring-2 focus:ring-aurora-green/20 transition-all;
+  }
+  
+  .floating-star {
+    @apply absolute w-2 h-2 bg-white rounded-full animate-twinkle;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-starlight-blue to-aurora-green bg-clip-text text-transparent;
+  }
+  
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+  }
+  
+  .accessibility-focus {
+    @apply focus:outline-none focus:ring-4 focus:ring-aurora-green/50 focus:border-aurora-green;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .cosmic-card {
+    @apply border-white border-2;
+  }
+  
+  .cosmic-button {
+    @apply bg-white text-black;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-twinkle,
+  .animate-orbit {
+    animation: none;
+  }
 }
