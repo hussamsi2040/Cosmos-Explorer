@@ -384,39 +384,122 @@ export default function LearnTab({ onTabChange }: LearnTabProps) {
       >
         {/* AI Tutor */}
         {activeSubTab === 'ai-tutor' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Chat Interface */}
-            <div className="lg:col-span-2 cosmic-card p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <MessageCircle className="w-6 h-6 text-starlight-blue" />
-                  AI Cosmic Tutor
-                </h3>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={tutorMode}
-                    onChange={(e) => setTutorMode(e.target.value as any)}
-                    className="cosmic-input text-sm px-2 py-1"
-                  >
-                    <option value="eli5">ELI5 (Simple)</option>
-                    <option value="regular">Regular</option>
-                    <option value="nerdy">Nerdy (Advanced)</option>
-                  </select>
-                  <button
-                    onClick={() => setVoiceEnabled(!voiceEnabled)}
-                    className={`p-2 rounded-lg transition-all ${
-                      voiceEnabled ? 'bg-aurora-green text-cosmic-navy' : 'bg-cosmic-navy/50'
+          <div className="flex gap-6">
+            {/* Question Input Area - Left Side */}
+            <div className="flex-1 max-w-[480px]">
+              <div className="space-y-4">
+                {/* Mode Selection */}
+                <div className="flex border-b border-[#40484f] gap-8">
+                  <button 
+                    onClick={() => setTutorMode('eli5')}
+                    className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${
+                      tutorMode === 'eli5' ? 'border-b-white text-white' : 'border-b-transparent text-[#a2acb3]'
                     }`}
                   >
-                    {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                    <p className="text-sm font-bold leading-normal tracking-[0.015em]">ELI5</p>
                   </button>
+                  <button 
+                    onClick={() => setTutorMode('regular')}
+                    className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${
+                      tutorMode === 'regular' ? 'border-b-white text-white' : 'border-b-transparent text-[#a2acb3]'
+                    }`}
+                  >
+                    <p className="text-sm font-bold leading-normal tracking-[0.015em]">Regular</p>
+                  </button>
+                  <button 
+                    onClick={() => setTutorMode('nerdy')}
+                    className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${
+                      tutorMode === 'nerdy' ? 'border-b-white text-white' : 'border-b-transparent text-[#a2acb3]'
+                    }`}
+                  >
+                    <p className="text-sm font-bold leading-normal tracking-[0.015em]">Nerdy Space Club</p>
+                  </button>
+                </div>
+
+                {/* Question Input */}
+                <div className="flex flex-wrap items-end gap-4">
+                  <label className="flex flex-col min-w-40 flex-1">
+                    <textarea
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      placeholder="Type your question here..."
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#2c3135] focus:border-none min-h-36 placeholder:text-[#a2acb3] p-4 text-base font-normal leading-normal"
+                    />
+                  </label>
+                </div>
+
+                {/* Ask Button and Voice Controls */}
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={isListening ? stopListening : startListening}
+                      className={`p-3 rounded-xl transition-all ${
+                        isListening ? 'bg-coral-glow' : 'bg-cosmic-navy/50'
+                      }`}
+                      disabled={!recognition.current}
+                    >
+                      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => setVoiceEnabled(!voiceEnabled)}
+                      className={`p-3 rounded-xl transition-all ${
+                        voiceEnabled ? 'bg-aurora-green text-cosmic-navy' : 'bg-cosmic-navy/50'
+                      }`}
+                    >
+                      {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!inputMessage.trim() || isLoading}
+                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#c5daeb] text-[#121516] text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50"
+                  >
+                    <span className="truncate">Ask</span>
+                  </button>
+                </div>
+
+                {/* Sample Questions */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-gray-300 flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-solar-orange" />
+                    Try These Questions
+                  </h4>
+                  {sampleQuestions.slice(0, 4).map((question, index) => (
+                    <motion.button
+                      key={question}
+                      onClick={() => handleSampleQuestion(question)}
+                      className="w-full text-left p-3 bg-cosmic-navy/30 rounded-lg hover:bg-cosmic-navy/50 transition-all text-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ x: 5 }}
+                    >
+                      {question}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Interface - Right Side */}
+            <div className="w-[360px]">
+              <div className="flex items-end gap-3 p-4">
+                <div 
+                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 shrink-0"
+                  style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCffnpAchok3htGniMvhi3tTBwc69QDw3_vBLfvgFqqcXLBbsQqAmGSrq4HLQ6U9WI-czXDH7R802vafN0ZXzMPw3E6TE5pbxbxyAItAXZAq46rgGPerKp4sJErM8VDKUC2WoTf7LtyHgHBjLqdl1uMeX9ACjD8I1VF5CcnnazxKiXwW0fMBIuD9Fj1LoephuNrd-gaOsGtq83uYVYyfIfJj2u7EhdqjQP3h6qkvXENYoa9qiaOr3QlrT1zNusRB_SkiwZ5ItaTp-M")'}}
+                />
+                <div className="flex flex-1 flex-col gap-1 items-start">
+                  <p className="text-[#a2acb3] text-[13px] font-normal leading-normal max-w-[360px]">Cosmic Tutor</p>
+                  <p className="text-base font-normal leading-normal flex max-w-[360px] rounded-xl px-4 py-3 bg-[#2c3135] text-white">
+                    Hi there! I'm your Cosmic Tutor. Ask me anything about space, Earth, and the universe. I'll explain it in a fun, clear way.
+                  </p>
                 </div>
               </div>
 
               {/* Chat Messages */}
-              <div className="h-96 overflow-y-auto bg-cosmic-navy/30 rounded-lg p-4 mb-4 space-y-3">
+              <div className="h-96 overflow-y-auto p-4 space-y-3">
                 <AnimatePresence>
-                  {chatMessages.map((message) => (
+                  {chatMessages.slice(1).map((message) => (
                     <motion.div
                       key={message.id}
                       className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -424,10 +507,16 @@ export default function LearnTab({ onTabChange }: LearnTabProps) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                     >
-                      <div className={`max-w-xs lg:max-w-md p-3 rounded-xl ${
+                      {message.type === 'assistant' && (
+                        <div 
+                          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0 mr-2 mt-1"
+                          style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCffnpAchok3htGniMvhi3tTBwc69QDw3_vBLfvgFqqcXLBbsQqAmGSrq4HLQ6U9WI-czXDH7R802vafN0ZXzMPw3E6TE5pbxbxyAItAXZAq46rgGPerKp4sJErM8VDKUC2WoTf7LtyHgHBjLqdl1uMeX9ACjD8I1VF5CcnnazxKiXwW0fMBIuD9Fj1LoephuNrd-gaOsGtq83uYVYyfIfJj2u7EhdqjQP3h6qkvXENYoa9qiaOr3QlrT1zNusRB_SkiwZ5ItaTp-M")'}}
+                        />
+                      )}
+                      <div className={`max-w-xs p-3 rounded-xl ${
                         message.type === 'user' 
-                          ? 'bg-starlight-blue text-white' 
-                          : 'bg-aurora-green/20 text-white border border-aurora-green/30'
+                          ? 'bg-[#c5daeb] text-[#121516]' 
+                          : 'bg-[#2c3135] text-white'
                       }`}>
                         <p className="text-sm">{message.content}</p>
                         {message.mode && (
@@ -445,7 +534,11 @@ export default function LearnTab({ onTabChange }: LearnTabProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <div className="bg-aurora-green/20 p-3 rounded-xl border border-aurora-green/30">
+                    <div 
+                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0 mr-2 mt-1"
+                      style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCffnpAchok3htGniMvhi3tTBwc69QDw3_vBLfvgFqqcXLBbsQqAmGSrq4HLQ6U9WI-czXDH7R802vafN0ZXzMPw3E6TE5pbxbxyAItAXZAq46rgGPerKp4sJErM8VDKUC2WoTf7LtyHgHBjLqdl1uMeX9ACjD8I1VF5CcnnazxKiXwW0fMBIuD9Fj1LoephuNrd-gaOsGtq83uYVYyfIfJj2u7EhdqjQP3h6qkvXENYoa9qiaOr3QlrT1zNusRB_SkiwZ5ItaTp-M")'}}
+                    />
+                    <div className="bg-[#2c3135] p-3 rounded-xl">
                       <div className="flex gap-1">
                         <div className="w-2 h-2 bg-aurora-green rounded-full animate-bounce" />
                         <div className="w-2 h-2 bg-aurora-green rounded-full animate-bounce delay-100" />
@@ -455,57 +548,6 @@ export default function LearnTab({ onTabChange }: LearnTabProps) {
                   </motion.div>
                 )}
                 <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask about stars, planets, rockets..."
-                  className="cosmic-input flex-1"
-                />
-                <button
-                  onClick={isListening ? stopListening : startListening}
-                  className={`p-3 rounded-xl transition-all ${
-                    isListening ? 'bg-coral-glow' : 'bg-cosmic-navy/50'
-                  }`}
-                  disabled={!recognition.current}
-                >
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!inputMessage.trim() || isLoading}
-                  className="cosmic-button p-3 disabled:opacity-50"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Sample Questions */}
-            <div className="cosmic-card p-6">
-              <h4 className="font-bold mb-4 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-solar-orange" />
-                Try These Questions
-              </h4>
-              <div className="space-y-2">
-                {sampleQuestions.map((question, index) => (
-                  <motion.button
-                    key={question}
-                    onClick={() => handleSampleQuestion(question)}
-                    className="w-full text-left p-3 bg-cosmic-navy/30 rounded-lg hover:bg-cosmic-navy/50 transition-all text-sm"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ x: 5 }}
-                  >
-                    {question}
-                  </motion.button>
-                ))}
               </div>
             </div>
           </div>
