@@ -1,34 +1,32 @@
-import DailyCosmicJournal from "../components/DailyCosmicJournal";
-import EpicGalleryWrapper from "../components/EpicGalleryWrapper";
-import { getAPOD } from "../lib/api/apod";
-import { getEPICDates } from "../lib/api/epic";
-import { getEONETEvents } from "../lib/api/eonet";
-import { Suspense } from "react";
-import Link from "next/link";
+"use client";
 
-export default async function Home() {
-  let apod, eonet;
-  let apodError: string | undefined = undefined, eonetError: string | undefined = undefined;
+import React, { useState } from "react";
+import RocketsTab from "../../components/RocketsTab";
+import SpaceWeatherTab from "../../components/SpaceWeatherTab";
+import SpaceCareersTab from "../../components/SpaceCareersTab";
+import CosmicChallengesTab from "../../components/CosmicChallengesTab";
+import LessonPathTab from "../../components/LessonPathTab";
+import ISSCrewLogTab from "../../components/ISSCrewLogTab";
+import MissionDashboard from "../../components/MissionDashboard";
+import PayloadExplorer from "../../components/PayloadExplorer";
+import LaunchGame from "../../components/LaunchGame";
 
-  try {
-    apod = await getAPOD();
-  } catch (e) {
-    apodError = "Could not load Astronomy Picture of the Day.";
-  }
+const ExplorePage = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-  try {
-    eonet = await getEONETEvents();
-  } catch (e) {
-    eonetError = "Could not load event data.";
-  }
+  const tabs = [
+    { id: "dashboard", label: "🧭 Mission Dashboard", component: MissionDashboard },
+    { id: "payloads", label: "📦 Payload Explorer", component: PayloadExplorer },
+    { id: "game", label: "🎮 Launch Game", component: LaunchGame },
+    { id: "rockets", label: "🚀 Rockets & Spaceflight", component: RocketsTab },
+    { id: "iss", label: "🛰️ ISS Crew Log", component: ISSCrewLogTab },
+    { id: "weather", label: "🌞 Space Weather", component: SpaceWeatherTab },
+    { id: "careers", label: "👨‍🚀 Space Careers", component: SpaceCareersTab },
+    { id: "challenges", label: "🎯 Cosmic Challenges", component: CosmicChallengesTab },
+    { id: "lessons", label: "🤖 AI Lesson Path", component: LessonPathTab },
+  ];
 
-  // Fetch available EPIC dates (for SSR, get the latest as default)
-  let epicDates: string[] = [];
-  let epicDefaultDate = "";
-  try {
-    epicDates = await getEPICDates();
-    epicDefaultDate = epicDates[epicDates.length - 1]; // Most recent
-  } catch {}
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
 
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-[#111418] dark group/design-root overflow-x-hidden">
@@ -44,10 +42,10 @@ export default async function Home() {
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <Link href="/" className="text-white text-sm font-medium leading-normal">Today</Link>
-              <Link href="/explore" className="text-white text-sm font-medium leading-normal">Explore</Link>
-              <Link href="/learn" className="text-white text-sm font-medium leading-normal">Learn</Link>
-              <Link href="/games" className="text-white text-sm font-medium leading-normal">Games</Link>
+              <a href="/" className="text-white text-sm font-medium leading-normal">Today</a>
+              <a href="/explore" className="text-white text-sm font-medium leading-normal">Explore</a>
+              <a href="/learn" className="text-white text-sm font-medium leading-normal">Learn</a>
+              <a href="/games" className="text-white text-sm font-medium leading-normal">Games</a>
             </div>
             <div className="flex gap-2">
               <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#292f38] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
@@ -73,28 +71,41 @@ export default async function Home() {
             ></div>
           </div>
         </header>
+        
         <div className="px-40 flex flex-1 justify-center py-5">
-          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+          <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
             <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Today</p>
+              <h1 className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Explore</h1>
             </div>
             
-            {/* Daily Cosmic Journal - All three data sources in one beautiful component */}
-            <div className="p-4">
-              <Suspense fallback={<div className="text-white text-center p-8">Loading your cosmic journal...</div>}>
-                <DailyCosmicJournal
-                  apod={apod}
-                  apodError={apodError}
-                  epicDates={epicDates}
-                  epicDefaultDate={epicDefaultDate}
-                  eonet={eonet}
-                  eonetError={eonetError}
-                />
-              </Suspense>
+            {/* Tab Navigation */}
+            <div className="px-4 mb-6">
+              <div className="flex flex-wrap gap-2 border-b border-white/20">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 rounded-t-lg font-medium transition-all duration-200 ${
+                      activeTab === tab.id
+                        ? "bg-blue-500 text-white shadow-lg"
+                        : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Tab Content */}
+            <div className="px-4 flex-1">
+              {ActiveComponent && <ActiveComponent />}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default ExplorePage; 

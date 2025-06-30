@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Planetary Scientist",
+    "description": "Studies planets, moons, and planetary systems to understand their composition, dynamics, and history.",
+    "skills": ["Geology", "Data Analysis", "Remote Sensing"],
+    "videoId": "21X5lGlDOfg"
+  },
+  {
+    "title": "Astronaut",
+    "description": "Trains for and conducts missions in space, performing experiments and operating spacecraft.",
+    "skills": ["Engineering", "Physical Fitness", "Teamwork"],
+    "videoId": "wwMDvPCGeE0"
+  },
+  {
+    "title": "Aerospace Engineer",
+    "description": "Designs, tests, and builds spacecraft, satellites, and related systems.",
+    "skills": ["Mathematics", "CAD", "Problem Solving"],
+    "videoId": "1Yb8T2QyQwA"
+  }
+] 
