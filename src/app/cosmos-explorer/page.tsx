@@ -251,7 +251,7 @@ function APODSection({ apod }: { apod: any }) {
             <div className="flex items-end gap-3 justify-between">
               <div className="flex flex-col gap-1">
                 <p className="text-[#a2abb3] text-base font-normal leading-normal">
-                  {apod && !apodError 
+                  {apod 
                     ? apod.explanation.substring(0, 150) + "..."
                     : "Capturing this stunning alignment took careful planning: being in the right place at the right time. The bright central core of our Milky Way Galaxy can be seen between two picturesque rock spires..."
                   }
@@ -265,22 +265,22 @@ function APODSection({ apod }: { apod: any }) {
                 {isExpanded && (
                   <div className="mt-3 p-3 bg-[#1e2124] rounded-lg">
                     <p className="text-[#a2abb3] text-sm leading-relaxed mb-2">
-                      {apod && !apodError 
+                      {apod 
                         ? apod.explanation
                         : "Does the Milky Way always rise between these two rocks? No. Capturing this stunning alignment took careful planning: being in the right place at the right time. In the featured image taken in June 2024 from Otago, New Zealand, the bright central core of our Milky Way Galaxy, home to the many of our Galaxy's 400 billion stars, can be seen between two picturesque rocks spires."
                       }
                     </p>
                     <div className="text-xs text-[#a2abb3] space-y-1">
-                      <p><strong>Date:</strong> {apod && !apodError ? apod.date : "2025 July 2"}</p>
-                      <p><strong>Media Type:</strong> {apod && !apodError ? apod.media_type : "Image"}</p>
-                      {apod && !apodError && apod.hdurl && (
+                      <p><strong>Date:</strong> {apod ? apod.date : "2025 July 2"}</p>
+                      <p><strong>Media Type:</strong> {apod ? apod.media_type : "Image"}</p>
+                      {apod && apod.hdurl && (
                         <p><strong>HD Version:</strong> <a href={apod.hdurl} className="text-blue-400 hover:text-blue-300">Available</a></p>
                       )}
                     </div>
                   </div>
                 )}
                 <p className="text-[#a2abb3] text-base font-normal leading-normal">
-                  Image Credit & Copyright: {apod && !apodError ? (apod.copyright || "NASA") : "Kavan Chay"}
+                  Image Credit & Copyright: {apod ? (apod.copyright || "NASA") : "Kavan Chay"}
                 </p>
               </div>
             </div>
@@ -291,7 +291,7 @@ function APODSection({ apod }: { apod: any }) {
         <button 
           className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#2c3035] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#373c42] transition-colors"
           onClick={() => {
-            if (apod && !apodError && apod.hdurl) {
+            if (apod && apod.hdurl) {
               window.open(apod.hdurl, '_blank');
             }
           }}
@@ -311,8 +311,8 @@ function APODSection({ apod }: { apod: any }) {
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={toggleFullscreen}>
           <div className="relative max-w-7xl max-h-full p-4">
             <img 
-              src={apod && !apodError ? (apod.hdurl || apod.url) : "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1200&h=800&fit=crop"}
-              alt={apod && !apodError ? apod.title : "Space image"}
+              src={apod ? (apod.hdurl || apod.url) : "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1200&h=800&fit=crop"}
+              alt={apod ? apod.title : "Space image"}
               className="max-w-full max-h-full object-contain rounded-lg"
             />
             <button 
@@ -480,9 +480,7 @@ function CosmosContent() {
             <div
               className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
               style={{
-                backgroundImage: epic && !epicError 
-                  ? `url("${epic.imageUrl}")` 
-                  : 'url("https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop")'
+                backgroundImage: epic ? `url("${epic.imageUrl}")` : 'url("https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop")'
               }}
             ></div>
             {/* Live Data Overlay */}
@@ -516,14 +514,14 @@ function CosmosContent() {
                   </div>
                 </div>
                 <p className="text-[#a2abb3] text-sm font-normal leading-normal">
-                  {epic && !epicError 
+                  {epic 
                     ? `This satellite image from NASA's EPIC camera shows Earth's natural color view captured on ${epic.date.split(' ')[0]}. The EPIC camera aboard the DSCOVR satellite provides continuous full Earth observations from the L1 Lagrange point.`
                     : "This satellite image shows the Earth's cloud cover, revealing weather patterns and atmospheric conditions. The swirling clouds indicate active weather systems, while clear areas suggest calm conditions."
                   }
                 </p>
                 <div className="text-[#a2abb3] text-xs">
                   <strong>Sea Ice Extent:</strong> {earthPhenomena.seaIceExtent} | 
-                  <strong> Data Source:</strong> {epic && !epicError ? "NASA EPIC/DSCOVR" : "NASA GIBS"}
+                  <strong> Data Source:</strong> {epic ? "NASA EPIC/DSCOVR" : "NASA GIBS"}
                 </div>
               </div>
             </div>
@@ -617,7 +615,7 @@ function CosmosContent() {
   );
 }
 
-export default function CosmosExplorer() {
+function CosmosExplorerClient() {
   return (
     <div
       className="relative flex size-full min-h-screen flex-col bg-[#121416] dark group/design-root overflow-x-hidden"
@@ -659,4 +657,27 @@ export default function CosmosExplorer() {
       </div>
     </div>
   );
+}
+
+export default function CosmosExplorer() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="relative flex size-full min-h-screen flex-col bg-[#121416] dark group/design-root overflow-x-hidden">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-white text-center p-8 flex items-center justify-center gap-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            Loading your cosmic journey...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <CosmosExplorerClient />;
 }
