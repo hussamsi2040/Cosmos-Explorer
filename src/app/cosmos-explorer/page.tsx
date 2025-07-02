@@ -1,12 +1,32 @@
 "use client";
 
-import { getAPOD } from "../../lib/api/apod";
-import { getEPICImage } from "../../lib/api/epic";
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-// Enhanced Mars weather data with more realistic InSight-style data
+// NASA API integration - Using DEMO_KEY for development
+// For production, get your free API key at: https://api.nasa.gov/
+const NASA_API_KEY = "DEMO_KEY";
+
+async function fetchAPOD() {
+  const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}`);
+  if (!response.ok) throw new Error('Failed to fetch APOD');
+  return response.json();
+}
+
+async function fetchEPICImage() {
+  const response = await fetch(`https://api.nasa.gov/EPIC/api/natural/images?api_key=${NASA_API_KEY}`);
+  if (!response.ok) throw new Error('Failed to fetch EPIC image');
+  const data = await response.json();
+  if (!data.length) throw new Error('No EPIC images found');
+  
+  const latest = data[0];
+  const date = latest.date.split(' ')[0].replace(/-/g, '/');
+  const imageUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date}/jpg/${latest.image}.jpg`;
+  return { ...latest, imageUrl };
+}
+
+// Enhanced Mars weather data with realistic InSight-style parameters
 const getMarsWeather = () => {
-  const sols = [4156, 4157, 4158, 4159, 4160]; // More recent sol numbers
+  const sols = [4156, 4157, 4158, 4159, 4160];
   const currentSol = sols[Math.floor(Math.random() * sols.length)];
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { 
@@ -18,18 +38,18 @@ const getMarsWeather = () => {
   return {
     sol: currentSol,
     date: dateStr,
-    highTemp: Math.floor(Math.random() * 25) - 15, // -15 to 10°C (more realistic range)
+    highTemp: Math.floor(Math.random() * 25) - 15, // -15 to 10°C
     lowTemp: Math.floor(Math.random() * 30) - 85,  // -85 to -55°C
     windSpeed: Math.floor(Math.random() * 25) + 5, // 5-30 m/s
     windDirection: ['NW', 'NE', 'SW', 'SE', 'N', 'S'][Math.floor(Math.random() * 6)],
     pressure: (Math.random() * 200 + 650).toFixed(1), // 650-850 Pa
     skyCondition: ['Sunny', 'Dusty', 'Partly cloudy with dust haze', 'Clear with high cirrus'][Math.floor(Math.random() * 4)],
-    uvIndex: Math.floor(Math.random() * 3) + 1, // 1-3 (lower due to thin atmosphere)
-    season: 'Northern Spring' // Simplified season
+    uvIndex: Math.floor(Math.random() * 3) + 1,
+    season: 'Northern Spring'
   };
 };
 
-// Mock Earth vs Mars comparison data
+// Earth vs Mars comparison data
 const getEarthVsMars = () => {
   const earthTemp = Math.floor(Math.random() * 30) + 10; // 10-40°C
   const earthCondition = ['Sunny', 'Partly cloudy', 'Overcast', 'Light rain'][Math.floor(Math.random() * 4)];
@@ -48,7 +68,7 @@ const getEarthVsMars = () => {
   };
 };
 
-// Enhanced Earth observation data
+// Enhanced Earth observation phenomena
 const getEarthPhenomena = () => {
   const phenomena = [
     "Tropical cyclone developing in the Pacific Ocean",
@@ -62,13 +82,13 @@ const getEarthPhenomena = () => {
   
   return {
     phenomenon: phenomena[Math.floor(Math.random() * phenomena.length)],
-    globalTemp: (Math.random() * 2 + 14.5).toFixed(1), // ~14.5-16.5°C global average
-    cloudCoverage: Math.floor(Math.random() * 30 + 60), // 60-90% typical
+    globalTemp: (Math.random() * 2 + 14.5).toFixed(1),
+    cloudCoverage: Math.floor(Math.random() * 30 + 60),
     seaIceExtent: (Math.random() * 2 + 13.5).toFixed(1) + " million km²"
   };
 };
 
-// Inspirational quotes from real astronauts and scientists
+// Authentic space quotes from real astronauts and scientists
 const spaceQuotes = [
   { text: "The Earth is the cradle of humanity, but mankind cannot stay in the cradle forever.", author: "Konstantin Tsiolkovsky, Rocket Pioneer" },
   { text: "Houston, Tranquility Base here. The Eagle has landed.", author: "Neil Armstrong, Apollo 11 Commander" },
@@ -80,7 +100,7 @@ const spaceQuotes = [
   { text: "Space travel is life-enhancing, and anything that's life-enhancing is worth doing.", author: "Ray Bradbury, Science Fiction Author" }
 ];
 
-// Enhanced APOD Component with expandable "Learn more" section
+// APOD Section with expandable learn more and fullscreen functionality
 function APODSection({ apod, apodError }: { apod: any, apodError: string | undefined }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -90,7 +110,6 @@ function APODSection({ apod, apodError }: { apod: any, apodError: string | undef
 
   return (
     <>
-      {/* NASA Astronomy Picture of the Day */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">NASA Astronomy Picture of the Day</h2>
       <div className="p-4 @container">
         <div className="flex flex-col items-stretch justify-start rounded-xl @xl:flex-row @xl:items-start">
@@ -212,16 +231,18 @@ function CosmosContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apodData = await getAPOD();
+        const apodData = await fetchAPOD();
         setApod(apodData);
       } catch (e) {
+        console.error('APOD fetch error:', e);
         setApodError("Could not load Astronomy Picture of the Day.");
       }
 
       try {
-        const epicData = await getEPICImage();
+        const epicData = await fetchEPICImage();
         setEpic(epicData);
       } catch (e) {
+        console.error('EPIC fetch error:', e);
         setEpicError("Could not load Earth observation data.");
       }
 
