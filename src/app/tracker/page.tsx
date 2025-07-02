@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 // Real-time space tracking APIs
@@ -80,79 +79,14 @@ async function fetchPeopleInSpace() {
   }
 }
 
-// Generate upcoming satellite passes
-const generateSatellitePasses = () => {
-  const satellites = [
-    { name: "ISS (ZARYA)", agency: "NASA/Roscosmos", type: "Space Station", brightness: -3.2 },
-    { name: "Hubble Space Telescope", agency: "NASA", type: "Science", brightness: 2.0 },
-    { name: "Starlink-1007", agency: "SpaceX", type: "Communications", brightness: 4.5 },
-    { name: "NOAA-18", agency: "NOAA", type: "Weather", brightness: 3.8 },
-    { name: "Terra", agency: "NASA", type: "Earth Observation", brightness: 2.5 },
-    { name: "Aqua", agency: "NASA", type: "Earth Observation", brightness: 2.3 },
-    { name: "Sentinel-2A", agency: "ESA", type: "Earth Observation", brightness: 4.1 }
-  ];
-  
-  const passes = [];
-  const now = new Date();
-  
-  for (let i = 0; i < 10; i++) {
-    const satellite = satellites[Math.floor(Math.random() * satellites.length)];
-    const passTime = new Date(now.getTime() + (Math.random() * 48 + 2) * 60 * 60 * 1000);
-    const duration = Math.floor(Math.random() * 8 + 2); // 2-10 minutes
-    const maxElevation = Math.floor(Math.random() * 60 + 20); // 20-80 degrees
-    
-    passes.push({
-      ...satellite,
-      startTime: passTime,
-      duration,
-      maxElevation,
-      direction: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)]
-    });
-  }
-  
-  return passes.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-};
-
-// Generate spacewalk alerts
-const generateSpacewalkAlerts = () => {
-  const spacewalks = [
-    {
-      id: 1,
-      mission: "ISS Expedition 72",
-      astronauts: ["Oleg Kononenko", "Nikolai Chub"],
-      scheduledDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-      duration: "6.5 hours",
-      objective: "External maintenance and antenna installation",
-      status: "Scheduled"
-    },
-    {
-      id: 2,
-      mission: "ISS Expedition 72",
-      astronauts: ["Tracy Caldwell Dyson", "Matthew Dominick"],
-      scheduledDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // 12 days from now
-      duration: "7.0 hours",
-      objective: "Solar array maintenance and COLPA installation",
-      status: "Planned"
-    }
-  ];
-  
-  return spacewalks;
-};
-
 // Prevent SSR for this component
 const SpaceTrackerContent = dynamic(() => Promise.resolve(SpaceTrackerContentInternal), {
   ssr: false,
   loading: () => (
-    <div className="min-h-screen bg-[#121416] p-6">
-      <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto">
-        <div className="animate-pulse">
-          <div className="h-8 bg-[#2c3035] rounded mb-6"></div>
-          <div className="space-y-4">
-            {[1,2,3].map(i => (
-              <div key={i} className="h-32 bg-[#2c3035] rounded"></div>
-            ))}
-          </div>
-        </div>
+    <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+      <div className="text-white text-center p-8 flex items-center justify-center gap-3">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+        Loading space tracking data...
       </div>
     </div>
   )
@@ -166,11 +100,11 @@ function SpaceTrackerContentInternal() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(true);
 
-  // Fetch real ISS data (already working)
+  // Fetch real ISS data
   useEffect(() => {
     const fetchISSData = async () => {
       try {
-        const response = await fetch('http://api.open-notify.org/iss-now.json');
+        const response = await fetch('https://api.open-notify.org/iss-now.json');
         const data = await response.json();
         setIssData(data);
       } catch (error) {
@@ -185,7 +119,7 @@ function SpaceTrackerContentInternal() {
 
     const fetchPeopleData = async () => {
       try {
-        const response = await fetch('http://api.open-notify.org/astros.json');
+        const response = await fetch('https://api.open-notify.org/astros.json');
         const data = await response.json();
         setPeopleData(data);
       } catch (error) {
@@ -374,7 +308,6 @@ function SpaceTrackerContentInternal() {
   };
 
   const generateFallbackSatellitePasses = () => {
-    // ... existing fallback generation code ...
     const satellites = [
       { name: "ISS", agency: "NASA", type: "Space Station" },
       { name: "Hubble Space Telescope", agency: "NASA", type: "Observatory" },
@@ -434,16 +367,10 @@ function SpaceTrackerContentInternal() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#121416] p-6">
-        <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-[#2c3035] rounded mb-6"></div>
-            <div className="space-y-4">
-              {[1,2,3].map(i => (
-                <div key={i} className="h-32 bg-[#2c3035] rounded"></div>
-              ))}
-            </div>
-          </div>
+      <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div className="text-white text-center p-8 flex items-center justify-center gap-3">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          Loading space tracking data...
         </div>
       </div>
     );
@@ -451,27 +378,9 @@ function SpaceTrackerContentInternal() {
 
   return (
     <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex flex-wrap justify-between gap-3 p-4">
-        <div>
-          <p className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
-            🛰️ Real-Time Space Tracker
-          </p>
-          <p className="text-[#a2abb3] text-sm font-normal leading-normal">
-            Live satellite tracking, crew info, and spacewalk schedules powered by real APIs
-          </p>
-        </div>
-        <nav className="flex gap-6 text-sm font-medium">
-          <Link href="/cosmos-explorer" className="text-[#a2abb3] hover:text-white transition-colors">
-            Home
-          </Link>
-          <Link href="/tracker" className="text-blue-400 hover:text-blue-300 transition-colors">
-            Tracker
-          </Link>
-          <Link href="/events" className="text-[#a2abb3] hover:text-white transition-colors">
-            Events
-          </Link>
-        </nav>
+        <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Real-Time Space Tracker</p>
       </div>
 
       {/* ISS Location & Crew */}
@@ -783,4 +692,50 @@ function SpaceTrackerContentInternal() {
   );
 }
 
-export default SpaceTrackerContent;
+function SpaceTrackerClient() {
+  return (
+    <div
+      className="relative flex size-full min-h-screen flex-col bg-[#121416] dark group/design-root overflow-x-hidden"
+      style={{
+        '--select-button-svg': "url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(162,171,179)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e')",
+        fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'
+      } as React.CSSProperties}
+    >
+      <div className="layout-container flex h-full grow flex-col">
+        {/* Header */}
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2c3035] px-10 py-3">
+          <div className="flex items-center gap-4 text-white">
+            <div className="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Cosmos Explorer</h2>
+          </div>
+          <div className="flex flex-1 justify-end gap-8">
+            <div className="flex items-center gap-9">
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
+              <a className="text-blue-400 text-sm font-medium leading-normal" href="/tracker">Tracker</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Weather</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
+            </div>
+          </div>
+        </header>
+
+        <div className="px-40 flex flex-1 justify-center py-5">
+          <SpaceTrackerContent />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SpaceTracker() {
+  return <SpaceTrackerClient />;
+}
