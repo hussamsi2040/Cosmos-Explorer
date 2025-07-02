@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
 
 // NASA API integration - Using personal API key for production
 // Personal API key provides 1,000 requests/hour vs DEMO_KEY's 30/hour
@@ -8,15 +9,24 @@ const NASA_API_KEY = "MQX17bNxdfKCDRZda4laA6DdVDTPrqeSkYzlmiqj";
 
 async function fetchAPOD() {
   try {
+    console.log('Fetching APOD with API key:', NASA_API_KEY.substring(0, 8) + '...');
     const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}`, {
       headers: {
         'Accept': 'application/json',
       },
     });
+    
+    console.log('APOD response status:', response.status, response.statusText);
+    
     if (!response.ok) {
+      if (response.status === 429) {
+        console.warn('APOD API rate limit exceeded, using fallback');
+      }
       throw new Error(`APOD API returned ${response.status}: ${response.statusText}`);
     }
-    return await response.json();
+    const data = await response.json();
+    console.log('APOD data received:', data.title);
+    return data;
   } catch (error) {
     console.error('APOD fetch failed, using fallback data:', error);
     // Return fallback APOD data when API fails
@@ -33,12 +43,19 @@ async function fetchAPOD() {
 
 async function fetchEPICImage() {
   try {
+    console.log('Fetching EPIC with API key:', NASA_API_KEY.substring(0, 8) + '...');
     const response = await fetch(`https://epic.gsfc.nasa.gov/api/natural?api_key=${NASA_API_KEY}`, {
       headers: {
         'Accept': 'application/json',
       },
     });
+    
+    console.log('EPIC response status:', response.status, response.statusText);
+    
     if (!response.ok) {
+      if (response.status === 429) {
+        console.warn('EPIC API rate limit exceeded, using fallback');
+      }
       throw new Error(`EPIC API returned ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
@@ -49,6 +66,7 @@ async function fetchEPICImage() {
     const latest = data[0];
     const date = latest.date.split(' ')[0].replace(/-/g, '/');
     const imageUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date}/jpg/${latest.image}.jpg`;
+    console.log('EPIC data received:', latest.image, 'for date:', date);
     return { ...latest, imageUrl };
   } catch (error) {
     console.error('EPIC fetch failed, using fallback data:', error);
@@ -131,10 +149,13 @@ const getMarsImageOfTheWeek = () => {
     "https://images.unsplash.com/photo-1446776851291-17811fa47966?w=800&h=600&fit=crop"
   ];
   
-  return {
+  const result = {
     ...selectedImage,
     fallbackUrl: fallbackImages[dayOfYear % fallbackImages.length]
   };
+  
+  console.log('Mars image data:', result);
+  return result;
 };
 
 // Enhanced Mars weather data with realistic Perseverance-era parameters  
@@ -330,13 +351,12 @@ function APODSection({ apod }: { apod: any }) {
   );
 }
 
-function CosmosContent() {
+function CosmosContentInternal() {
   const [apod, setApod] = useState<any>(null);
   const [epic, setEpic] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
   
-  // Client-side only data to prevent hydration mismatch
+  // Client-side only data
   const [marsWeather, setMarsWeather] = useState<any>(null);
   const [marsImage, setMarsImage] = useState<any>(null);
   const [earthVsMars, setEarthVsMars] = useState<any>(null);
@@ -344,9 +364,6 @@ function CosmosContent() {
   const [todayQuote, setTodayQuote] = useState<any>(null);
 
   useEffect(() => {
-    // Set mounted to true to prevent hydration mismatch
-    setIsMounted(true);
-    
     const fetchData = async () => {
       // Fetch APOD data (with fallback built-in)
       const apodData = await fetchAPOD();
@@ -359,7 +376,7 @@ function CosmosContent() {
       setIsLoading(false);
     };
 
-    // Initialize client-side data to prevent hydration mismatch
+    // Initialize client-side data
     setMarsWeather(getMarsWeather());
     setMarsImage(getMarsImageOfTheWeek());
     setEarthVsMars(getEarthVsMars());
@@ -369,8 +386,8 @@ function CosmosContent() {
     fetchData();
   }, []);
 
-  // Show loading state until component is mounted and all data is ready
-  if (!isMounted || isLoading || !apod || !epic || !marsWeather || !marsImage || !earthVsMars || !earthPhenomena || !todayQuote) {
+  // Show loading state until all data is ready
+  if (isLoading || !apod || !epic || !marsWeather || !marsImage || !earthVsMars || !earthPhenomena || !todayQuote) {
     return (
       <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
         <div className="text-white text-center p-8 flex items-center justify-center gap-3">
@@ -397,7 +414,7 @@ function CosmosContent() {
           <div
             className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl relative"
             style={{
-              backgroundImage: `url("${marsImage.fallbackUrl}")`
+              backgroundImage: `url("${marsImage?.fallbackUrl || 'https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=800&h=600&fit=crop'}")`
             }}
           >
             {/* Weather Gauge Overlay */}
@@ -406,19 +423,19 @@ function CosmosContent() {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <div className="text-[#a2abb3]">Temp</div>
-                  <div className="font-bold">{marsWeather.highTemp}°C</div>
+                  <div className="font-bold">{marsWeather?.highTemp || '-15'}°C</div>
                 </div>
                 <div>
                   <div className="text-[#a2abb3]">Wind</div>
-                  <div className="font-bold">{marsWeather.windSpeed}m/s</div>
+                  <div className="font-bold">{marsWeather?.windSpeed || '12'}m/s</div>
                 </div>
               </div>
             </div>
             
             {/* Image Attribution Overlay */}
             <div className="absolute top-4 right-4 bg-black/70 rounded-lg p-2 text-white">
-              <div className="text-xs font-semibold">Week {marsImage.week}</div>
-              <div className="text-xs text-[#a2abb3]">{marsImage.camera}</div>
+              <div className="text-xs font-semibold">Week {marsImage?.week || '228'}</div>
+              <div className="text-xs text-[#a2abb3]">{marsImage?.camera || 'MASTCAM-Z'}</div>
             </div>
           </div>
           <div className="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
@@ -615,6 +632,19 @@ function CosmosContent() {
   );
 }
 
+// Dynamic import to prevent SSR hydration issues
+const CosmosContent = dynamic(() => Promise.resolve(CosmosContentInternal), {
+  ssr: false,
+  loading: () => (
+    <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+      <div className="text-white text-center p-8 flex items-center justify-center gap-3">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+        Loading your cosmic journey...
+      </div>
+    </div>
+  )
+});
+
 function CosmosExplorerClient() {
   return (
     <div
@@ -660,24 +690,5 @@ function CosmosExplorerClient() {
 }
 
 export default function CosmosExplorer() {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="relative flex size-full min-h-screen flex-col bg-[#121416] dark group/design-root overflow-x-hidden">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-white text-center p-8 flex items-center justify-center gap-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-            Loading your cosmic journey...
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return <CosmosExplorerClient />;
 }
