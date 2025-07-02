@@ -330,82 +330,198 @@ function EventPlannerInternal() {
       {/* Upcoming Launches */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
       <div className="p-4">
-        <div className="space-y-4">
-          {launches?.results?.slice(0, 5).map((launch: any) => (
-            <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">🚀</div>
-                  <div>
-                    <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
-                    <div className="text-[#a2abb3] text-sm">{launch.rocket?.full_name} • {launch.launch_service_provider?.name}</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-white font-medium">
-                    {new Date(launch.net).toLocaleDateString()}
-                  </div>
-                  <div className="text-white text-lg font-bold">
-                    {new Date(launch.net).toLocaleTimeString()}
-                  </div>
-                  <div className="text-[#a2abb3] text-xs">
-                    {launch.status?.name || 'Scheduled'}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                <div>
-                  <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
-                  <div className="text-white text-sm">{launch.mission?.name || 'Mission Details TBD'}</div>
-                  <div className="text-[#a2abb3] text-xs">{launch.mission?.type || 'Operational'}</div>
-                </div>
-                <div>
-                  <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH SITE</div>
-                  <div className="text-white text-sm">{launch.pad?.name || 'Launch Pad TBD'}</div>
-                  <div className="text-[#a2abb3] text-xs">{launch.pad?.location?.name || 'Location TBD'}</div>
-                </div>
-                <div>
-                  <div className="text-[#a2abb3] text-xs font-semibold mb-1">WINDOW</div>
-                  <div className="text-white text-sm">
-                    {launch.window_start && launch.window_end 
-                      ? `${Math.floor((new Date(launch.window_end).getTime() - new Date(launch.window_start).getTime()) / (1000 * 60))} minutes`
-                      : 'Instantaneous'
-                    }
-                  </div>
-                  <div className="text-[#a2abb3] text-xs">Launch window</div>
-                </div>
-              </div>
-              
-              <div className="bg-[#2c3035] rounded-lg p-3">
-                <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION DESCRIPTION</div>
-                <div className="text-white text-sm">
-                  {launch.mission?.description || 'Mission details to be announced'}
-                </div>
-              </div>
+        {/* Launch Hero Gallery */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="SpaceX Launch"
+              className="w-full h-48 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">🚀 SpaceX Falcon Heavy</div>
             </div>
-          ))}
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1527977966376-1c8408f9f108?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="NASA SLS"
+              className="w-full h-48 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">🌙 NASA Artemis</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="ESA Ariane"
+              className="w-full h-48 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">🌍 ESA Ariane 6</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          {launches?.results?.slice(0, 5).map((launch: any, index: number) => {
+            // Get launch-specific image
+            const getLaunchImage = (name: string, provider: string) => {
+              if (provider?.includes('SpaceX')) return 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=100&h=100&fit=crop&auto=format&q=80';
+              if (provider?.includes('NASA')) return 'https://images.unsplash.com/photo-1527977966376-1c8408f9f108?w=100&h=100&fit=crop&auto=format&q=80';
+              if (provider?.includes('ESA')) return 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=100&h=100&fit=crop&auto=format&q=80';
+              return 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=100&h=100&fit=crop&auto=format&q=80';
+            };
+            
+            return (
+              <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20 relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 opacity-5 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${getLaunchImage(launch.name, launch.launch_service_provider?.name)}')`
+                  }}
+                ></div>
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src={getLaunchImage(launch.name, launch.launch_service_provider?.name)}
+                        alt={launch.launch_service_provider?.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                      <div>
+                        <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
+                        <div className="text-[#a2abb3] text-sm">{launch.rocket?.full_name} • {launch.launch_service_provider?.name}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">
+                        {new Date(launch.net).toLocaleDateString()}
+                      </div>
+                      <div className="text-white text-lg font-bold">
+                        {new Date(launch.net).toLocaleTimeString()}
+                      </div>
+                      <div className="text-[#a2abb3] text-xs">
+                        {launch.status?.name || 'Scheduled'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                    <div>
+                      <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
+                      <div className="text-white text-sm">{launch.mission?.name || 'Mission Details TBD'}</div>
+                      <div className="text-[#a2abb3] text-xs">{launch.mission?.type || 'Operational'}</div>
+                    </div>
+                    <div>
+                      <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH SITE</div>
+                      <div className="text-white text-sm">{launch.pad?.name || 'Launch Pad TBD'}</div>
+                      <div className="text-[#a2abb3] text-xs">{launch.pad?.location?.name || 'Location TBD'}</div>
+                    </div>
+                    <div>
+                      <div className="text-[#a2abb3] text-xs font-semibold mb-1">WINDOW</div>
+                      <div className="text-white text-sm">
+                        {launch.window_start && launch.window_end 
+                          ? `${Math.floor((new Date(launch.window_end).getTime() - new Date(launch.window_start).getTime()) / (1000 * 60))} minutes`
+                          : 'Instantaneous'
+                        }
+                      </div>
+                      <div className="text-[#a2abb3] text-xs">Launch window</div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#2c3035] rounded-lg p-3">
+                    <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION DESCRIPTION</div>
+                    <div className="text-white text-sm">
+                      {launch.mission?.description || 'Mission details to be announced'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Astronomical Events */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
       <div className="p-4">
+        {/* Astronomical Events Hero Gallery */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Solar Eclipse"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">🌒 Eclipses</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Meteor Shower"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">☄️ Meteors</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Planetary Alignment"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">🪐 Planets</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Night Sky"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">✨ Stargazing</div>
+            </div>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {astronomicalEvents.slice(0, 6).map(event => (
-            <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">
-                    {event.type === 'Eclipse' ? '🌒' : 
-                     event.type === 'Meteor Shower' ? '☄️' : 
-                     event.type === 'Planetary' ? '🪐' : '✨'}
-                  </div>
-                  <div>
-                    <h4 className="text-white font-semibold">{event.name}</h4>
-                    <div className="text-[#a2abb3] text-sm">{event.type}</div>
-                  </div>
-                </div>
+          {astronomicalEvents.slice(0, 6).map(event => {
+            // Get event-specific background image
+            const getEventImage = (type: string) => {
+              if (type === 'Eclipse') return 'https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=400&h=300&fit=crop&auto=format&q=80';
+              if (type === 'Meteor Shower') return 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=400&h=300&fit=crop&auto=format&q=80';
+              if (type === 'Planetary') return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&auto=format&q=80';
+              return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=300&fit=crop&auto=format&q=80';
+            };
+            
+            return (
+              <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20 relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 opacity-10 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${getEventImage(event.type)}')`
+                  }}
+                ></div>
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">
+                        {event.type === 'Eclipse' ? '🌒' : 
+                         event.type === 'Meteor Shower' ? '☄️' : 
+                         event.type === 'Planetary' ? '🪐' : '✨'}
+                      </div>
+                      <div>
+                        <h4 className="text-white font-semibold">{event.name}</h4>
+                        <div className="text-[#a2abb3] text-sm">{event.type}</div>
+                      </div>
+                    </div>
                 <div className="text-right">
                   <div className="text-white font-medium">
                     {event.date.toLocaleDateString()}

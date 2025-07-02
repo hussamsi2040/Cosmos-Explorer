@@ -243,13 +243,40 @@ function SpaceTrackerInternal() {
       {/* ISS Location & Crew */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">International Space Station</h2>
       <div className="p-4">
+        {/* ISS Hero Image */}
+        <div className="mb-6 relative">
+          <div 
+            className="w-full h-64 bg-cover bg-center rounded-xl relative overflow-hidden"
+            style={{
+              backgroundImage: "url('https://images.unsplash.com/photo-1446776756689-0e3a17a5b3a7?w=1200&h=400&fit=crop&auto=format&q=80')"
+            }}
+          >
+            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-2xl font-bold mb-1">International Space Station</h3>
+              <p className="text-sm opacity-90">Orbiting Earth at 27,600 km/h • 408km altitude</p>
+            </div>
+            <div className="absolute top-4 right-4 bg-black/70 rounded-lg p-3">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mb-1"></div>
+              <div className="text-white text-xs font-semibold">LIVE TRACKING</div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* ISS Location */}
-          <div className="bg-[#1e2124] rounded-xl p-6 border border-blue-500/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-              <h3 className="text-white font-semibold text-lg">Live Location</h3>
-            </div>
+          <div className="bg-[#1e2124] rounded-xl p-6 border border-blue-500/20 relative overflow-hidden">
+            <div 
+              className="absolute inset-0 opacity-10 bg-cover bg-center"
+              style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&h=300&fit=crop&auto=format&q=80')"
+              }}
+            ></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                <h3 className="text-white font-semibold text-lg">Live Location</h3>
+              </div></div>
             
             {issData && (
               <div className="space-y-3">
@@ -279,28 +306,36 @@ function SpaceTrackerInternal() {
           </div>
 
           {/* Current Crew */}
-          <div className="bg-[#1e2124] rounded-xl p-6 border border-green-500/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="text-2xl">👨‍🚀</div>
-              <h3 className="text-white font-semibold text-lg">Current Crew</h3>
-            </div>
-            
-            {peopleData && (
-              <div className="space-y-3">
-                <div className="text-white text-2xl font-bold">{peopleData.number} People in Space</div>
-                <div className="space-y-2">
-                  {peopleData.people.slice(0, 7).map((person: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center bg-[#2c3035] rounded-lg p-3">
-                      <div>
-                        <div className="text-white font-medium">{person.name}</div>
-                        <div className="text-[#a2abb3] text-xs">{person.craft}</div>
-                      </div>
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    </div>
-                  ))}
-                </div>
+          <div className="bg-[#1e2124] rounded-xl p-6 border border-green-500/20 relative overflow-hidden">
+            <div 
+              className="absolute inset-0 opacity-10 bg-cover bg-center"
+              style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1604613453506-d8992efad17b?w=400&h=300&fit=crop&auto=format&q=80')"
+              }}
+            ></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-2xl">👨‍🚀</div>
+                <h3 className="text-white font-semibold text-lg">Current Crew</h3>
               </div>
-            )}
+            
+              {peopleData && (
+                <div className="space-y-3">
+                  <div className="text-white text-2xl font-bold">{peopleData.number} People in Space</div>
+                  <div className="space-y-2">
+                    {peopleData.people.slice(0, 7).map((person: any, index: number) => (
+                      <div key={index} className="flex justify-between items-center bg-[#2c3035] rounded-lg p-3">
+                        <div>
+                          <div className="text-white font-medium">{person.name}</div>
+                          <div className="text-[#a2abb3] text-xs">{person.craft}</div>
+                        </div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -308,6 +343,50 @@ function SpaceTrackerInternal() {
       {/* Satellite Tracking */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Satellite Passes</h2>
       <div className="p-4">
+        {/* Satellite Gallery Hero */}
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Hubble Space Telescope"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">Hubble</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1517026575980-3e1e2dedeab4?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Satellite Array"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">Starlink</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Weather Satellite"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">NOAA</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1567306301408-9b74779a11af?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Earth Observation"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1">
+              <div className="text-white text-xs font-semibold">Terra</div>
+            </div>
+          </div>
+        </div>
+        
         {/* Filter Controls */}
         <div className="flex gap-2 mb-4 flex-wrap">
           {agencies.map(agency => (
@@ -327,76 +406,153 @@ function SpaceTrackerInternal() {
 
         {/* Satellite List */}
         <div className="space-y-3">
-          {filteredSatellites.slice(0, 8).map((satellite, index) => (
-            <div key={index} className="bg-[#1e2124] rounded-lg p-4 border border-[#40474f]/30">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="text-white font-semibold">{satellite.name}</h4>
-                  <div className="flex gap-4 text-sm text-[#a2abb3]">
-                    <span>🏢 {satellite.agency}</span>
-                    <span>📡 {satellite.type}</span>
-                    <span>✨ Mag {satellite.brightness}</span>
+          {filteredSatellites.slice(0, 8).map((satellite, index) => {
+            // Get satellite-specific image
+            const getSatelliteImage = (name: string) => {
+              if (name.includes('ISS')) return 'https://images.unsplash.com/photo-1446776756689-0e3a17a5b3a7?w=100&h=100&fit=crop&auto=format&q=80';
+              if (name.includes('Hubble')) return 'https://images.unsplash.com/photo-1542744173-05336fcc7ad4?w=100&h=100&fit=crop&auto=format&q=80';
+              if (name.includes('Starlink')) return 'https://images.unsplash.com/photo-1517026575980-3e1e2dedeab4?w=100&h=100&fit=crop&auto=format&q=80';
+              if (name.includes('NOAA')) return 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=100&h=100&fit=crop&auto=format&q=80';
+              return 'https://images.unsplash.com/photo-1567306301408-9b74779a11af?w=100&h=100&fit=crop&auto=format&q=80';
+            };
+            
+            return (
+              <div key={index} className="bg-[#1e2124] rounded-lg p-4 border border-[#40474f]/30 relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 opacity-5 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${getSatelliteImage(satellite.name)}')`
+                  }}
+                ></div>
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src={getSatelliteImage(satellite.name)}
+                        alt={satellite.name}
+                        className="w-12 h-12 object-cover rounded-lg"
+                      />
+                      <div>
+                        <h4 className="text-white font-semibold">{satellite.name}</h4>
+                        <div className="flex gap-4 text-sm text-[#a2abb3]">
+                          <span>🏢 {satellite.agency}</span>
+                          <span>📡 {satellite.type}</span>
+                          <span>✨ Mag {satellite.brightness}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">
+                        {satellite.startTime.toLocaleDateString()} {satellite.startTime.toLocaleTimeString()}
+                      </div>
+                      <div className="text-[#a2abb3] text-sm">
+                        {satellite.duration}min • Max {satellite.maxElevation}° {satellite.direction}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-white font-medium">
-                    {satellite.startTime.toLocaleDateString()} {satellite.startTime.toLocaleTimeString()}
-                  </div>
-                  <div className="text-[#a2abb3] text-sm">
-                    {satellite.duration}min • Max {satellite.maxElevation}° {satellite.direction}
+                  
+                  <div className="bg-[#2c3035] rounded-lg p-2">
+                    <div className="flex justify-between text-xs text-[#a2abb3]">
+                      <span>Visibility: {satellite.brightness < 3 ? 'Excellent' : satellite.brightness < 4 ? 'Good' : 'Fair'}</span>
+                      <span>Best viewing: {satellite.maxElevation > 50 ? 'Overhead' : satellite.maxElevation > 30 ? 'High' : 'Low'}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div className="bg-[#2c3035] rounded-lg p-2">
-                <div className="flex justify-between text-xs text-[#a2abb3]">
-                  <span>Visibility: {satellite.brightness < 3 ? 'Excellent' : satellite.brightness < 4 ? 'Good' : 'Fair'}</span>
-                  <span>Best viewing: {satellite.maxElevation > 50 ? 'Overhead' : satellite.maxElevation > 30 ? 'High' : 'Low'}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Spacewalk Alerts */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Spacewalks</h2>
       <div className="p-4">
+        {/* Spacewalk Hero Gallery */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1520637836862-4d197d17c91a?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="Astronaut EVA"
+              className="w-full h-40 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">🚀 EVA Operations</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1610296669228-602fa827455c?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="Space Station Maintenance"
+              className="w-full h-40 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">🔧 Maintenance</div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="Solar Panel Work"
+              className="w-full h-40 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-3 left-3 bg-black/80 rounded px-3 py-2">
+              <div className="text-white text-sm font-semibold">⚡ Solar Arrays</div>
+            </div>
+          </div>
+        </div>
+        
         <div className="space-y-4">
-          {spacewalkAlerts.map(spacewalk => (
-            <div key={spacewalk.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-yellow-500/20">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">🚀</div>
-                  <div>
-                    <h4 className="text-white font-semibold text-lg">{spacewalk.mission}</h4>
-                    <div className="text-[#a2abb3] text-sm">{spacewalk.astronauts.join(' & ')}</div>
+          {spacewalkAlerts.map((spacewalk, index) => (
+            <div key={spacewalk.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-yellow-500/20 relative overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url('https://images.unsplash.com/photo-1520637836862-4d197d17c91a?w=800&h=400&fit=crop&auto=format&q=80')`
+                }}
+              ></div>
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden">
+                      <img 
+                        src={index === 0 
+                          ? "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop&auto=format&q=80"
+                          : "https://images.unsplash.com/photo-1604613453506-d8992efad17b?w=100&h=100&fit=crop&auto=format&q=80"
+                        }
+                        alt="Astronaut"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-lg">{spacewalk.mission}</h4>
+                      <div className="text-[#a2abb3] text-sm">{spacewalk.astronauts.join(' & ')}</div>
+                    </div>
+                  </div>
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    spacewalk.status === 'Scheduled' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {spacewalk.status}
                   </div>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  spacewalk.status === 'Scheduled' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
-                }`}>
-                  {spacewalk.status}
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <div className="text-[#a2abb3] font-semibold">Date</div>
+                    <div className="text-white">{spacewalk.scheduledDate.toLocaleDateString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-[#a2abb3] font-semibold">Duration</div>
+                    <div className="text-white">{spacewalk.duration}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-[#a2abb3] font-semibold">Objective</div>
+                    <div className="text-white">{spacewalk.objective}</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <div className="text-[#a2abb3] font-semibold">Date</div>
-                  <div className="text-white">{spacewalk.scheduledDate.toLocaleDateString()}</div>
+                
+                <div className="mt-3 text-xs text-[#a2abb3]">
+                  📺 Live coverage will be available on NASA TV and social media platforms
                 </div>
-                <div>
-                  <div className="text-[#a2abb3] font-semibold">Duration</div>
-                  <div className="text-white">{spacewalk.duration}</div>
-                </div>
-                <div className="col-span-2">
-                  <div className="text-[#a2abb3] font-semibold">Objective</div>
-                  <div className="text-white">{spacewalk.objective}</div>
-                </div>
-              </div>
-              
-              <div className="mt-3 text-xs text-[#a2abb3]">
-                📺 Live coverage will be available on NASA TV and social media platforms
               </div>
             </div>
           ))}
