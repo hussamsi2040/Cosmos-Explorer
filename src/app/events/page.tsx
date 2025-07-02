@@ -498,9 +498,110 @@ function CosmicEventsContentInternal() {
         <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Cosmic Event Planner</p>
       </div>
 
+      {/* Header Gallery */}
+      <div className="px-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1517976487492-5750f3195933?w=300&h=150&fit=crop&auto=format&q=80" 
+              alt="Rocket Launch"
+              className="w-full h-20 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🚀 Launches
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=300&h=150&fit=crop&auto=format&q=80" 
+              alt="Meteor Shower"
+              className="w-full h-20 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              ☄️ Meteors
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=300&h=150&fit=crop&auto=format&q=80" 
+              alt="Aurora"
+              className="w-full h-20 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🌌 Aurora
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?w=300&h=150&fit=crop&auto=format&q=80" 
+              alt="Solar Eclipse"
+              className="w-full h-20 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🌘 Eclipse
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Upcoming Launches */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
       <div className="p-4">
+        {/* Launch Photo Gallery */}
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="SpaceX Falcon 9 Launch"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🚀 Falcon 9
+            </div>
+            <div className="absolute top-2 right-2 bg-gray-800/80 rounded px-2 py-1 text-white text-xs">
+              SpaceX
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="NASA SLS Artemis Launch"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🌙 Artemis SLS
+            </div>
+            <div className="absolute top-2 right-2 bg-blue-600/80 rounded px-2 py-1 text-white text-xs">
+              NASA
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="ESA Ariane 6 Launch"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🇪🇺 Ariane 6
+            </div>
+            <div className="absolute top-2 right-2 bg-blue-700/80 rounded px-2 py-1 text-white text-xs">
+              ESA
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=250&fit=crop&auto=format&q=80" 
+              alt="Atlas V Launch"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🔶 Atlas V
+            </div>
+            <div className="absolute top-2 right-2 bg-orange-600/80 rounded px-2 py-1 text-white text-xs">
+              ULA
+            </div>
+          </div>
+        </div>
         {/* Launch Hero Gallery */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
