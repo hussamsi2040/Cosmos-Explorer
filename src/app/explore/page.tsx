@@ -6,7 +6,7 @@ import { Search, Filter, Sparkles, Zap, Globe, Rocket, Star, Users, Calendar, Tr
 // Import components with lazy loading for better performance
 import dynamic from "next/dynamic";
 
-const MissionDashboardTab = dynamic(() => import("../../components/MissionDashboardTab"), { 
+const MissionDashboardTab = dynamic(() => import("../../components/MissionDashboard"), { 
   loading: () => <ModernLoader title="Mission Dashboard" />,
   ssr: false 
 });
@@ -34,11 +34,11 @@ const AISpaceTutor = dynamic(() => import("../../components/AISpaceTutor"), {
   loading: () => <ModernLoader title="AI Tutor" />,
   ssr: false 
 });
-const PayloadExplorerTab = dynamic(() => import("../../components/PayloadExplorerTab"), { 
+const PayloadExplorerTab = dynamic(() => import("../../components/PayloadExplorer"), { 
   loading: () => <ModernLoader title="Payload Explorer" />,
   ssr: false 
 });
-const LaunchGameTab = dynamic(() => import("../../components/LaunchGameTab"), { 
+const LaunchGameTab = dynamic(() => import("../../components/LaunchGame"), { 
   loading: () => <ModernLoader title="Launch Game" />,
   ssr: false 
 });
@@ -58,7 +58,7 @@ const CosmicChallengesTab = dynamic(() => import("../../components/CosmicChallen
   loading: () => <ModernLoader title="Cosmic Challenges" />,
   ssr: false 
 });
-const AILessonPathTab = dynamic(() => import("../../components/AILessonPathTab"), { 
+const LessonPathTab = dynamic(() => import("../../components/LessonPathTab"), { 
   loading: () => <ModernLoader title="AI Lessons" />,
   ssr: false 
 });
@@ -206,7 +206,7 @@ const modernTabs = [
     id: "lessons",
     label: "AI Lessons",
     icon: Bot,
-    component: AILessonPathTab,
+    component: LessonPathTab,
     gradient: "from-fuchsia-500 to-pink-600",
     description: "Personalized learning",
     category: "Education"
