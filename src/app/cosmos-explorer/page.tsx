@@ -7,13 +7,22 @@ import dynamic from 'next/dynamic';
 // Personal API key provides 1,000 requests/hour vs DEMO_KEY's 30/hour
 const NASA_API_KEY = "MQX17bNxdfKCDRZda4laA6DdVDTPrqeSkYzlmiqj";
 
+// Helper function to delay requests
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function fetchAPOD() {
   try {
     console.log('Fetching APOD with API key:', NASA_API_KEY.substring(0, 8) + '...');
+    
+    // Add a small delay to prevent rapid-fire requests
+    await delay(Math.random() * 1000 + 500); // 500-1500ms delay
+    
     const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}`, {
       headers: {
         'Accept': 'application/json',
       },
+      // Add cache control to help with rate limiting
+      cache: 'force-cache'
     });
     
     console.log('APOD response status:', response.status, response.statusText);
@@ -21,6 +30,12 @@ async function fetchAPOD() {
     if (!response.ok) {
       if (response.status === 429) {
         console.warn('APOD API rate limit exceeded, using fallback');
+        // Wait a bit longer and try one more time
+        await delay(2000);
+        const retryResponse = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${NASA_API_KEY}`);
+        if (retryResponse.ok) {
+          return await retryResponse.json();
+        }
       }
       throw new Error(`APOD API returned ${response.status}: ${response.statusText}`);
     }
@@ -29,14 +44,15 @@ async function fetchAPOD() {
     return data;
   } catch (error) {
     console.error('APOD fetch failed, using fallback data:', error);
-    // Return fallback APOD data when API fails
+    // Return today's actual APOD fallback that we know works
     return {
-      title: "The Horsehead Nebula",
-      explanation: "The Horsehead Nebula is one of the most identifiable nebulae in the sky. It is located in the constellation Orion and is part of the Orion Molecular Cloud Complex. This dark nebula is approximately 1,500 light years from Earth and appears as a dark silhouette against the bright background of ionized gas.",
-      url: "https://science.nasa.gov/wp-content/uploads/2023/09/hubble-horsehead-nebula-stsci-h-p1434a-m-1000x1000-1.jpg",
-      hdurl: "https://science.nasa.gov/wp-content/uploads/2023/09/hubble-horsehead-nebula-stsci-h-p1434a-m-2000x2000-1.jpg",
-      date: new Date().toISOString().split('T')[0],
-      media_type: "image"
+      title: "Milky Way Through Otago Spires",
+      explanation: "Does the Milky Way always rise between these two rocks? No. Capturing this stunning alignment took careful planning: being in the right place at the right time. In the featured image taken in June 2024 from Otago, New Zealand, the bright central core of our Milky Way Galaxy, home to the many of our Galaxy's 400 billion stars, can be seen between two picturesque rocks spires.",
+      url: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_960.jpg",
+      hdurl: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_1874.jpg",
+      date: "2025-07-02",
+      media_type: "image",
+      copyright: "Kavan Chay; Text: Ogetay Kayali (Michigan Tech U.)"
     };
   }
 }
@@ -44,10 +60,15 @@ async function fetchAPOD() {
 async function fetchEPICImage() {
   try {
     console.log('Fetching EPIC with API key:', NASA_API_KEY.substring(0, 8) + '...');
+    
+    // Add delay to stagger API requests
+    await delay(Math.random() * 1000 + 1000); // 1000-2000ms delay, after APOD
+    
     const response = await fetch(`https://epic.gsfc.nasa.gov/api/natural?api_key=${NASA_API_KEY}`, {
       headers: {
         'Accept': 'application/json',
       },
+      cache: 'force-cache'
     });
     
     console.log('EPIC response status:', response.status, response.statusText);
@@ -55,6 +76,18 @@ async function fetchEPICImage() {
     if (!response.ok) {
       if (response.status === 429) {
         console.warn('EPIC API rate limit exceeded, using fallback');
+        // Wait and retry once
+        await delay(3000);
+        const retryResponse = await fetch(`https://epic.gsfc.nasa.gov/api/natural?api_key=${NASA_API_KEY}`);
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+          if (retryData && retryData.length) {
+            const latest = retryData[0];
+            const date = latest.date.split(' ')[0].replace(/-/g, '/');
+            const imageUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date}/jpg/${latest.image}.jpg`;
+            return { ...latest, imageUrl };
+          }
+        }
       }
       throw new Error(`EPIC API returned ${response.status}: ${response.statusText}`);
     }
@@ -70,16 +103,14 @@ async function fetchEPICImage() {
     return { ...latest, imageUrl };
   } catch (error) {
     console.error('EPIC fetch failed, using fallback data:', error);
-    // Return fallback EPIC data when API fails
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
+    // Return fallback EPIC data with a working NASA image
     return {
-      image: "epic_1b_20240320181355",
+      image: "epic_1b_20250701003634",
       caption: "This image was taken by the NASA EPIC camera onboard the NOAA DSCOVR spacecraft",
-      date: `${dateStr} 18:13:55`,
-      centroid_coordinates: { lat: -2.47, lon: -157.21 },
-      dscovr_j2000_position: { x: -1372045.25, y: -669893.44, z: -130240.87 },
-      imageUrl: "https://science.nasa.gov/wp-content/uploads/2023/09/epic-earth-image-2048x2048-1.jpg"
+      date: "2025-07-01 00:31:45",
+      centroid_coordinates: { lat: 16.61, lon: 171.39 },
+      dscovr_j2000_position: { x: -223826.70, y: 1360808.31, z: 413597.05 },
+      imageUrl: "https://epic.gsfc.nasa.gov/archive/natural/2025/07/01/jpg/epic_1b_20250701003634.jpg"
     };
   }
 }
@@ -141,12 +172,13 @@ const getMarsImageOfTheWeek = () => {
   const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
   const selectedImage = marsImages[dayOfYear % marsImages.length];
   
-  // Use fallback Unsplash Mars images if NASA images aren't available
+  // Use high-quality Mars images as fallbacks
   const fallbackImages = [
-    "https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=800&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=800&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1446776851291-17811fa47966?w=800&h=600&fit=crop"
+    "https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=800&h=600&fit=crop&auto=format&q=80",
+    "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&h=600&fit=crop&auto=format&q=80", 
+    "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=800&h=600&fit=crop&auto=format&q=80",
+    "https://images.unsplash.com/photo-1446776851291-17811fa47966?w=800&h=600&fit=crop&auto=format&q=80",
+    "https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?w=800&h=600&fit=crop&auto=format&q=80"
   ];
   
   const result = {
@@ -254,7 +286,7 @@ function APODSection({ apod }: { apod: any }) {
             <div
               className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl cursor-pointer transition-transform hover:scale-[1.02]"
               style={{
-                backgroundImage: apod ? `url("${apod.url}")` : 'url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=600&fit=crop")'
+                backgroundImage: `url("${apod.url}")`
               }}
               onClick={toggleFullscreen}
             >
@@ -267,15 +299,12 @@ function APODSection({ apod }: { apod: any }) {
           </div>
           <div className="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
             <p className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-              {apod ? apod.title : "Milky Way Through Otago Spires"}
+              {apod.title}
             </p>
             <div className="flex items-end gap-3 justify-between">
               <div className="flex flex-col gap-1">
                 <p className="text-[#a2abb3] text-base font-normal leading-normal">
-                  {apod 
-                    ? apod.explanation.substring(0, 150) + "..."
-                    : "Capturing this stunning alignment took careful planning: being in the right place at the right time. The bright central core of our Milky Way Galaxy can be seen between two picturesque rock spires..."
-                  }
+                  {apod.explanation.substring(0, 150) + "..."}
                 </p>
                 <button 
                   onClick={toggleExpanded}
@@ -286,22 +315,19 @@ function APODSection({ apod }: { apod: any }) {
                 {isExpanded && (
                   <div className="mt-3 p-3 bg-[#1e2124] rounded-lg">
                     <p className="text-[#a2abb3] text-sm leading-relaxed mb-2">
-                      {apod 
-                        ? apod.explanation
-                        : "Does the Milky Way always rise between these two rocks? No. Capturing this stunning alignment took careful planning: being in the right place at the right time. In the featured image taken in June 2024 from Otago, New Zealand, the bright central core of our Milky Way Galaxy, home to the many of our Galaxy's 400 billion stars, can be seen between two picturesque rocks spires."
-                      }
+                      {apod.explanation}
                     </p>
                     <div className="text-xs text-[#a2abb3] space-y-1">
-                      <p><strong>Date:</strong> {apod ? apod.date : "2025 July 2"}</p>
-                      <p><strong>Media Type:</strong> {apod ? apod.media_type : "Image"}</p>
-                      {apod && apod.hdurl && (
+                      <p><strong>Date:</strong> {apod.date}</p>
+                      <p><strong>Media Type:</strong> {apod.media_type}</p>
+                      {apod.hdurl && (
                         <p><strong>HD Version:</strong> <a href={apod.hdurl} className="text-blue-400 hover:text-blue-300">Available</a></p>
                       )}
                     </div>
                   </div>
                 )}
                 <p className="text-[#a2abb3] text-base font-normal leading-normal">
-                  Image Credit & Copyright: {apod ? (apod.copyright || "NASA") : "Kavan Chay"}
+                  Image Credit & Copyright: {apod.copyright || "NASA"}
                 </p>
               </div>
             </div>
@@ -312,7 +338,7 @@ function APODSection({ apod }: { apod: any }) {
         <button 
           className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#2c3035] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#373c42] transition-colors"
           onClick={() => {
-            if (apod && apod.hdurl) {
+            if (apod.hdurl) {
               window.open(apod.hdurl, '_blank');
             }
           }}
@@ -332,8 +358,8 @@ function APODSection({ apod }: { apod: any }) {
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={toggleFullscreen}>
           <div className="relative max-w-7xl max-h-full p-4">
             <img 
-              src={apod ? (apod.hdurl || apod.url) : "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1200&h=800&fit=crop"}
-              alt={apod ? apod.title : "Space image"}
+              src={apod.hdurl || apod.url}
+              alt={apod.title}
               className="max-w-full max-h-full object-contain rounded-lg"
             />
             <button 
@@ -365,29 +391,70 @@ function CosmosContentInternal() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch APOD data (with fallback built-in)
-      const apodData = await fetchAPOD();
-      setApod(apodData);
+      try {
+        console.log('Starting data fetch process...');
+        
+        // Initialize client-side data first (these are immediate)
+        console.log('Setting up client-side data...');
+        setMarsWeather(getMarsWeather());
+        setMarsImage(getMarsImageOfTheWeek());
+        setEarthVsMars(getEarthVsMars());
+        setEarthPhenomena(getEarthPhenomena());
+        setTodayQuote(spaceQuotes[Math.floor(Math.random() * spaceQuotes.length)]);
 
-      // Fetch EPIC data (with fallback built-in)
-      const epicData = await fetchEPICImage();
-      setEpic(epicData);
+        // Fetch NASA APIs with staggered delays
+        console.log('Fetching NASA APIs...');
+        const [apodData, epicData] = await Promise.allSettled([
+          fetchAPOD(),
+          fetchEPICImage()
+        ]);
 
-      setIsLoading(false);
+        // Handle APOD result
+        if (apodData.status === 'fulfilled') {
+          setApod(apodData.value);
+          console.log('APOD data loaded successfully');
+        } else {
+          console.error('APOD failed:', apodData.reason);
+          // Fallback APOD data
+          setApod({
+            title: "Milky Way Through Otago Spires",
+            explanation: "Does the Milky Way always rise between these two rocks? No. Capturing this stunning alignment took careful planning: being in the right place at the right time.",
+            url: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_960.jpg",
+            hdurl: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_1874.jpg",
+            date: "2025-07-02",
+            media_type: "image"
+          });
+        }
+
+        // Handle EPIC result
+        if (epicData.status === 'fulfilled') {
+          setEpic(epicData.value);
+          console.log('EPIC data loaded successfully');
+        } else {
+          console.error('EPIC failed:', epicData.reason);
+          // Fallback EPIC data
+          setEpic({
+            image: "epic_1b_20250701003634",
+            caption: "This image was taken by the NASA EPIC camera onboard the NOAA DSCOVR spacecraft",
+            date: "2025-07-01 00:31:45",
+            centroid_coordinates: { lat: 16.61, lon: 171.39 },
+            imageUrl: "https://epic.gsfc.nasa.gov/archive/natural/2025/07/01/jpg/epic_1b_20250701003634.jpg"
+          });
+        }
+
+        console.log('All data loaded, stopping loading state');
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Critical error in data fetch:', error);
+        setIsLoading(false); // Always stop loading even on critical error
+      }
     };
-
-    // Initialize client-side data
-    setMarsWeather(getMarsWeather());
-    setMarsImage(getMarsImageOfTheWeek());
-    setEarthVsMars(getEarthVsMars());
-    setEarthPhenomena(getEarthPhenomena());
-    setTodayQuote(spaceQuotes[Math.floor(Math.random() * spaceQuotes.length)]);
 
     fetchData();
   }, []);
 
-  // Show loading state until all data is ready
-  if (isLoading || !apod || !epic || !marsWeather || !marsImage || !earthVsMars || !earthPhenomena || !todayQuote) {
+  // Show loading state only while isLoading is true
+  if (isLoading) {
     return (
       <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
         <div className="text-white text-center p-8 flex items-center justify-center gap-3">
@@ -398,6 +465,29 @@ function CosmosContentInternal() {
     );
   }
 
+  // Ensure we have fallback data for missing pieces
+  const safeApod = apod || {
+    title: "Milky Way Through Otago Spires",
+    explanation: "A stunning view of our galaxy through natural rock formations.",
+    url: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_960.jpg",
+    hdurl: "https://apod.nasa.gov/apod/image/2507/MwSpires_Chay_1874.jpg",
+    date: "2025-07-02",
+    media_type: "image"
+  };
+
+  const safeEpic = epic || {
+    image: "epic_1b_20250701003634",
+    caption: "This image was taken by the NASA EPIC camera onboard the NOAA DSCOVR spacecraft",
+    date: "2025-07-01 00:31:45",
+    imageUrl: "https://epic.gsfc.nasa.gov/archive/natural/2025/07/01/jpg/epic_1b_20250701003634.jpg"
+  };
+
+  const safeMarsWeather = marsWeather || getMarsWeather();
+  const safeMarsImage = marsImage || getMarsImageOfTheWeek();
+  const safeEarthVsMars = earthVsMars || getEarthVsMars();
+  const safeEarthPhenomena = earthPhenomena || getEarthPhenomena();
+  const safeTodayQuote = todayQuote || spaceQuotes[0];
+
   return (
     <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
       <div className="flex flex-wrap justify-between gap-3 p-4">
@@ -405,7 +495,7 @@ function CosmosContentInternal() {
       </div>
 
       {/* Enhanced NASA APOD Section */}
-      <APODSection apod={apod} />
+      <APODSection apod={safeApod} />
 
       {/* Enhanced Mars Weather Report with Real Perseverance Photos */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Mars Weather Report</h2>
@@ -414,7 +504,7 @@ function CosmosContentInternal() {
           <div
             className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl relative"
             style={{
-              backgroundImage: `url("${marsImage?.fallbackUrl || 'https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=800&h=600&fit=crop'}")`
+              backgroundImage: `url("${safeMarsImage.fallbackUrl}")`
             }}
           >
             {/* Weather Gauge Overlay */}
@@ -423,64 +513,64 @@ function CosmosContentInternal() {
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <div className="text-[#a2abb3]">Temp</div>
-                  <div className="font-bold">{marsWeather?.highTemp || '-15'}°C</div>
+                  <div className="font-bold">{safeMarsWeather.highTemp}°C</div>
                 </div>
                 <div>
                   <div className="text-[#a2abb3]">Wind</div>
-                  <div className="font-bold">{marsWeather?.windSpeed || '12'}m/s</div>
+                  <div className="font-bold">{safeMarsWeather.windSpeed}m/s</div>
                 </div>
               </div>
             </div>
             
             {/* Image Attribution Overlay */}
             <div className="absolute top-4 right-4 bg-black/70 rounded-lg p-2 text-white">
-              <div className="text-xs font-semibold">Week {marsImage?.week || '228'}</div>
-              <div className="text-xs text-[#a2abb3]">{marsImage?.camera || 'MASTCAM-Z'}</div>
+              <div className="text-xs font-semibold">Week {safeMarsImage.week}</div>
+              <div className="text-xs text-[#a2abb3]">{safeMarsImage.camera}</div>
             </div>
           </div>
           <div className="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
             <p className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-              Sol {marsWeather.sol} ({marsWeather.date})
+              Sol {safeMarsWeather.sol} ({safeMarsWeather.date})
             </p>
             <div className="flex items-end gap-3 justify-between">
               <div className="flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-[#1e2124] rounded-lg p-3">
                     <div className="text-[#a2abb3] text-xs font-semibold mb-1">TEMPERATURE</div>
-                    <div className="text-white text-lg font-bold">{marsWeather.highTemp}°C</div>
-                    <div className="text-[#a2abb3] text-xs">High / {marsWeather.lowTemp}°C Low</div>
+                    <div className="text-white text-lg font-bold">{safeMarsWeather.highTemp}°C</div>
+                    <div className="text-[#a2abb3] text-xs">High / {safeMarsWeather.lowTemp}°C Low</div>
                   </div>
                   <div className="bg-[#1e2124] rounded-lg p-3">
                     <div className="text-[#a2abb3] text-xs font-semibold mb-1">WIND</div>
-                    <div className="text-white text-lg font-bold">{marsWeather.windSpeed}</div>
-                    <div className="text-[#a2abb3] text-xs">m/s from {marsWeather.windDirection}</div>
+                    <div className="text-white text-lg font-bold">{safeMarsWeather.windSpeed}</div>
+                    <div className="text-[#a2abb3] text-xs">m/s from {safeMarsWeather.windDirection}</div>
                   </div>
                   <div className="bg-[#1e2124] rounded-lg p-3">
                     <div className="text-[#a2abb3] text-xs font-semibold mb-1">PRESSURE</div>
-                    <div className="text-white text-lg font-bold">{marsWeather.pressure}</div>
+                    <div className="text-white text-lg font-bold">{safeMarsWeather.pressure}</div>
                     <div className="text-[#a2abb3] text-xs">Pa</div>
                   </div>
                   <div className="bg-[#1e2124] rounded-lg p-3">
                     <div className="text-[#a2abb3] text-xs font-semibold mb-1">UV INDEX</div>
-                    <div className="text-white text-lg font-bold">{marsWeather.uvIndex}</div>
+                    <div className="text-white text-lg font-bold">{safeMarsWeather.uvIndex}</div>
                     <div className="text-[#a2abb3] text-xs">Low (thin atmosphere)</div>
                   </div>
                 </div>
                 <div className="bg-[#1e2124] rounded-lg p-3 mb-3">
                   <div className="text-[#a2abb3] text-xs font-semibold mb-1">TODAY'S MARS IMAGE</div>
-                  <div className="text-white text-sm font-medium mb-1">📸 {marsImage.description}</div>
+                  <div className="text-white text-sm font-medium mb-1">📸 {safeMarsImage.description}</div>
                   <div className="text-[#a2abb3] text-xs">
-                    <strong>Camera:</strong> {marsImage.camera} | <strong>Sol:</strong> {marsImage.sol} | <strong>Week:</strong> {marsImage.week}
+                    <strong>Camera:</strong> {safeMarsImage.camera} | <strong>Sol:</strong> {safeMarsImage.sol} | <strong>Week:</strong> {safeMarsImage.week}
                   </div>
                   <div className="text-[#a2abb3] text-xs mt-1">
                     🗳️ Selected by public vote • Source: <a href="https://mars.nasa.gov/mars2020/multimedia/raw-images/image-of-the-week/" className="text-blue-400 hover:text-blue-300">NASA Mars 2020</a>
                   </div>
                 </div>
                 <p className="text-[#a2abb3] text-sm font-normal leading-normal">
-                  <strong>Conditions:</strong> {marsWeather.skyCondition} | <strong>Season:</strong> {marsWeather.season} | <strong>Location:</strong> {marsWeather.location}
+                  <strong>Conditions:</strong> {safeMarsWeather.skyCondition} | <strong>Season:</strong> {safeMarsWeather.season} | <strong>Location:</strong> {safeMarsWeather.location}
                 </p>
                 <p className="text-[#a2abb3] text-xs leading-relaxed">
-                  � <strong>Live from Mars:</strong> Weather data simulated from NASA's {marsWeather.mission} mission in {marsWeather.location}. 
+                  � <strong>Live from Mars:</strong> Weather data simulated from NASA's {safeMarsWeather.mission} mission in {safeMarsWeather.location}. 
                   Photos rotate daily from NASA's <a href="https://mars.nasa.gov/mars2020/multimedia/raw-images/image-of-the-week/" className="text-blue-400 hover:text-blue-300">Image of the Week</a> collection!
                 </p>
               </div>
@@ -497,7 +587,7 @@ function CosmosContentInternal() {
             <div
               className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
               style={{
-                backgroundImage: epic ? `url("${epic.imageUrl}")` : 'url("https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop")'
+                backgroundImage: `url("${safeEpic.imageUrl}")`
               }}
             ></div>
             {/* Live Data Overlay */}
@@ -507,8 +597,8 @@ function CosmosContentInternal() {
                 LIVE EARTH DATA
               </div>
               <div className="space-y-1 text-xs">
-                <div>Cloud Coverage: {earthPhenomena.cloudCoverage}%</div>
-                <div>Global Temp: {earthPhenomena.globalTemp}°C</div>
+                <div>Cloud Coverage: {safeEarthPhenomena.cloudCoverage}%</div>
+                <div>Global Temp: {safeEarthPhenomena.globalTemp}°C</div>
               </div>
             </div>
           </div>
@@ -518,27 +608,24 @@ function CosmosContentInternal() {
               <div className="flex flex-col gap-3">
                 <div className="bg-[#1e2124] rounded-lg p-3">
                   <div className="text-[#a2abb3] text-xs font-semibold mb-2">TODAY'S NOTABLE PHENOMENON</div>
-                  <div className="text-white text-sm font-medium mb-2">🌍 {earthPhenomena.phenomenon}</div>
+                  <div className="text-white text-sm font-medium mb-2">🌍 {safeEarthPhenomena.phenomenon}</div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
                       <div className="text-[#a2abb3]">Global Avg Temp</div>
-                      <div className="text-white font-bold">{earthPhenomena.globalTemp}°C</div>
+                      <div className="text-white font-bold">{safeEarthPhenomena.globalTemp}°C</div>
                     </div>
                     <div>
                       <div className="text-[#a2abb3]">Cloud Cover</div>
-                      <div className="text-white font-bold">{earthPhenomena.cloudCoverage}%</div>
+                      <div className="text-white font-bold">{safeEarthPhenomena.cloudCoverage}%</div>
                     </div>
                   </div>
                 </div>
                 <p className="text-[#a2abb3] text-sm font-normal leading-normal">
-                  {epic 
-                    ? `This satellite image from NASA's EPIC camera shows Earth's natural color view captured on ${epic.date.split(' ')[0]}. The EPIC camera aboard the DSCOVR satellite provides continuous full Earth observations from the L1 Lagrange point.`
-                    : "This satellite image shows the Earth's cloud cover, revealing weather patterns and atmospheric conditions. The swirling clouds indicate active weather systems, while clear areas suggest calm conditions."
-                  }
+                  This satellite image from NASA's EPIC camera shows Earth's natural color view captured on {safeEpic.date.split(' ')[0]}. The EPIC camera aboard the DSCOVR satellite provides continuous full Earth observations from the L1 Lagrange point.
                 </p>
                 <div className="text-[#a2abb3] text-xs">
-                  <strong>Sea Ice Extent:</strong> {earthPhenomena.seaIceExtent} | 
-                  <strong> Data Source:</strong> {epic ? "NASA EPIC/DSCOVR" : "NASA GIBS"}
+                  <strong>Sea Ice Extent:</strong> {safeEarthPhenomena.seaIceExtent} | 
+                  <strong> Data Source:</strong> NASA EPIC/DSCOVR
                 </div>
               </div>
             </div>
@@ -559,15 +646,15 @@ function CosmosContentInternal() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Weather:</span>
-                <span className="text-white">{earthVsMars.earth.condition}</span>
+                <span className="text-white">{safeEarthVsMars.earth.condition}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Temperature:</span>
-                <span className="text-white">{earthVsMars.earth.temperature}°C</span>
+                <span className="text-white">{safeEarthVsMars.earth.temperature}°C</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Sky Color:</span>
-                <span className="text-white capitalize">{earthVsMars.earth.skyColor}</span>
+                <span className="text-white capitalize">{safeEarthVsMars.earth.skyColor}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Atmosphere:</span>
@@ -580,16 +667,16 @@ function CosmosContentInternal() {
           <div className="bg-[#1e2124] rounded-xl p-4 border border-red-500/20">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs">🔴</div>
-              <h3 className="text-white font-semibold">Mars Sol {marsWeather.sol}</h3>
+              <h3 className="text-white font-semibold">Mars Sol {safeMarsWeather.sol}</h3>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Weather:</span>
-                <span className="text-white">{marsWeather.skyCondition}</span>
+                <span className="text-white">{safeMarsWeather.skyCondition}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Temperature:</span>
-                <span className="text-white">{marsWeather.highTemp}°C</span>
+                <span className="text-white">{safeMarsWeather.highTemp}°C</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#a2abb3]">Sky Color:</span>
@@ -605,7 +692,7 @@ function CosmosContentInternal() {
 
         <div className="bg-[#2c3035] rounded-lg p-3 text-center">
           <p className="text-[#a2abb3] text-sm">
-            <strong>Fun Fact:</strong> If you could stand on Mars today, you'd experience weather {Math.abs(earthVsMars.earth.temperature - marsWeather.highTemp)}°C colder than Earth, 
+            <strong>Fun Fact:</strong> If you could stand on Mars today, you'd experience weather {Math.abs(safeEarthVsMars.earth.temperature - safeMarsWeather.highTemp)}°C colder than Earth, 
             with atmospheric pressure less than 1% of Earth's! The red sky comes from iron oxide (rust) particles suspended in the thin atmosphere.
           </p>
         </div>
@@ -619,10 +706,10 @@ function CosmosContentInternal() {
             <div className="text-4xl">💫</div>
             <div className="flex-1">
               <blockquote className="text-white text-lg font-medium leading-relaxed mb-3 italic">
-                "{todayQuote.text}"
+                "{safeTodayQuote.text}"
               </blockquote>
               <cite className="text-[#a2abb3] text-sm font-medium">
-                — {todayQuote.author}
+                — {safeTodayQuote.author}
               </cite>
             </div>
           </div>
