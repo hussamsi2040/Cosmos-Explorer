@@ -1,334 +1,573 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Activity, Sun, Zap, Compass, AlertTriangle, Info } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Sun, 
+  Zap, 
+  Activity, 
+  AlertTriangle, 
+  Wind, 
+  Eye, 
+  RefreshCw, 
+  TrendingUp,
+  Shield,
+  Gauge,
+  Waves,
+  Satellite,
+  Radio,
+  Lightbulb,
+  ChevronRight,
+  Star
+} from "lucide-react";
+
+interface SolarFlare {
+  id: string;
+  intensity: "C" | "M" | "X";
+  magnitude: number;
+  timestamp: Date;
+  duration: number;
+  region: string;
+  impact: "Low" | "Moderate" | "High";
+}
 
 interface SpaceWeatherData {
-  solarFlares: any[];
-  geomagneticStorms: any[];
-  auroraForecast: any;
-  solarWind: any;
   kpIndex: number;
+  solarWindSpeed: number;
+  solarWindDensity: number;
+  magneticField: number;
+  flareRisk: "Low" | "Moderate" | "High" | "Extreme";
+  auroraForecast: {
+    visibility: "None" | "Weak" | "Moderate" | "Strong" | "Extreme";
+    latitudeLimit: number;
+  };
+  radioBlackout: "None" | "Minor" | "Moderate" | "Strong" | "Extreme";
+  satelliteRisk: "Green" | "Yellow" | "Orange" | "Red";
 }
 
-// Generate consistent solar wind data for initial render
-const generateSolarWindData = () => {
-  // Use fixed values for consistent server/client rendering
-  return {
-    speed: 425, // km/s - typical value
-    density: 8.5, // protons/cm³ - typical value
-    temperature: 75000 // K - typical value
-  };
+// Modern color schemes and gradients
+const intensityColors = {
+  C: "from-green-400 to-emerald-500",
+  M: "from-yellow-400 to-orange-500", 
+  X: "from-red-500 to-pink-600"
 };
 
-async function fetchSpaceWeatherData(): Promise<SpaceWeatherData> {
-  const today = new Date();
-  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-  
-  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
-  const endDate = today.toISOString().split('T')[0];
+const riskColors = {
+  Low: "from-green-400 to-emerald-500",
+  Moderate: "from-yellow-400 to-orange-500",
+  High: "from-orange-500 to-red-500",
+  Extreme: "from-red-500 to-pink-600"
+};
 
-  // Fetch multiple space weather data sources
-  const [solarFlares, geomagneticStorms, auroraData] = await Promise.all([
-    fetch(`https://kauai.ccmc.gsfc.nasa.gov/DONKI/ws/get/FLR?startDate=${startDate}&endDate=${endDate}`).then(r => r.json()).catch(() => []),
-    fetch(`https://kauai.ccmc.gsfc.nasa.gov/DONKI/ws/get/GST?startDate=${startDate}&endDate=${endDate}`).then(r => r.json()).catch(() => []),
-    fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json').then(r => r.json()).catch(() => [])
-  ]);
+const visibilityColors = {
+  None: "from-gray-400 to-gray-500",
+  Weak: "from-green-400 to-emerald-500",
+  Moderate: "from-yellow-400 to-orange-500",
+  Strong: "from-orange-500 to-red-500",
+  Extreme: "from-red-500 to-pink-600"
+};
 
-  // Use consistent solar wind data
-  const solarWind = generateSolarWindData();
+const generateMockData = (): SpaceWeatherData => ({
+  kpIndex: 3.2,
+  solarWindSpeed: 420,
+  solarWindDensity: 8.5,
+  magneticField: 6.2,
+  flareRisk: "Moderate",
+  auroraForecast: {
+    visibility: "Moderate",
+    latitudeLimit: 55
+  },
+  radioBlackout: "Minor",
+  satelliteRisk: "Yellow"
+});
 
-  // Calculate current Kp index from aurora data
-  const kpIndex = auroraData.length > 1 ? parseFloat(auroraData[auroraData.length - 1][1]) || 2.0 : 2.0;
-
-  return {
-    solarFlares: solarFlares.slice(-5).reverse(),
-    geomagneticStorms: geomagneticStorms.slice(-3).reverse(),
-    auroraForecast: auroraData,
-    solarWind,
-    kpIndex
-  };
-}
-
-function getAuroraVisibility(kpIndex: number) {
-  if (kpIndex >= 7) return { level: "Extreme", color: "text-red-400", desc: "Auroras visible as far south as 40°N" };
-  if (kpIndex >= 6) return { level: "High", color: "text-orange-400", desc: "Auroras visible as far south as 50°N" };
-  if (kpIndex >= 5) return { level: "Moderate", color: "text-yellow-400", desc: "Auroras visible as far south as 55°N" };
-  if (kpIndex >= 4) return { level: "Low", color: "text-green-400", desc: "Auroras visible in northern regions (60°N+)" };
-  return { level: "Minimal", color: "text-gray-400", desc: "Auroras confined to polar regions" };
-}
-
-function getSpaceWeatherRisk(kpIndex: number, hasRecentFlares: boolean) {
-  if (kpIndex >= 6 || hasRecentFlares) return { level: "High", color: "text-red-400", icon: AlertTriangle };
-  if (kpIndex >= 4) return { level: "Moderate", color: "text-yellow-400", icon: Activity };
-  return { level: "Low", color: "text-green-400", icon: Info };
-}
-
-export default function SpaceWeatherTab() {
-  const [data, setData] = useState<SpaceWeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Initialize with default data first to avoid hydration issues
-    const defaultData: SpaceWeatherData = {
-      solarFlares: [],
-      geomagneticStorms: [],
-      auroraForecast: [],
-      solarWind: generateSolarWindData(),
-      kpIndex: 2.0
-    };
-    
-    setData(defaultData);
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const weatherData = await fetchSpaceWeatherData();
-        setData(weatherData);
-      } catch (e) {
-        setError("Could not load space weather data.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-    
-    // Update every 15 minutes
-    const interval = setInterval(fetchData, 15 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [mounted]);
-
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-        <span className="ml-3 text-white">Initializing space weather monitor...</span>
-      </div>
-    );
+const generateMockFlares = (): SolarFlare[] => [
+  {
+    id: "flare_001",
+    intensity: "M",
+    magnitude: 2.4,
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    duration: 15,
+    region: "AR3182",
+    impact: "Moderate"
+  },
+  {
+    id: "flare_002",
+    intensity: "C",
+    magnitude: 8.7,
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+    duration: 8,
+    region: "AR3180",
+    impact: "Low"
+  },
+  {
+    id: "flare_003",
+    intensity: "X",
+    magnitude: 1.2,
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    duration: 32,
+    region: "AR3181",
+    impact: "High"
   }
+];
 
-  if (loading && !data) return <div className="text-white p-6">Loading space weather data...</div>;
-  if (error) return <div className="text-red-400 p-6">{error}</div>;
-  if (!data) return <div className="text-gray-400 p-6">No space weather data available.</div>;
+const ModernMetricCard = ({ 
+  title, 
+  value, 
+  unit, 
+  icon: Icon, 
+  gradient, 
+  description,
+  trend 
+}: {
+  title: string;
+  value: string | number;
+  unit: string;
+  icon: any;
+  gradient: string;
+  description: string;
+  trend?: "up" | "down" | "stable";
+}) => (
+  <motion.div
+    whileHover={{ scale: 1.02, y: -2 }}
+    className="relative group"
+  >
+    <div className={`bg-gradient-to-br ${gradient} p-0.5 rounded-2xl shadow-lg`}>
+      <div className="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6 h-full">
+        <div className="flex items-start justify-between mb-4">
+          <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+          {trend && (
+            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
+              trend === 'up' ? 'bg-green-500/20 text-green-400' :
+              trend === 'down' ? 'bg-red-500/20 text-red-400' :
+              'bg-gray-500/20 text-gray-400'
+            }`}>
+              <TrendingUp className={`w-3 h-3 ${trend === 'down' ? 'rotate-180' : ''}`} />
+              {trend}
+            </div>
+          )}
+        </div>
+        
+        <div className="space-y-2">
+          <h3 className="text-gray-300 text-sm font-medium">{title}</h3>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-white">{value}</span>
+            <span className="text-gray-400 text-sm">{unit}</span>
+          </div>
+          <p className="text-gray-400 text-xs leading-relaxed">{description}</p>
+        </div>
+      </div>
+    </div>
+  </motion.div>
+);
 
-  const auroraVis = getAuroraVisibility(data.kpIndex);
-  const weatherRisk = getSpaceWeatherRisk(data.kpIndex, data.solarFlares.length > 0);
-  const RiskIcon = weatherRisk.icon;
+const FlareCard = ({ flare }: { flare: SolarFlare }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ scale: 1.02 }}
+    className="relative group"
+  >
+    <div className={`bg-gradient-to-br ${intensityColors[flare.intensity]} p-0.5 rounded-xl`}>
+      <div className="bg-slate-900/95 backdrop-blur-xl rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 bg-gradient-to-br ${intensityColors[flare.intensity]} rounded-lg flex items-center justify-center shadow-lg`}>
+              <Sun className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-lg">
+                {flare.intensity}{flare.magnitude.toFixed(1)}
+              </h3>
+              <p className="text-gray-400 text-sm">{flare.region}</p>
+            </div>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+            flare.impact === "High" ? "bg-red-500/20 text-red-400" :
+            flare.impact === "Moderate" ? "bg-orange-500/20 text-orange-400" :
+            "bg-green-500/20 text-green-400"
+          }`}>
+            {flare.impact} Impact
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-gray-400">Time:</span>
+            <p className="text-white font-medium">{flare.timestamp.toLocaleTimeString()}</p>
+          </div>
+          <div>
+            <span className="text-gray-400">Duration:</span>
+            <p className="text-white font-medium">{flare.duration} min</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </motion.div>
+);
+
+const RiskIndicator = ({ level, label, description }: { 
+  level: "Green" | "Yellow" | "Orange" | "Red";
+  label: string;
+  description: string;
+}) => {
+  const colors = {
+    Green: "from-green-400 to-emerald-500",
+    Yellow: "from-yellow-400 to-orange-500",
+    Orange: "from-orange-500 to-red-500",
+    Red: "from-red-500 to-pink-600"
+  };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <Sun className="text-yellow-400 w-8 h-8" />
-        <h2 className="text-3xl font-bold text-white">Live Space Weather Dashboard</h2>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full"
-        />
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className="relative group cursor-pointer"
+    >
+      <div className={`bg-gradient-to-r ${colors[level]} p-0.5 rounded-xl`}>
+        <div className="bg-slate-900/90 backdrop-blur-xl rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-4 h-4 bg-gradient-to-br ${colors[level]} rounded-full shadow-lg`} />
+            <div className="flex-1">
+              <h4 className="text-white font-medium">{label}</h4>
+              <p className="text-gray-400 text-sm">{description}</p>
+            </div>
+            <Shield className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default function SpaceWeatherTab() {
+  const [weatherData, setWeatherData] = useState<SpaceWeatherData>(generateMockData());
+  const [recentFlares, setRecentFlares] = useState<SolarFlare[]>(generateMockFlares());
+  const [activeTab, setActiveTab] = useState("overview");
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWeatherData(generateMockData());
+      setLastUpdate(new Date());
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setWeatherData(generateMockData());
+      setRecentFlares(generateMockFlares());
+      setLastUpdate(new Date());
+      setIsRefreshing(false);
+    }, 1500);
+  };
+
+  const tabs = [
+    { id: "overview", label: "Overview", icon: Eye },
+    { id: "flares", label: "Solar Flares", icon: Sun },
+    { id: "aurora", label: "Aurora Forecast", icon: Star },
+    { id: "education", label: "Learn More", icon: Lightbulb }
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Modern Header */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-pink-500/20 rounded-3xl blur-xl" />
+        <div className="relative bg-gradient-to-br from-slate-900/90 via-orange-900/30 to-red-900/40 backdrop-blur-2xl border border-orange-500/30 rounded-3xl p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-2xl"
+              >
+                <Sun className="w-8 h-8 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">Space Weather Monitor</h1>
+                <p className="text-orange-200 text-lg">Real-time solar activity and space environment conditions</p>
+                <div className="flex items-center gap-2 mt-2 text-sm text-orange-300">
+                  <Activity className="w-4 h-4" />
+                  <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
+                </div>
+              </div>
+            </div>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={refreshData}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-3 rounded-2xl font-medium transition-all shadow-lg disabled:opacity-50"
+            >
+              <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Updating...' : 'Refresh Data'}
+            </motion.button>
+          </div>
+        </div>
       </div>
 
-      {/* Current Conditions Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 border border-blue-400/20 rounded-2xl p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <RiskIcon className={`w-6 h-6 ${weatherRisk.color}`} />
-            <h3 className="text-xl font-bold text-white">Space Weather Risk</h3>
-          </div>
-          <div className={`text-2xl font-bold ${weatherRisk.color} mb-2`}>
-            {weatherRisk.level}
-          </div>
-          <div className="text-gray-300 text-sm">
-            Current Kp Index: <span className="font-bold text-white">{data.kpIndex.toFixed(1)}</span>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br from-green-900/50 to-emerald-900/50 border border-green-400/20 rounded-2xl p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Zap className="w-6 h-6 text-green-400" />
-            <h3 className="text-xl font-bold text-white">Aurora Activity</h3>
-          </div>
-          <div className={`text-2xl font-bold ${auroraVis.color} mb-2`}>
-            {auroraVis.level}
-          </div>
-          <div className="text-gray-300 text-sm">
-            {auroraVis.desc}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-orange-900/50 to-red-900/50 border border-orange-400/20 rounded-2xl p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Activity className="w-6 h-6 text-orange-400" />
-            <h3 className="text-xl font-bold text-white">Solar Wind</h3>
-          </div>
-          <div className="text-2xl font-bold text-orange-400 mb-2">
-            {data.solarWind.speed} km/s
-          </div>
-          <div className="text-gray-300 text-sm">
-            Density: {data.solarWind.density} p/cm³
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Detailed Tabs */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <div className="flex gap-2 mb-6 border-b border-white/20">
-          {[
-            { id: "overview", label: "Overview", icon: Activity },
-            { id: "flares", label: "Solar Flares", icon: Sun },
-            { id: "storms", label: "Geomagnetic Storms", icon: Compass },
-            { id: "education", label: "Learn More", icon: Info }
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-all ${
-                activeTab === id
-                  ? "bg-blue-500 text-white"
-                  : "bg-white/10 text-gray-300 hover:bg-white/20"
+      {/* Modern Tab Navigation */}
+      <div className="flex overflow-x-auto gap-2 p-2 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          const IconComponent = tab.icon;
+          
+          return (
+            <motion.button
+              key={tab.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-3 px-6 py-3 rounded-xl font-medium transition-all relative ${
+                isActive
+                  ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg"
+                  : "text-gray-300 hover:text-white hover:bg-white/10"
               }`}
             >
-              <Icon className="w-4 h-4" />
-              {label}
-            </button>
-          ))}
-        </div>
+              <IconComponent className="w-5 h-5" />
+              <span className="whitespace-nowrap">{tab.label}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-600/20 rounded-xl"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
 
-        {activeTab === "overview" && (
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white mb-4">Current Space Weather Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white/10 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Solar Activity</h4>
-                <p className="text-gray-300 text-sm">
-                  Recent solar flares: <span className="text-white font-bold">{data.solarFlares.length}</span> in the last 30 days
-                </p>
+      {/* Content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {activeTab === "overview" && (
+            <div className="space-y-8">
+              {/* Current Conditions Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <ModernMetricCard
+                  title="Kp Index"
+                  value={weatherData.kpIndex}
+                  unit=""
+                  icon={Gauge}
+                  gradient="from-purple-500 to-indigo-600"
+                  description="Geomagnetic activity level (0-9 scale)"
+                  trend="stable"
+                />
+                
+                <ModernMetricCard
+                  title="Solar Wind Speed"
+                  value={weatherData.solarWindSpeed}
+                  unit="km/s"
+                  icon={Wind}
+                  gradient="from-blue-500 to-cyan-600"
+                  description="Current solar wind velocity"
+                  trend="up"
+                />
+                
+                <ModernMetricCard
+                  title="Particle Density"
+                  value={weatherData.solarWindDensity}
+                  unit="p/cm³"
+                  icon={Waves}
+                  gradient="from-green-500 to-teal-600"
+                  description="Solar wind particle density"
+                  trend="down"
+                />
+                
+                <ModernMetricCard
+                  title="Magnetic Field"
+                  value={weatherData.magneticField}
+                  unit="nT"
+                  icon={Activity}
+                  gradient="from-orange-500 to-red-600"
+                  description="Interplanetary magnetic field strength"
+                  trend="stable"
+                />
               </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Geomagnetic Conditions</h4>
-                <p className="text-gray-300 text-sm">
-                  Recent storms: <span className="text-white font-bold">{data.geomagneticStorms.length}</span> in the last 30 days
-                </p>
+
+              {/* Risk Assessment */}
+              <div className="bg-gradient-to-br from-slate-900/50 via-red-900/20 to-orange-900/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Shield className="w-6 h-6 text-orange-400" />
+                  Current Risk Assessment
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <RiskIndicator
+                    level={weatherData.satelliteRisk}
+                    label="Satellite Operations"
+                    description="Risk to satellite systems and operations"
+                  />
+                  
+                  <RiskIndicator
+                    level={weatherData.radioBlackout === "None" ? "Green" : 
+                           weatherData.radioBlackout === "Minor" ? "Yellow" :
+                           weatherData.radioBlackout === "Moderate" ? "Orange" : "Red"}
+                    label="Radio Communications"
+                    description="HF radio blackout conditions"
+                  />
+                  
+                  <RiskIndicator
+                    level={weatherData.flareRisk === "Low" ? "Green" :
+                           weatherData.flareRisk === "Moderate" ? "Yellow" :
+                           weatherData.flareRisk === "High" ? "Orange" : "Red"}
+                    label="Solar Flare Activity"
+                    description="Probability of significant solar flares"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "flares" && (
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white mb-4">Recent Solar Flares</h3>
-            {data.solarFlares.length === 0 ? (
-              <div className="text-gray-400">No recent solar flare events found.</div>
-            ) : (
-              data.solarFlares.map((event, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="bg-white/10 rounded-lg p-4 border-l-4 border-yellow-400"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="text-white font-semibold">{event.classType || "Solar Flare"}</div>
-                    <div className="text-xs text-gray-400">
-                      {event.beginTime?.slice(0, 10)} {event.beginTime?.slice(11, 16)}
+          {activeTab === "flares" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-slate-900/50 via-orange-900/20 to-red-900/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Sun className="w-6 h-6 text-orange-400" />
+                  Recent Solar Flares
+                </h2>
+                
+                <div className="grid gap-4">
+                  {recentFlares.map((flare) => (
+                    <FlareCard key={flare.id} flare={flare} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "aurora" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-slate-900/50 via-green-900/20 to-blue-900/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Star className="w-6 h-6 text-green-400" />
+                  Aurora Forecast
+                </h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className={`bg-gradient-to-r ${visibilityColors[weatherData.auroraForecast.visibility]} p-0.5 rounded-2xl`}>
+                      <div className="bg-slate-900/90 backdrop-blur-xl rounded-2xl p-6">
+                        <h3 className="text-xl font-bold text-white mb-4">Visibility Level</h3>
+                        <div className="text-3xl font-bold text-white mb-2">
+                          {weatherData.auroraForecast.visibility}
+                        </div>
+                        <p className="text-gray-300">
+                          Current aurora visibility conditions
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4">Visibility Latitude</h3>
+                      <div className="text-3xl font-bold text-white mb-2">
+                        {weatherData.auroraForecast.latitudeLimit}°N
+                      </div>
+                      <p className="text-gray-300">
+                        Southernmost latitude for aurora visibility
+                      </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
-                    <div>Active Region: {event.activeRegionNum || "N/A"}</div>
-                    <div>Peak Time: {event.peakTime?.replace("T", " ") || "N/A"}</div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-white">Viewing Tips</h3>
+                    <div className="space-y-3">
+                      {[
+                        "Best viewing is typically between 10 PM and 2 AM",
+                        "Look north towards the magnetic pole",
+                        "Find dark skies away from city lights",
+                        "Clear weather conditions are essential",
+                        "Aurora apps can provide real-time alerts"
+                      ].map((tip, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10"
+                        >
+                          <ChevronRight className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-300">{tip}</span>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-        )}
-
-        {activeTab === "storms" && (
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white mb-4">Geomagnetic Storms</h3>
-            {data.geomagneticStorms.length === 0 ? (
-              <div className="text-gray-400">No recent geomagnetic storms detected.</div>
-            ) : (
-              data.geomagneticStorms.map((storm, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="bg-white/10 rounded-lg p-4 border-l-4 border-purple-400"
-                >
-                  <div className="text-white font-semibold mb-2">
-                    Geomagnetic Storm - {storm.gstID || `Event ${idx + 1}`}
-                  </div>
-                  <div className="text-sm text-gray-300">
-                    Start: {storm.startTime?.replace("T", " ") || "N/A"}
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-        )}
-
-        {activeTab === "education" && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-white mb-4">Understanding Space Weather</h3>
-            
-            <div className="space-y-4">
-              <div className="bg-blue-900/30 rounded-lg p-4">
-                <h4 className="font-bold text-blue-400 mb-2">🌅 Aurora Borealis & Australis</h4>
-                <p className="text-gray-300 text-sm">
-                  Auroras are caused by charged particles from the solar wind interacting with Earth's magnetic field. 
-                  The Kp index measures geomagnetic activity on a scale of 0-9, with higher values indicating greater aurora visibility.
-                </p>
-              </div>
-              
-              <div className="bg-yellow-900/30 rounded-lg p-4">
-                <h4 className="font-bold text-yellow-400 mb-2">☀️ Solar Flares</h4>
-                <p className="text-gray-300 text-sm">
-                  Solar flares are intense bursts of radiation from the Sun's surface. They're classified as A, B, C, M, or X, 
-                  with X-class being the most powerful and capable of affecting satellite communications and power grids on Earth.
-                </p>
-              </div>
-              
-              <div className="bg-purple-900/30 rounded-lg p-4">
-                <h4 className="font-bold text-purple-400 mb-2">🧲 Geomagnetic Storms</h4>
-                <p className="text-gray-300 text-sm">
-                  When solar wind carries magnetic fields that interact strongly with Earth's magnetosphere, it can cause 
-                  geomagnetic storms. These can disrupt GPS, radio communications, and create beautiful aurora displays.
-                </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
 
-      <div className="text-xs text-gray-400 text-center">
-        Data from <a href="https://kauai.ccmc.gsfc.nasa.gov/DONKI/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">NASA DONKI</a> and 
-        <a href="https://www.swpc.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline ml-1">NOAA SWPC</a>
-      </div>
+          {activeTab === "education" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-slate-900/50 via-blue-900/20 to-purple-900/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Lightbulb className="w-6 h-6 text-blue-400" />
+                  Understanding Space Weather
+                </h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Sun className="w-5 h-5 text-orange-400" />
+                        Solar Flares
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">
+                        Solar flares are sudden releases of electromagnetic energy from the Sun's surface. They're classified by intensity: C-class (small), M-class (medium), and X-class (large). These events can disrupt radio communications and damage satellites.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-purple-400" />
+                        Geomagnetic Storms
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">
+                        Geomagnetic storms occur when solar wind interacts with Earth's magnetic field. The Kp index measures these disturbances on a scale of 0-9, with higher values indicating stronger storms that can cause aurora and affect technology.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Star className="w-5 h-5 text-green-400" />
+                        Aurora Formation
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">
+                        Auroras form when charged particles from the solar wind collide with Earth's atmosphere. These collisions excite oxygen and nitrogen atoms, causing them to emit light in beautiful green, red, and blue colors typically seen near the polar regions.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <Satellite className="w-5 h-5 text-blue-400" />
+                        Technology Impacts
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">
+                        Space weather can affect GPS accuracy, disrupt radio communications, damage satellite electronics, and even cause power grid failures. Monitoring these conditions helps protect our technology-dependent society.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 } 

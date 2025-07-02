@@ -1,577 +1,694 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, Globe, Thermometer, Ruler, Clock, Star, Info, Eye, Zap } from "lucide-react";
+import { 
+  Star, 
+  Search, 
+  Filter, 
+  Info, 
+  Eye, 
+  Zap, 
+  Thermometer, 
+  Timer, 
+  Target,
+  Globe,
+  Telescope,
+  Orbit,
+  ChevronRight,
+  ExternalLink,
+  Sparkles,
+  Sun
+} from "lucide-react";
 
 interface Exoplanet {
   id: string;
   name: string;
-  discoveryMethod: "transit" | "radial_velocity" | "direct_imaging" | "gravitational_microlensing" | "other";
-  discoveryYear: number;
   hostStar: string;
-  orbitalPeriod: number; // days
+  distanceFromEarth: number; // light years
   planetRadius: number; // Earth radii
-  planetMass?: number; // Earth masses
-  stellarDistance: number; // light years
-  equilibriumTemp?: number; // Kelvin
-  habitableZone: "too_hot" | "habitable" | "too_cold" | "unknown";
-  composition: "rocky" | "gas_giant" | "ice_giant" | "super_earth" | "unknown";
-  confirmed: boolean;
-  // Add consistent positioning for visualization
+  planetMass: number; // Earth masses
+  orbitalPeriod: number; // days
+  discoveryMethod: string;
+  discoveryYear: number;
+  temperature: number; // Kelvin
+  habitableZone: boolean;
+  atmosphereType: string;
+  surfaceType: string;
   visualPosition: { x: number; y: number };
+  starType: string;
+  planetType: string;
 }
 
-const DISCOVERY_METHODS = {
-  transit: { 
-    icon: Eye, 
-    color: "text-blue-400", 
-    bg: "bg-blue-900/30", 
-    label: "Transit Method",
-    description: "Planet passes in front of its star"
+const discoveryMethods = [
+  "Transit",
+  "Radial Velocity", 
+  "Direct Imaging",
+  "Gravitational Microlensing",
+  "Astrometry"
+];
+
+const planetTypes = [
+  "Super Earth",
+  "Neptune-like", 
+  "Jupiter-like",
+  "Earth-like",
+  "Rocky"
+];
+
+// Modern gradient colors for different planet types
+const planetColors = {
+  "Super Earth": "from-green-400 to-emerald-600",
+  "Neptune-like": "from-blue-400 to-cyan-600",
+  "Jupiter-like": "from-orange-400 to-red-600",
+  "Earth-like": "from-blue-500 to-green-500",
+  "Rocky": "from-gray-400 to-slate-600"
+};
+
+const methodColors = {
+  "Transit": "from-purple-500 to-indigo-600",
+  "Radial Velocity": "from-blue-500 to-cyan-600",
+  "Direct Imaging": "from-yellow-400 to-orange-500",
+  "Gravitational Microlensing": "from-pink-500 to-rose-600",
+  "Astrometry": "from-green-500 to-teal-600"
+};
+
+// Enhanced mock data
+const generateExoplanets = (): Exoplanet[] => [
+  {
+    id: "kepler_452b",
+    name: "Kepler-452b",
+    hostStar: "Kepler-452",
+    distanceFromEarth: 1400,
+    planetRadius: 1.6,
+    planetMass: 5.0,
+    orbitalPeriod: 385,
+    discoveryMethod: "Transit",
+    discoveryYear: 2015,
+    temperature: 265,
+    habitableZone: true,
+    atmosphereType: "Unknown",
+    surfaceType: "Possibly Rocky",
+    visualPosition: { x: 25, y: 35 },
+    starType: "G-type (Sun-like)",
+    planetType: "Super Earth"
   },
-  radial_velocity: { 
-    icon: Zap, 
-    color: "text-green-400", 
-    bg: "bg-green-900/30", 
-    label: "Radial Velocity",
-    description: "Star wobbles due to planetary gravity"
+  {
+    id: "trappist_1e",
+    name: "TRAPPIST-1e",
+    hostStar: "TRAPPIST-1",
+    distanceFromEarth: 40,
+    planetRadius: 0.92,
+    planetMass: 0.77,
+    orbitalPeriod: 6.1,
+    discoveryMethod: "Transit",
+    discoveryYear: 2017,
+    temperature: 251,
+    habitableZone: true,
+    atmosphereType: "Thin",
+    surfaceType: "Rocky",
+    visualPosition: { x: 60, y: 20 },
+    starType: "M-dwarf",
+    planetType: "Earth-like"
   },
-  direct_imaging: { 
-    icon: Star, 
-    color: "text-yellow-400", 
-    bg: "bg-yellow-900/30", 
-    label: "Direct Imaging",
-    description: "Planet photographed directly"
+  {
+    id: "proxima_b",
+    name: "Proxima Centauri b",
+    hostStar: "Proxima Centauri",
+    distanceFromEarth: 4.2,
+    planetRadius: 1.1,
+    planetMass: 1.3,
+    orbitalPeriod: 11.2,
+    discoveryMethod: "Radial Velocity",
+    discoveryYear: 2016,
+    temperature: 234,
+    habitableZone: true,
+    atmosphereType: "Unknown",
+    surfaceType: "Rocky",
+    visualPosition: { x: 80, y: 60 },
+    starType: "M-dwarf",
+    planetType: "Earth-like"
   },
-  gravitational_microlensing: { 
-    icon: Globe, 
-    color: "text-purple-400", 
-    bg: "bg-purple-900/30", 
-    label: "Microlensing",
-    description: "Gravitational lensing effect"
+  {
+    id: "hd_209458b",
+    name: "HD 209458 b",
+    hostStar: "HD 209458",
+    distanceFromEarth: 159,
+    planetRadius: 1.35,
+    planetMass: 0.69,
+    orbitalPeriod: 3.5,
+    discoveryMethod: "Transit",
+    discoveryYear: 1999,
+    temperature: 1130,
+    habitableZone: false,
+    atmosphereType: "Hydrogen-Helium",
+    surfaceType: "Gas Giant",
+    visualPosition: { x: 15, y: 75 },
+    starType: "G-type",
+    planetType: "Jupiter-like"
   },
-  other: { 
-    icon: Search, 
-    color: "text-gray-400", 
-    bg: "bg-gray-900/30", 
-    label: "Other Methods",
-    description: "Various other detection techniques"
+  {
+    id: "toi_715b",
+    name: "TOI-715 b",
+    hostStar: "TOI-715",
+    distanceFromEarth: 137,
+    planetRadius: 1.55,
+    planetMass: 3.02,
+    orbitalPeriod: 19.3,
+    discoveryMethod: "Transit",
+    discoveryYear: 2024,
+    temperature: 280,
+    habitableZone: true,
+    atmosphereType: "Unknown",
+    surfaceType: "Super Earth",
+    visualPosition: { x: 45, y: 80 },
+    starType: "M-dwarf",
+    planetType: "Super Earth"
+  },
+  {
+    id: "wasp_12b",
+    name: "WASP-12b",
+    hostStar: "WASP-12",
+    distanceFromEarth: 871,
+    planetRadius: 1.9,
+    planetMass: 1.4,
+    orbitalPeriod: 1.1,
+    discoveryMethod: "Transit",
+    discoveryYear: 2008,
+    temperature: 2516,
+    habitableZone: false,
+    atmosphereType: "Hydrogen-Helium",
+    surfaceType: "Hot Jupiter",
+    visualPosition: { x: 70, y: 45 },
+    starType: "G-type",
+    planetType: "Jupiter-like"
   }
-};
+];
 
-const HABITABILITY = {
-  too_hot: { color: "text-red-400", bg: "bg-red-900/30", label: "Too Hot", emoji: "🔥" },
-  habitable: { color: "text-green-400", bg: "bg-green-900/30", label: "Potentially Habitable", emoji: "🌍" },
-  too_cold: { color: "text-blue-400", bg: "bg-blue-900/30", label: "Too Cold", emoji: "❄️" },
-  unknown: { color: "text-gray-400", bg: "bg-gray-900/30", label: "Unknown", emoji: "❓" }
-};
-
-const COMPOSITION = {
-  rocky: { color: "text-orange-400", label: "Rocky Planet", emoji: "🪨" },
-  gas_giant: { color: "text-purple-400", label: "Gas Giant", emoji: "🪐" },
-  ice_giant: { color: "text-cyan-400", label: "Ice Giant", emoji: "🧊" },
-  super_earth: { color: "text-green-400", label: "Super-Earth", emoji: "🌍" },
-  unknown: { color: "text-gray-400", label: "Unknown", emoji: "❓" }
-};
-
-// Sample exoplanet data with fixed positions for consistent rendering
-const generateExoplanetData = (): Exoplanet[] => {
-  const planets: Exoplanet[] = [
-    {
-      id: "kepler-452b",
-      name: "Kepler-452b",
-      discoveryMethod: "transit",
-      discoveryYear: 2015,
-      hostStar: "Kepler-452",
-      orbitalPeriod: 384.8,
-      planetRadius: 1.6,
-      stellarDistance: 1402,
-      equilibriumTemp: 265,
-      habitableZone: "habitable",
-      composition: "super_earth",
-      confirmed: true,
-      visualPosition: { x: 25, y: 30 }
-    },
-    {
-      id: "proxima-b",
-      name: "Proxima Centauri b",
-      discoveryMethod: "radial_velocity",
-      discoveryYear: 2016,
-      hostStar: "Proxima Centauri",
-      orbitalPeriod: 11.2,
-      planetRadius: 1.1,
-      planetMass: 1.27,
-      stellarDistance: 4.24,
-      equilibriumTemp: 234,
-      habitableZone: "habitable",
-      composition: "rocky",
-      confirmed: true,
-      visualPosition: { x: 60, y: 20 }
-    },
-    {
-      id: "trappist-1e",
-      name: "TRAPPIST-1e",
-      discoveryMethod: "transit",
-      discoveryYear: 2017,
-      hostStar: "TRAPPIST-1",
-      orbitalPeriod: 6.1,
-      planetRadius: 0.92,
-      planetMass: 0.62,
-      stellarDistance: 40.7,
-      equilibriumTemp: 251,
-      habitableZone: "habitable",
-      composition: "rocky",
-      confirmed: true,
-      visualPosition: { x: 80, y: 60 }
-    },
-    {
-      id: "k2-18b",
-      name: "K2-18b",
-      discoveryMethod: "transit",
-      discoveryYear: 2015,
-      hostStar: "K2-18",
-      orbitalPeriod: 33.0,
-      planetRadius: 2.3,
-      planetMass: 8.6,
-      stellarDistance: 124,
-      equilibriumTemp: 265,
-      habitableZone: "habitable",
-      composition: "super_earth",
-      confirmed: true,
-      visualPosition: { x: 40, y: 70 }
-    },
-    {
-      id: "hd-209458b",
-      name: "HD 209458b",
-      discoveryMethod: "transit",
-      discoveryYear: 1999,
-      hostStar: "HD 209458",
-      orbitalPeriod: 3.5,
-      planetRadius: 1.4,
-      stellarDistance: 159,
-      equilibriumTemp: 1400,
-      habitableZone: "too_hot",
-      composition: "gas_giant",
-      confirmed: true,
-      visualPosition: { x: 15, y: 80 }
-    },
-    {
-      id: "gliese-581g",
-      name: "Gliese 581g",
-      discoveryMethod: "radial_velocity",
-      discoveryYear: 2010,
-      hostStar: "Gliese 581",
-      orbitalPeriod: 36.6,
-      planetRadius: 1.5,
-      planetMass: 3.1,
-      stellarDistance: 20.4,
-      habitableZone: "habitable",
-      composition: "super_earth",
-      confirmed: false,
-      visualPosition: { x: 70, y: 40 }
-    },
-    {
-      id: "wolf-359c",
-      name: "Wolf 359c",
-      discoveryMethod: "radial_velocity",
-      discoveryYear: 2019,
-      hostStar: "Wolf 359",
-      orbitalPeriod: 2800,
-      planetRadius: 1.8,
-      stellarDistance: 7.9,
-      equilibriumTemp: 180,
-      habitableZone: "too_cold",
-      composition: "super_earth",
-      confirmed: true,
-      visualPosition: { x: 50, y: 15 }
-    },
-    {
-      id: "toi-715b",
-      name: "TOI-715b",
-      discoveryMethod: "transit",
-      discoveryYear: 2024,
-      hostStar: "TOI-715",
-      orbitalPeriod: 19.3,
-      planetRadius: 1.55,
-      stellarDistance: 137,
-      habitableZone: "habitable",
-      composition: "super_earth",
-      confirmed: true,
-      visualPosition: { x: 35, y: 50 }
-    }
-  ];
-
-  return planets;
-};
-
-export default function ExoplanetExplorer() {
-  const [exoplanets, setExoplanets] = useState<Exoplanet[]>([]);
-  const [selectedPlanet, setSelectedPlanet] = useState<Exoplanet | null>(null);
-  const [filter, setFilter] = useState({
-    method: "all",
-    habitability: "all",
-    composition: "all"
-  });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"distance" | "discovery" | "size">("distance");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Load data only on client side to avoid hydration issues
-    setExoplanets(generateExoplanetData());
-    setMounted(true);
-  }, []);
-
-  const filteredPlanets = useMemo(() => {
-    if (!mounted) return [];
-    
-    return exoplanets
-      .filter(planet => {
-        const nameMatch = planet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         planet.hostStar.toLowerCase().includes(searchTerm.toLowerCase());
-        const methodMatch = filter.method === "all" || planet.discoveryMethod === filter.method;
-        const habitMatch = filter.habitability === "all" || planet.habitableZone === filter.habitability;
-        const compMatch = filter.composition === "all" || planet.composition === filter.composition;
-        
-        return nameMatch && methodMatch && habitMatch && compMatch;
-      })
-      .sort((a, b) => {
-        switch (sortBy) {
-          case "distance":
-            return a.stellarDistance - b.stellarDistance;
-          case "discovery":
-            return b.discoveryYear - a.discoveryYear;
-          case "size":
-            return b.planetRadius - a.planetRadius;
-          default:
-            return 0;
-        }
-      });
-  }, [exoplanets, filter, searchTerm, sortBy, mounted]);
-
-  const stats = useMemo(() => {
-    if (!mounted) return { habitable: 0, confirmed: 0, total: 0, closest: null };
-    
-    const habitable = exoplanets.filter(p => p.habitableZone === "habitable").length;
-    const confirmed = exoplanets.filter(p => p.confirmed).length;
-    const closest = exoplanets.reduce((min, planet) => 
-      planet.stellarDistance < min.stellarDistance ? planet : min
-    );
-    
-    return { habitable, confirmed, total: exoplanets.length, closest };
-  }, [exoplanets, mounted]);
-
-  const PlanetVisualization = ({ planet }: { planet: Exoplanet }) => {
-    const size = Math.max(20, Math.min(100, planet.planetRadius * 30));
-    const habitability = HABITABILITY[planet.habitableZone];
-    const composition = COMPOSITION[planet.composition];
-
-    return (
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.1 }}
-        onClick={() => setSelectedPlanet(planet)}
-        className="absolute cursor-pointer group"
-        style={{
-          left: `${planet.visualPosition.x}%`,
-          top: `${planet.visualPosition.y}%`,
-          transform: 'translate(-50%, -50%)'
-        }}
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: Math.max(5, planet.orbitalPeriod / 10), repeat: Infinity, ease: "linear" }}
-          className={`rounded-full ${habitability.bg} border-2 border-current ${habitability.color} flex items-center justify-center`}
-          style={{ width: size, height: size }}
-        >
-          <span className="text-lg">{composition.emoji}</span>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          {planet.name}
-        </motion.div>
-      </motion.div>
-    );
-  };
-
-  const PlanetCard = ({ planet }: { planet: Exoplanet }) => {
-    const method = DISCOVERY_METHODS[planet.discoveryMethod];
-    const habitability = HABITABILITY[planet.habitableZone];
-    const composition = COMPOSITION[planet.composition];
-    const MethodIcon = method.icon;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        onClick={() => setSelectedPlanet(planet)}
-        className={`${method.bg} border border-white/10 rounded-lg p-4 cursor-pointer hover:bg-white/10 transition-all`}
-      >
-        <div className="flex justify-between items-start mb-3">
+const PlanetCard = ({ planet, onSelect }: { planet: Exoplanet; onSelect: (planet: Exoplanet) => void }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ scale: 1.02, y: -2 }}
+    onClick={() => onSelect(planet)}
+    className="cursor-pointer group relative"
+  >
+    <div className={`bg-gradient-to-br ${planetColors[planet.planetType as keyof typeof planetColors]} p-0.5 rounded-2xl shadow-lg`}>
+      <div className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 h-full">
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <MethodIcon className={`w-6 h-6 ${method.color}`} />
+            <div className={`w-12 h-12 bg-gradient-to-br ${planetColors[planet.planetType as keyof typeof planetColors]} rounded-xl flex items-center justify-center shadow-lg`}>
+              <Globe className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h3 className="text-white font-bold">{planet.name}</h3>
-              <p className="text-sm text-gray-400">{planet.hostStar}</p>
+              <h3 className="font-bold text-white text-lg leading-tight">{planet.name}</h3>
+              <p className="text-gray-400 text-sm">{planet.hostStar}</p>
             </div>
           </div>
-          <div className="flex gap-1">
-            <span className="text-lg">{composition.emoji}</span>
-            <span className="text-lg">{habitability.emoji}</span>
-            {!planet.confirmed && <span className="text-lg">❓</span>}
+          
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+            planet.habitableZone 
+              ? "bg-green-500/20 text-green-400 border border-green-500/30" 
+              : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+          }`}>
+            {planet.habitableZone ? "Habitable Zone" : "Outside HZ"}
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 text-xs text-gray-300">
-          <div>
-            <span className="text-gray-400">Distance:</span>
-            <div className="text-white font-bold">{planet.stellarDistance.toFixed(1)} ly</div>
-          </div>
-          <div>
-            <span className="text-gray-400">Radius:</span>
-            <div className="text-white font-bold">{planet.planetRadius.toFixed(1)}× Earth</div>
-          </div>
-          <div>
-            <span className="text-gray-400">Period:</span>
-            <div className="text-white">{planet.orbitalPeriod.toFixed(1)} days</div>
-          </div>
-          <div>
-            <span className="text-gray-400">Discovered:</span>
-            <div className="text-white">{planet.discoveryYear}</div>
-          </div>
-        </div>
-
-        <div className="mt-3 flex gap-2 flex-wrap">
-          <span className={`text-xs px-2 py-1 rounded-full ${habitability.bg} ${habitability.color}`}>
-            {habitability.label}
-          </span>
-          <span className={`text-xs px-2 py-1 rounded-full bg-white/10 ${composition.color}`}>
-            {composition.label}
-          </span>
-        </div>
-      </motion.div>
-    );
-  };
-
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-        <span className="ml-3 text-white">Loading exoplanet data...</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Globe className="text-blue-400 w-8 h-8" />
-          <h2 className="text-3xl font-bold text-white">Exoplanet Explorer</h2>
-        </div>
-        <div className="text-sm text-gray-400">
-          {filteredPlanets.length} of {exoplanets.length} planets
-        </div>
-      </div>
-
-      {/* Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-white">{stats.total}</div>
-          <div className="text-sm text-gray-400">Total Exoplanets</div>
-        </div>
-        <div className="bg-green-900/30 border border-green-400/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-400">{stats.habitable}</div>
-          <div className="text-sm text-gray-400">Potentially Habitable</div>
-        </div>
-        <div className="bg-blue-900/30 border border-blue-400/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-400">{stats.confirmed}</div>
-          <div className="text-sm text-gray-400">Confirmed Planets</div>
-        </div>
-        <div className="bg-purple-900/30 border border-purple-400/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-purple-400">
-            {stats.closest ? stats.closest.stellarDistance.toFixed(1) : '0'}
-          </div>
-          <div className="text-sm text-gray-400">Closest (ly)</div>
-        </div>
-      </div>
-
-      {/* Interactive Visualization */}
-      <div className="bg-gradient-to-b from-black via-purple-900/20 to-black rounded-2xl border border-white/10 h-96 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[length:50px_50px] opacity-30"></div>
-        <div className="absolute top-4 left-4 text-white">
-          <h3 className="text-lg font-bold mb-2">Solar Neighborhood</h3>
-          <p className="text-sm text-gray-400">Click planets to explore • Size = radius • Color = habitability</p>
         </div>
         
-        {filteredPlanets.slice(0, 15).map(planet => (
-          <PlanetVisualization key={planet.id} planet={planet} />
-        ))}
-      </div>
-
-      {/* Filters and Search */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search planets or stars..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+          <div>
+            <span className="text-gray-400">Distance:</span>
+            <p className="text-white font-medium">{planet.distanceFromEarth} ly</p>
+          </div>
+          <div>
+            <span className="text-gray-400">Discovery:</span>
+            <p className="text-white font-medium">{planet.discoveryYear}</p>
+          </div>
+          <div>
+            <span className="text-gray-400">Method:</span>
+            <p className="text-white font-medium">{planet.discoveryMethod}</p>
+          </div>
+          <div>
+            <span className="text-gray-400">Type:</span>
+            <p className="text-white font-medium">{planet.planetType}</p>
+          </div>
         </div>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
-          className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="distance">Sort by Distance</option>
-          <option value="discovery">Sort by Discovery Year</option>
-          <option value="size">Sort by Size</option>
-        </select>
-
-        <div className="flex gap-2">
-          <select
-            value={filter.habitability}
-            onChange={(e) => setFilter(prev => ({ ...prev, habitability: e.target.value }))}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Habitable Zones</option>
-            <option value="habitable">Potentially Habitable</option>
-            <option value="too_hot">Too Hot</option>
-            <option value="too_cold">Too Cold</option>
-          </select>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Thermometer className="w-4 h-4 text-orange-400" />
+            <span className="text-sm text-gray-300">{planet.temperature}K</span>
+          </div>
+          
+          <div className="flex items-center gap-1 text-blue-400 group-hover:text-blue-300 transition-colors">
+            <span className="text-sm font-medium">Explore</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
         </div>
       </div>
+    </div>
+  </motion.div>
+);
 
-      {/* Planet List */}
-      <div>
-        <h3 className="text-xl font-bold text-white mb-4">Discovered Exoplanets</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredPlanets.map(planet => (
-            <PlanetCard key={planet.id} planet={planet} />
-          ))}
+const PlanetModal = ({ planet, onClose }: { planet: Exoplanet; onClose: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    onClick={onClose}
+  >
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.9, opacity: 0 }}
+      onClick={(e) => e.stopPropagation()}
+      className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+    >
+      <div className={`bg-gradient-to-br ${planetColors[planet.planetType as keyof typeof planetColors]} p-1 rounded-3xl`}>
+        <div className="bg-slate-900/95 backdrop-blur-2xl rounded-3xl p-8">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 bg-gradient-to-br ${planetColors[planet.planetType as keyof typeof planetColors]} rounded-2xl flex items-center justify-center shadow-2xl`}>
+                <Globe className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-2">{planet.name}</h2>
+                <p className="text-gray-300 text-lg">Orbiting {planet.hostStar}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Star className="w-4 h-4 text-yellow-400" />
+                  <span className="text-gray-400 text-sm">{planet.starType}</span>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+            >
+              <span className="sr-only">Close</span>
+              <div className="w-6 h-6 text-gray-400">✕</div>
+            </button>
+          </div>
+
+          {/* Key Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Target className="w-6 h-6 text-blue-400" />
+                <h3 className="text-lg font-bold text-white">Physical Properties</h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-gray-400 text-sm">Radius:</span>
+                  <p className="text-white font-medium">{planet.planetRadius} Earth radii</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Mass:</span>
+                  <p className="text-white font-medium">{planet.planetMass} Earth masses</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Temperature:</span>
+                  <p className="text-white font-medium">{planet.temperature}K ({(planet.temperature - 273).toFixed(0)}°C)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Orbit className="w-6 h-6 text-purple-400" />
+                <h3 className="text-lg font-bold text-white">Orbital Characteristics</h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-gray-400 text-sm">Orbital Period:</span>
+                  <p className="text-white font-medium">{planet.orbitalPeriod} days</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Distance from Earth:</span>
+                  <p className="text-white font-medium">{planet.distanceFromEarth} light years</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Discovery Year:</span>
+                  <p className="text-white font-medium">{planet.discoveryYear}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Telescope className="w-6 h-6 text-green-400" />
+                <h3 className="text-lg font-bold text-white">Discovery & Environment</h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-gray-400 text-sm">Discovery Method:</span>
+                  <p className="text-white font-medium">{planet.discoveryMethod}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Planet Type:</span>
+                  <p className="text-white font-medium">{planet.planetType}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm">Surface Type:</span>
+                  <p className="text-white font-medium">{planet.surfaceType}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Information */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5 text-blue-400" />
+                  Habitability Assessment
+                </h3>
+                <div className={`p-4 rounded-xl border ${
+                  planet.habitableZone 
+                    ? "bg-green-500/10 border-green-500/30" 
+                    : "bg-red-500/10 border-red-500/30"
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      planet.habitableZone ? "bg-green-400" : "bg-red-400"
+                    }`} />
+                    <span className={`font-medium ${
+                      planet.habitableZone ? "text-green-400" : "text-red-400"
+                    }`}>
+                      {planet.habitableZone ? "In Habitable Zone" : "Outside Habitable Zone"}
+                    </span>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {planet.habitableZone 
+                      ? "This planet orbits within the habitable zone where liquid water could potentially exist on its surface, making it a candidate for supporting life as we know it."
+                      : "This planet orbits outside the habitable zone, making it unlikely to support liquid water or Earth-like life on its surface."
+                    }
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-orange-400" />
+                  Atmosphere & Composition
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-gray-400 text-sm">Atmosphere Type:</span>
+                    <p className="text-white font-medium">{planet.atmosphereType}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 text-sm">Surface Composition:</span>
+                    <p className="text-white font-medium">{planet.surfaceType}</p>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    Understanding a planet's atmospheric composition is crucial for determining its potential habitability and climate conditions.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Telescope className="w-5 h-5 text-purple-400" />
+                  Discovery Method Explained
+                </h3>
+                <div className={`p-4 rounded-xl bg-gradient-to-r ${methodColors[planet.discoveryMethod as keyof typeof methodColors]}/10 border border-white/20`}>
+                  <h4 className="font-medium text-white mb-2">{planet.discoveryMethod}</h4>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {planet.discoveryMethod === "Transit" && "Detected by observing the slight dimming of the host star's light as the planet passes in front of it."}
+                    {planet.discoveryMethod === "Radial Velocity" && "Discovered by measuring the wobble of the host star caused by the gravitational pull of the orbiting planet."}
+                    {planet.discoveryMethod === "Direct Imaging" && "Directly photographed by blocking out the light from the host star to reveal the planet."}
+                    {planet.discoveryMethod === "Gravitational Microlensing" && "Detected when the planet's gravity bends and magnifies light from a background star."}
+                    {planet.discoveryMethod === "Astrometry" && "Found by precisely measuring the position of the host star as it moves due to planetary gravitational influence."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-400" />
+                  Host Star Information
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-gray-400 text-sm">Star Type:</span>
+                    <p className="text-white font-medium">{planet.starType}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 text-sm">Distance from Earth:</span>
+                    <p className="text-white font-medium">{planet.distanceFromEarth} light years</p>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    The characteristics of the host star greatly influence the planet's temperature, radiation environment, and potential for habitability.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Learn More Section */}
+          <div className="mt-8 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-white/20 rounded-2xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">Want to Learn More?</h3>
+                <p className="text-gray-300 text-sm">Explore detailed scientific data and discoveries about this exoplanet</p>
+              </div>
+              <div className="flex gap-3">
+                <button className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-xl text-blue-400 font-medium transition-colors">
+                  <ExternalLink className="w-4 h-4" />
+                  NASA Exoplanet Archive
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  </motion.div>
+);
+
+export default function ExoplanetExplorer() {
+  const [planets] = useState<Exoplanet[]>(generateExoplanets());
+  const [filteredPlanets, setFilteredPlanets] = useState<Exoplanet[]>(planets);
+  const [selectedPlanet, setSelectedPlanet] = useState<Exoplanet | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterMethod, setFilterMethod] = useState("All");
+  const [filterHabitable, setFilterHabitable] = useState("All");
+  const [showVisualMode, setShowVisualMode] = useState(false);
+
+  useEffect(() => {
+    let filtered = planets;
+
+    if (searchQuery) {
+      filtered = filtered.filter(planet =>
+        planet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        planet.hostStar.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (filterMethod !== "All") {
+      filtered = filtered.filter(planet => planet.discoveryMethod === filterMethod);
+    }
+
+    if (filterHabitable !== "All") {
+      const isHabitable = filterHabitable === "Habitable";
+      filtered = filtered.filter(planet => planet.habitableZone === isHabitable);
+    }
+
+    setFilteredPlanets(filtered);
+  }, [searchQuery, filterMethod, filterHabitable, planets]);
+
+  return (
+    <div className="space-y-8">
+      {/* Modern Header */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-xl" />
+        <div className="relative bg-gradient-to-br from-slate-900/90 via-purple-900/30 to-blue-900/40 backdrop-blur-2xl border border-purple-500/30 rounded-3xl p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 bg-gradient-to-br from-purple-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-2xl"
+              >
+                <Star className="w-8 h-8 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">Exoplanet Explorer</h1>
+                <p className="text-purple-200 text-lg">Discover worlds beyond our solar system</p>
+                <div className="flex items-center gap-2 mt-2 text-sm text-purple-300">
+                  <Telescope className="w-4 h-4" />
+                  <span>{planets.length} confirmed exoplanets in database</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowVisualMode(!showVisualMode)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-medium transition-all shadow-lg ${
+                  showVisualMode
+                    ? "bg-gradient-to-r from-purple-500 to-blue-600 text-white"
+                    : "bg-white/10 backdrop-blur-xl text-purple-300 hover:bg-white/20 border border-white/20"
+                }`}
+              >
+                <Eye className="w-5 h-5" />
+                {showVisualMode ? 'Grid View' : 'Visual Mode'}
+              </motion.button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Planet Detail Modal */}
-      <AnimatePresence>
-        {selectedPlanet && (
+      {/* Modern Search & Filters */}
+      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search exoplanets or host stars..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 pr-4 py-3 w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 transition-all"
+            />
+          </div>
+          
+          <div className="flex gap-3">
+            <select
+              value={filterMethod}
+              onChange={(e) => setFilterMethod(e.target.value)}
+              className="px-4 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 transition-all"
+            >
+              <option value="All" className="bg-slate-900">All Methods</option>
+              {discoveryMethods.map(method => (
+                <option key={method} value={method} className="bg-slate-900">{method}</option>
+              ))}
+            </select>
+            
+            <select
+              value={filterHabitable}
+              onChange={(e) => setFilterHabitable(e.target.value)}
+              className="px-4 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 transition-all"
+            >
+              <option value="All" className="bg-slate-900">All Zones</option>
+              <option value="Habitable" className="bg-slate-900">Habitable Zone</option>
+              <option value="Non-Habitable" className="bg-slate-900">Outside HZ</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Filter className="w-4 h-4" />
+            <span>Showing {filteredPlanets.length} of {planets.length} exoplanets</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            <span>Updated with latest discoveries</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Display */}
+      <AnimatePresence mode="wait">
+        {showVisualMode ? (
+          // Visual Star Field Mode
           <motion.div
+            key="visual"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
-            onClick={() => setSelectedPlanet(null)}
+            className="relative bg-gradient-to-br from-slate-900/50 via-purple-900/20 to-blue-900/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8 min-h-[600px] overflow-hidden"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-gray-900 border border-white/20 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{selectedPlanet.name}</h2>
-                  <p className="text-gray-400">Orbiting {selectedPlanet.hostStar}</p>
-                </div>
-                <button
-                  onClick={() => setSelectedPlanet(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
+            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20" />
+            
+            {/* Star field background */}
+            <div className="absolute inset-0">
+              {[...Array(50)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    opacity: Math.random() * 0.8 + 0.2
+                  }}
+                />
+              ))}
+            </div>
+            
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">Exoplanet Star Field Visualization</h2>
+              
+              {filteredPlanets.map((planet) => (
+                <motion.button
+                  key={planet.id}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.2 }}
+                  onClick={() => setSelectedPlanet(planet)}
+                  className="absolute group"
+                  style={{
+                    left: `${planet.visualPosition.x}%`,
+                    top: `${planet.visualPosition.y}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
                 >
-                  ✕
-                </button>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-3">Planet Properties</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Radius:</span>
-                      <span className="text-white">{selectedPlanet.planetRadius.toFixed(2)} Earth radii</span>
-                    </div>
-                    {selectedPlanet.planetMass && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Mass:</span>
-                        <span className="text-white">{selectedPlanet.planetMass.toFixed(2)} Earth masses</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Orbital Period:</span>
-                      <span className="text-white">{selectedPlanet.orbitalPeriod.toFixed(1)} days</span>
-                    </div>
-                    {selectedPlanet.equilibriumTemp && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Temperature:</span>
-                        <span className="text-white">{selectedPlanet.equilibriumTemp}K ({(selectedPlanet.equilibriumTemp - 273).toFixed(0)}°C)</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Distance:</span>
-                      <span className="text-white">{selectedPlanet.stellarDistance.toFixed(1)} light-years</span>
+                  <div className={`w-4 h-4 bg-gradient-to-br ${planetColors[planet.planetType as keyof typeof planetColors]} rounded-full shadow-lg group-hover:shadow-xl transition-all`}>
+                    <div className="absolute inset-0 rounded-full animate-ping bg-current opacity-30" />
+                  </div>
+                  
+                  {/* Planet label */}
+                  <div className="absolute top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-lg px-3 py-2 whitespace-nowrap">
+                      <p className="text-white font-medium text-sm">{planet.name}</p>
+                      <p className="text-gray-400 text-xs">{planet.distanceFromEarth} ly away</p>
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-3">Discovery Info</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Discovery Year:</span>
-                      <span className="text-white">{selectedPlanet.discoveryYear}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Method:</span>
-                      <span className="text-white">{DISCOVERY_METHODS[selectedPlanet.discoveryMethod].label}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Status:</span>
-                      <span className={selectedPlanet.confirmed ? "text-green-400" : "text-yellow-400"}>
-                        {selectedPlanet.confirmed ? "Confirmed" : "Candidate"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Composition:</span>
-                      <span className={COMPOSITION[selectedPlanet.composition].color}>
-                        {COMPOSITION[selectedPlanet.composition].label}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Habitability:</span>
-                      <span className={HABITABILITY[selectedPlanet.habitableZone].color}>
-                        {HABITABILITY[selectedPlanet.habitableZone].label}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-white/5 rounded-lg">
-                <h4 className="text-white font-semibold mb-2">Discovery Method: {DISCOVERY_METHODS[selectedPlanet.discoveryMethod].label}</h4>
-                <p className="text-sm text-gray-300">
-                  {DISCOVERY_METHODS[selectedPlanet.discoveryMethod].description}
-                </p>
-              </div>
-            </motion.div>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        ) : (
+          // Grid Mode
+          <motion.div
+            key="grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+          >
+            <AnimatePresence>
+              {filteredPlanets.map((planet) => (
+                <PlanetCard
+                  key={planet.id}
+                  planet={planet}
+                  onSelect={setSelectedPlanet}
+                />
+              ))}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="text-xs text-gray-400 text-center">
-        Data simplified for educational purposes. Real exoplanet data available from 
-        <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline ml-1">
-          NASA Exoplanet Archive
-        </a>
-      </div>
+      {/* Planet Detail Modal */}
+      <AnimatePresence>
+        {selectedPlanet && (
+          <PlanetModal
+            planet={selectedPlanet}
+            onClose={() => setSelectedPlanet(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
