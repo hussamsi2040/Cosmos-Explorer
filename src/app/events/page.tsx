@@ -636,8 +636,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1446776756689-0e3a17a5b3a7?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Space Shuttle"
+              src="https://images.unsplash.com/photo-1617854818583-09e7f077a156?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="SpaceX Crew Dragon"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
