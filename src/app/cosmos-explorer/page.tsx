@@ -759,11 +759,11 @@ function CosmosExplorerClient() {
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <a className="text-white text-sm font-medium leading-normal" href="#">Home</a>
-              <a className="text-white text-sm font-medium leading-normal" href="#">Tracker</a>
-              <a className="text-white text-sm font-medium leading-normal" href="#">Events</a>
-              <a className="text-white text-sm font-medium leading-normal" href="#">Weather</a>
-              <a className="text-white text-sm font-medium leading-normal" href="#">Today</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Weather</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
             </div>
           </div>
         </header>
