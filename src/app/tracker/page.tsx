@@ -636,44 +636,7 @@ function SpaceTrackerContentInternal() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* ISS Location */}
-          <div className="bg-[#1e2124] rounded-xl p-6 border border-blue-500/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-              <h3 className="text-white font-semibold text-lg">Live Location</h3>
-            </div>
-            
-            {issData && (
-              <div className="space-y-3">
-                <div className="text-white text-2xl font-bold">
-                  {parseFloat(issData.iss_position.latitude).toFixed(4)}°, {parseFloat(issData.iss_position.longitude).toFixed(4)}°
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Latitude</div>
-                    <div className="text-white">{parseFloat(issData.iss_position.latitude).toFixed(4)}°</div>
-                  </div>
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Longitude</div>
-                    <div className="text-white">{parseFloat(issData.iss_position.longitude).toFixed(4)}°</div>
-                  </div>
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Altitude</div>
-                    <div className="text-white">~408 km</div>
-                  </div>
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Speed</div>
-                    <div className="text-white">~7.66 km/s</div>
-                  </div>
-                </div>
-                <div className="text-xs text-[#a2abb3]">
-                  Last updated: {new Date(issData.timestamp * 1000).toLocaleTimeString()}
-                </div>
-              </div>
-            )}
-          </div>
-
+        <div className="grid grid-cols-1 gap-4">
           {/* Current Crew */}
           <div className="bg-[#1e2124] rounded-xl p-6 border border-green-500/20 relative overflow-hidden">
             <div 
