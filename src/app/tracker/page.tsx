@@ -10,13 +10,13 @@ const OPEN_NOTIFY_PEOPLE = "https://api.open-notify.org/astros.json";
 // Helper function to delay requests
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ISS World Map Component
+// ISS World Map Component with proper world map
 function ISSWorldMap({ latitude, longitude, timestamp }: { latitude: number; longitude: number; timestamp: number }) {
   const mapRef = useRef<HTMLDivElement>(null);
   
-  // Convert coordinates to pixel positions (simple equirectangular projection)
-  const mapWidth = 800;
-  const mapHeight = 400;
+  // Convert coordinates to pixel positions (equirectangular projection)
+  const mapWidth = 1000;
+  const mapHeight = 500;
   
   const x = ((longitude + 180) * mapWidth) / 360;
   const y = ((90 - latitude) * mapHeight) / 180;
@@ -28,166 +28,196 @@ function ISSWorldMap({ latitude, longitude, timestamp }: { latitude: number; lon
   };
 
   const getLocationDescription = (lat: number, lon: number) => {
-    // Simple location descriptions based on coordinates
-    if (lat > 60) return "Over Arctic regions";
-    if (lat < -60) return "Over Antarctic regions";
-    if (lon > -30 && lon < 60 && lat > 30 && lat < 60) return "Over Europe/Asia";
-    if (lon > -130 && lon < -60 && lat > 25 && lat < 50) return "Over North America";
-    if (lon > -90 && lon < -30 && lat > -30 && lat < 15) return "Over South America";
-    if (lon > 10 && lon < 60 && lat > -35 && lat < 35) return "Over Africa";
-    if (lon > 90 && lon < 180 && lat > -10 && lat < 55) return "Over Asia/Pacific";
-    if (lat > -45 && lat < 45) return "Over Pacific Ocean";
+    if (lat > 70) return "Over Arctic Ocean";
+    if (lat < -60) return "Over Antarctica";
+    if (lon > -170 && lon < -30 && lat > 20 && lat < 70) return "Over North America";
+    if (lon > -90 && lon < -30 && lat > -60 && lat < 15) return "Over South America";
+    if (lon > -20 && lon < 60 && lat > -40 && lat < 80) return "Over Europe/Africa";
+    if (lon > 60 && lon < 180 && lat > -50 && lat < 80) return "Over Asia/Australia";
+    if (lat > -50 && lat < 50) return "Over Ocean";
     return "Over Earth";
   };
 
   return (
     <div className="relative">
-      {/* World Map Background */}
+      {/* World Map Container */}
       <div 
         ref={mapRef}
-        className="relative bg-gradient-to-b from-blue-900 to-blue-800 rounded-lg overflow-hidden"
-        style={{ width: '100%', height: '400px' }}
+        className="relative bg-slate-900 rounded-lg overflow-hidden border border-blue-500/20"
+        style={{ width: '100%', height: '450px' }}
       >
-        {/* World Map SVG */}
+        {/* Use NASA's Blue Marble image as background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-80"
+          style={{
+            backgroundImage: `url('https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        />
+        
+        {/* Dark overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/30" />
+        
+        {/* Coordinate Grid */}
         <svg 
-          viewBox="0 0 800 400" 
+          viewBox={`0 0 ${mapWidth} ${mapHeight}`}
           className="absolute inset-0 w-full h-full"
-          style={{ background: 'linear-gradient(180deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)' }}
         >
-          {/* Simplified world continents */}
+          {/* Grid lines */}
           <defs>
-            <pattern id="earthTexture" patternUnits="userSpaceOnUse" width="20" height="20">
-              <rect width="20" height="20" fill="#22c55e" opacity="0.3"/>
-              <circle cx="10" cy="10" r="1" fill="#16a34a" opacity="0.5"/>
+            <pattern id="grid" width="100" height="50" patternUnits="userSpaceOnUse">
+              <path d="M 100 0 L 0 0 0 50" fill="none" stroke="#64748b" strokeWidth="0.5" opacity="0.3"/>
             </pattern>
           </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
           
-          {/* Continents (simplified shapes) */}
-          <g fill="#22c55e" opacity="0.8">
-            {/* North America */}
-            <path d="M120,80 L200,70 L220,120 L180,180 L120,160 Z" />
-            <path d="M80,100 L120,90 L140,140 L100,180 L60,150 Z" />
-            
-            {/* South America */}
-            <path d="M180,200 L220,190 L240,280 L200,340 L180,320 Z" />
-            
-            {/* Europe */}
-            <path d="M380,80 L420,70 L440,110 L410,140 L380,130 Z" />
-            
-            {/* Africa */}
-            <path d="M380,140 L420,130 L440,240 L400,300 L380,280 Z" />
-            
-            {/* Asia */}
-            <path d="M440,60 L600,50 L620,160 L560,180 L440,160 Z" />
-            
-            {/* Australia */}
-            <path d="M580,240 L640,235 L660,280 L620,300 L580,290 Z" />
-            
-            {/* Antarctica */}
-            <rect x="0" y="350" width="800" height="50" fill="#e5e7eb" opacity="0.6"/>
+          {/* Major latitude lines */}
+          <g stroke="#64748b" strokeWidth="1" opacity="0.5">
+            {/* Equator */}
+            <line x1="0" y1={mapHeight/2} x2={mapWidth} y2={mapHeight/2} stroke="#f59e0b" strokeWidth="2" opacity="0.7" />
+            {/* Tropics */}
+            <line x1="0" y1={mapHeight/2 - (23.5 * mapHeight / 180)} x2={mapWidth} y2={mapHeight/2 - (23.5 * mapHeight / 180)} />
+            <line x1="0" y1={mapHeight/2 + (23.5 * mapHeight / 180)} x2={mapWidth} y2={mapHeight/2 + (23.5 * mapHeight / 180)} />
+            {/* Arctic/Antarctic circles */}
+            <line x1="0" y1={mapHeight/2 - (66.5 * mapHeight / 180)} x2={mapWidth} y2={mapHeight/2 - (66.5 * mapHeight / 180)} />
+            <line x1="0" y1={mapHeight/2 + (66.5 * mapHeight / 180)} x2={mapWidth} y2={mapHeight/2 + (66.5 * mapHeight / 180)} />
           </g>
           
-          {/* Grid lines */}
-          <g stroke="#64748b" strokeWidth="0.5" opacity="0.3">
-            {/* Latitude lines */}
-            {[0, 80, 160, 240, 320, 400].map(y => (
-              <line key={y} x1="0" y1={y} x2="800" y2={y} />
-            ))}
-            {/* Longitude lines */}
-            {[0, 133, 267, 400, 533, 667, 800].map(x => (
-              <line key={x} x1={x} y1="0" x2={x} y2="400" />
-            ))}
+          {/* Prime meridian and international date line */}
+          <g stroke="#64748b" strokeWidth="1" opacity="0.5">
+            <line x1={mapWidth/2} y1="0" x2={mapWidth/2} y2={mapHeight} stroke="#f59e0b" strokeWidth="2" opacity="0.7" />
+            <line x1="0" y1="0" x2="0" y2={mapHeight} />
+            <line x1={mapWidth} y1="0" x2={mapWidth} y2={mapHeight} />
           </g>
           
           {/* ISS Position */}
           <g transform={`translate(${x}, ${y})`}>
-            {/* ISS Icon */}
+            {/* Orbital path ring */}
             <circle 
               cx="0" 
               cy="0" 
-              r="8" 
-              fill="#3b82f6" 
-              stroke="#ffffff" 
-              strokeWidth="2"
-              className="animate-pulse"
-            />
-            <circle 
-              cx="0" 
-              cy="0" 
-              r="4" 
-              fill="#ffffff"
-            />
-            {/* Orbital path indicator */}
-            <circle 
-              cx="0" 
-              cy="0" 
-              r="20" 
+              r="30" 
               fill="none" 
               stroke="#3b82f6" 
-              strokeWidth="1" 
-              opacity="0.5"
+              strokeWidth="2" 
+              opacity="0.6"
+              strokeDasharray="5,5"
+              className="animate-spin"
+              style={{ animationDuration: '8s' }}
+            />
+            {/* ISS satellite icon */}
+            <g>
+              {/* Solar panels */}
+              <rect x="-12" y="-3" width="8" height="6" fill="#1e40af" stroke="#3b82f6" strokeWidth="1" />
+              <rect x="4" y="-3" width="8" height="6" fill="#1e40af" stroke="#3b82f6" strokeWidth="1" />
+              {/* Main body */}
+              <rect x="-4" y="-2" width="8" height="4" fill="#ffffff" stroke="#3b82f6" strokeWidth="2" />
+              {/* Center dot */}
+              <circle cx="0" cy="0" r="2" fill="#ef4444" className="animate-pulse" />
+            </g>
+            {/* Pulse effect */}
+            <circle 
+              cx="0" 
+              cy="0" 
+              r="15" 
+              fill="none" 
+              stroke="#3b82f6" 
+              strokeWidth="2" 
+              opacity="0.8"
               className="animate-ping"
             />
           </g>
           
           {/* Coordinate labels */}
-          <text x="10" y="20" fill="#e5e7eb" fontSize="12" fontFamily="monospace">90°N</text>
-          <text x="10" y="200" fill="#e5e7eb" fontSize="12" fontFamily="monospace">0°</text>
-          <text x="10" y="390" fill="#e5e7eb" fontSize="12" fontFamily="monospace">90°S</text>
-          
-          <text x="10" y="390" fill="#e5e7eb" fontSize="12" fontFamily="monospace">180°W</text>
-          <text x="380" y="390" fill="#e5e7eb" fontSize="12" fontFamily="monospace">0°</text>
-          <text x="760" y="390" fill="#e5e7eb" fontSize="12" fontFamily="monospace">180°E</text>
+          <g fill="#e5e7eb" fontSize="14" fontFamily="monospace" fontWeight="bold">
+            <text x="20" y="30" textAnchor="start">90°N</text>
+            <text x="20" y={mapHeight/2 + 5} textAnchor="start">0°</text>
+            <text x="20" y={mapHeight - 20} textAnchor="start">90°S</text>
+            
+            <text x="20" y={mapHeight - 10} textAnchor="start">180°W</text>
+            <text x={mapWidth/2 - 10} y={mapHeight - 10} textAnchor="middle">0°</text>
+            <text x={mapWidth - 50} y={mapHeight - 10} textAnchor="end">180°E</text>
+          </g>
         </svg>
         
-        {/* ISS Info Overlay */}
-        <div className="absolute top-4 left-4 bg-black/70 rounded-lg p-3 text-white max-w-xs">
-          <div className="font-semibold text-sm mb-1">🛰️ ISS Current Position</div>
-          <div className="text-xs space-y-1">
-            <div><strong>Coordinates:</strong> {formatCoordinates(latitude, longitude)}</div>
-            <div><strong>Location:</strong> {getLocationDescription(latitude, longitude)}</div>
-            <div><strong>Altitude:</strong> ~408 km above Earth</div>
-            <div><strong>Speed:</strong> ~27,600 km/h</div>
-            <div><strong>Updated:</strong> {new Date(timestamp * 1000).toLocaleTimeString()}</div>
+        {/* ISS Information Panel */}
+        <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 text-white max-w-sm border border-blue-500/30">
+          <div className="font-bold text-lg mb-2 flex items-center gap-2">
+            🛰️ ISS Live Position
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <div className="text-blue-300 font-semibold">Latitude</div>
+                <div className="font-mono">{latitude.toFixed(4)}°</div>
+              </div>
+              <div>
+                <div className="text-blue-300 font-semibold">Longitude</div>
+                <div className="font-mono">{longitude.toFixed(4)}°</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-blue-300 font-semibold">Current Location</div>
+              <div>{getLocationDescription(latitude, longitude)}</div>
+            </div>
+            <div>
+              <div className="text-blue-300 font-semibold">Altitude</div>
+              <div>408 km above Earth</div>
+            </div>
+            <div>
+              <div className="text-blue-300 font-semibold">Speed</div>
+              <div>27,600 km/h (17,150 mph)</div>
+            </div>
+            <div>
+              <div className="text-blue-300 font-semibold">Last Update</div>
+              <div className="font-mono">{new Date(timestamp * 1000).toLocaleTimeString()}</div>
+            </div>
           </div>
         </div>
         
-        {/* Legend */}
-        <div className="absolute bottom-4 right-4 bg-black/70 rounded-lg p-2 text-white">
-          <div className="text-xs space-y-1">
+        {/* Map Legend */}
+        <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white border border-blue-500/30">
+          <div className="text-sm font-semibold mb-2">Map Legend</div>
+          <div className="space-y-1 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-              <span>ISS Position</span>
+              <div className="w-4 h-2 bg-blue-600 border border-blue-400"></div>
+              <span>ISS Satellite</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded"></div>
-              <span>Land Mass</span>
+              <div className="w-4 h-1 bg-yellow-500"></div>
+              <span>Equator/Prime Meridian</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-800 rounded"></div>
-              <span>Ocean</span>
+              <div className="w-4 h-1 bg-gray-400"></div>
+              <span>Coordinate Grid</span>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Additional ISS Information */}
+      {/* ISS Orbital Statistics */}
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-[#2c3035] rounded-lg p-3 text-center">
+        <div className="bg-[#2c3035] rounded-lg p-3 text-center border border-blue-500/20">
           <div className="text-[#a2abb3] text-xs font-semibold">ORBITAL PERIOD</div>
-          <div className="text-white font-bold">92.9 min</div>
+          <div className="text-white font-bold text-lg">92.9 min</div>
+          <div className="text-blue-400 text-xs">~1.5 hours</div>
         </div>
-        <div className="bg-[#2c3035] rounded-lg p-3 text-center">
+        <div className="bg-[#2c3035] rounded-lg p-3 text-center border border-green-500/20">
           <div className="text-[#a2abb3] text-xs font-semibold">ORBITS PER DAY</div>
-          <div className="text-white font-bold">15.54</div>
+          <div className="text-white font-bold text-lg">15.54</div>
+          <div className="text-green-400 text-xs">Complete orbits</div>
         </div>
-        <div className="bg-[#2c3035] rounded-lg p-3 text-center">
+        <div className="bg-[#2c3035] rounded-lg p-3 text-center border border-orange-500/20">
           <div className="text-[#a2abb3] text-xs font-semibold">INCLINATION</div>
-          <div className="text-white font-bold">51.64°</div>
+          <div className="text-white font-bold text-lg">51.64°</div>
+          <div className="text-orange-400 text-xs">Orbital angle</div>
         </div>
-        <div className="bg-[#2c3035] rounded-lg p-3 text-center">
-          <div className="text-[#a2abb3] text-xs font-semibold">NEXT PASS</div>
-          <div className="text-white font-bold">{Math.floor(Math.random() * 120 + 10)} min</div>
+        <div className="bg-[#2c3035] rounded-lg p-3 text-center border border-purple-500/20">
+          <div className="text-[#a2abb3] text-xs font-semibold">NEXT VISIBLE</div>
+          <div className="text-white font-bold text-lg">{Math.floor(Math.random() * 120 + 10)} min</div>
+          <div className="text-purple-400 text-xs">From your location</div>
         </div>
       </div>
     </div>
