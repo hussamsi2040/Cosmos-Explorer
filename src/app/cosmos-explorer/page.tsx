@@ -494,61 +494,7 @@ function CosmosContentInternal() {
         <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Today in Space</p>
       </div>
 
-      {/* Space Gallery */}
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=300&h=150&fit=crop&auto=format&q=80" 
-              alt="Cosmic Nebula"
-              className="w-full h-20 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🌌 Nebula
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop&auto=format&q=80" 
-              alt="Moon Phases"
-              className="w-full h-20 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🌙 Moon
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=300&h=150&fit=crop&auto=format&q=80" 
-              alt="Mars Surface"
-              className="w-full h-20 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🔴 Mars
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=300&h=150&fit=crop&auto=format&q=80" 
-              alt="Earth from Space"
-              className="w-full h-20 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🌍 Earth
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=300&h=150&fit=crop&auto=format&q=80" 
-              alt="Solar Activity"
-              className="w-full h-20 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-1 left-1 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              ☀️ Sun
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Enhanced NASA APOD Section */}
       <APODSection apod={safeApod} />
