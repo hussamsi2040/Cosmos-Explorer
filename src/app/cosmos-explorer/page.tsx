@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import dynamic from 'next/dynamic';
 
 // NASA API integration - Using personal API key for production
-// Personal API key provides 1,000 requests/hour vs DEMO_KEY's 30/hour
-const NASA_API_KEY = "MQX17bNxdfKCDRZda4laA6DdVDTPrqeSkYzlmiqj";
+  // Using NASA DEMO_KEY - provides 30 requests/hour, 50/day per IP
+  const NASA_API_KEY = "DEMO_KEY";
 
 // Helper function to delay requests
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
