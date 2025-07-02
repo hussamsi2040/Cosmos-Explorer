@@ -366,12 +366,12 @@ function SpaceTrackerContentInternal() {
       try {
         // Use multiple satellites for variety
         const satellites = [
-          { id: 25544, name: "ISS", agency: "NASA/ESA/JAXA", type: "Space Station" },
+          { id: 25544, name: "ISS (ZARYA)", agency: "NASA/ESA/JAXA", type: "Space Station" },
           { id: 20580, name: "Hubble Space Telescope", agency: "NASA", type: "Observatory" },
           { id: 43013, name: "Starlink-1007", agency: "SpaceX", type: "Communications" },
           { id: 25338, name: "NOAA-18", agency: "NOAA", type: "Weather" },
           { id: 27424, name: "GOES-15", agency: "NOAA", type: "Weather" },
-          { id: 37849, name: "TERRA", agency: "NASA", type: "Earth Observation" }
+          { id: 37849, name: "Terra", agency: "NASA", type: "Earth Observation" }
         ];
 
         const allPasses = [];
@@ -396,7 +396,7 @@ function SpaceTrackerContentInternal() {
                   brightness: pass.visible ? Math.random() * 2 - 1 : 0, // Simulate magnitude
                   duration: Math.round((new Date(pass.set.utc_datetime).getTime() - new Date(pass.rise.utc_datetime).getTime()) / 60000),
                   visible: pass.visible,
-                  imageUrl: getImageForSatellite(satellite.agency)
+                  imageUrl: getImageForSatellite(satellite.agency, satellite.name)
                 });
               });
             }
@@ -415,7 +415,7 @@ function SpaceTrackerContentInternal() {
               brightness: Math.random() * 3 - 1,
               duration: Math.floor(Math.random() * 600) + 120,
               visible: Math.random() > 0.3,
-              imageUrl: getImageForSatellite(satellite.agency)
+              imageUrl: getImageForSatellite(satellite.agency, satellite.name)
             });
           }
         }
@@ -494,12 +494,36 @@ function SpaceTrackerContentInternal() {
     return () => clearTimeout(timer);
   }, []);
 
-  const getImageForSatellite = (agency: string) => {
+  const getImageForSatellite = (agency: string, satelliteName?: string) => {
+    // Return specific satellite images based on name and agency
+    if (satelliteName?.toLowerCase().includes('iss')) {
+      return 'https://science.nasa.gov/wp-content/uploads/2023/09/iss-expedition-47-1041.jpg?w=768&format=webp';
+    }
+    if (satelliteName?.toLowerCase().includes('hubble')) {
+      return 'https://science.nasa.gov/wp-content/uploads/2024/03/hubble-in-orbit-above-earth-hs-2009-14-a-1920x1200-1.jpg?w=768&format=webp';
+    }
+    if (satelliteName?.toLowerCase().includes('starlink')) {
+      return 'https://cdn.mos.cms.futurecdn.net/7fYyCaVL8FLnhXz9nDX7jd-1200-80.jpg';
+    }
+    if (satelliteName?.toLowerCase().includes('terra')) {
+      return 'https://www.nasa.gov/wp-content/uploads/2023/07/terra-satellite.jpg?resize=800,600';
+    }
+    if (satelliteName?.toLowerCase().includes('aqua')) {
+      return 'https://eoimages.gsfc.nasa.gov/images/imagerecords/6000/6928/aqua_2002_3d.jpg';
+    }
+    if (satelliteName?.toLowerCase().includes('noaa') || satelliteName?.toLowerCase().includes('goes')) {
+      return 'https://www.nasa.gov/wp-content/uploads/2023/07/noaa-20_satellite.jpg?resize=800,600';
+    }
+    if (satelliteName?.toLowerCase().includes('sentinel')) {
+      return 'https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2015/04/sentinel-2a_in_orbit/15447932-1-eng-GB/Sentinel-2A_in_orbit_pillars.jpg';
+    }
+    
+    // Fallback by agency
     const images = {
-      'NASA': 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop&auto=format&q=80',
-      'SpaceX': 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=300&h=200&fit=crop&auto=format&q=80',
-      'NOAA': 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=300&h=200&fit=crop&auto=format&q=80',
-      'ESA': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format&q=80'
+      'NASA': 'https://science.nasa.gov/wp-content/uploads/2023/09/iss-expedition-47-1041.jpg?w=768&format=webp',
+      'SpaceX': 'https://cdn.mos.cms.futurecdn.net/7fYyCaVL8FLnhXz9nDX7jd-1200-80.jpg',
+      'NOAA': 'https://www.nasa.gov/wp-content/uploads/2023/07/noaa-20_satellite.jpg?resize=800,600',
+      'ESA': 'https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2015/04/sentinel-2a_in_orbit/15447932-1-eng-GB/Sentinel-2A_in_orbit_pillars.jpg'
     };
     return images[agency as keyof typeof images] || images['NASA'];
   };
@@ -523,10 +547,12 @@ function SpaceTrackerContentInternal() {
 
   const generateFallbackSatellitePasses = () => {
     const satellites = [
-      { name: "ISS", agency: "NASA", type: "Space Station" },
+      { name: "ISS (ZARYA)", agency: "NASA", type: "Space Station" },
       { name: "Hubble Space Telescope", agency: "NASA", type: "Observatory" },
       { name: "Starlink-1007", agency: "SpaceX", type: "Communications" },
-      { name: "NOAA-18", agency: "NOAA", type: "Weather" }
+      { name: "NOAA-18", agency: "NOAA", type: "Weather" },
+      { name: "Terra", agency: "NASA", type: "Earth Observation" },
+      { name: "Aqua", agency: "NASA", type: "Earth Observation" }
     ];
 
     return satellites.map((sat, i) => {
@@ -542,7 +568,7 @@ function SpaceTrackerContentInternal() {
         brightness: Math.random() * 3 - 1,
         duration: Math.floor(Math.random() * 600) + 120,
         visible: Math.random() > 0.3,
-        imageUrl: getImageForSatellite(sat.agency)
+        imageUrl: getImageForSatellite(sat.agency, sat.name)
       };
     });
   };
@@ -678,46 +704,62 @@ function SpaceTrackerContentInternal() {
       {/* Satellite Tracking */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Satellite Passes</h2>
       <div className="p-4">
-        {/* Satellite Gallery */}
+        {/* Satellite Gallery - Real Photos */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Hubble Space Telescope"
+              src="https://science.nasa.gov/wp-content/uploads/2024/03/hubble-in-orbit-above-earth-hs-2009-14-a-1920x1200-1.jpg?w=768&format=webp" 
+              alt="Hubble Space Telescope in orbit"
               className="w-full h-32 object-cover rounded-lg"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              Hubble Telescope
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🔭 Hubble Space Telescope
+            </div>
+            <div className="absolute top-2 right-2 bg-blue-500/80 rounded px-2 py-1 text-white text-xs">
+              NASA
             </div>
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1517976487492-5750f3195933?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Starlink Satellites"
+              src="https://cdn.mos.cms.futurecdn.net/7fYyCaVL8FLnhXz9nDX7jd-1200-80.jpg" 
+              alt="SpaceX Starlink satellites in orbit"
               className="w-full h-32 object-cover rounded-lg"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              Starlink Constellation
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🛰️ Starlink Constellation
+            </div>
+            <div className="absolute top-2 right-2 bg-gray-800/80 rounded px-2 py-1 text-white text-xs">
+              SpaceX
             </div>
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="NOAA Weather Satellite"
+              src="https://www.nasa.gov/wp-content/uploads/2023/07/noaa-20_satellite.jpg?resize=2000,1500" 
+              alt="NOAA-20 Weather Satellite"
               className="w-full h-32 object-cover rounded-lg"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              NOAA Weather Sat
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🌤️ NOAA Weather Satellites
+            </div>
+            <div className="absolute top-2 right-2 bg-blue-600/80 rounded px-2 py-1 text-white text-xs">
+              NOAA
             </div>
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1628126235206-5260b9ea6441?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Terra Satellite"
+              src="https://terra.nasa.gov/images/terra-satellite-3d-rendering" 
+              alt="Terra Earth Observation Satellite"
               className="w-full h-32 object-cover rounded-lg"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://www.nasa.gov/wp-content/uploads/2023/07/terra-satellite.jpg?resize=2000,1500";
+              }}
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              Terra Observatory
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🌍 Terra Observatory
+            </div>
+            <div className="absolute top-2 right-2 bg-green-600/80 rounded px-2 py-1 text-white text-xs">
+              NASA
             </div>
           </div>
         </div>
