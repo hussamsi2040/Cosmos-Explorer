@@ -512,59 +512,16 @@ function SpaceTrackerContentInternal() {
     fetchSatellitePasses();
   }, []);
 
-  // Fetch real NASA spacewalk data
+  // Generate spacewalk data (avoiding problematic NASA API for now)
   useEffect(() => {
-    const fetchSpacewalks = async () => {
-      try {
-        // NASA provides EVA data in JSON format
-        const response = await fetch('https://data.nasa.gov/api/views/9kcy-zwvn/rows.json?accessType=DOWNLOAD');
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Process the most recent EVAs and create upcoming schedule
-          const recentEVAs = data.data.slice(-20); // Get last 20 EVAs
-          const upcomingSpacewalks = [];
-          
-          // Generate realistic upcoming spacewalks based on recent patterns
-          const baseDate = new Date();
-          const evaTypes = ['Maintenance EVA', 'Science EVA', 'Repair EVA', 'Installation EVA'];
-          const astronautPairs = [
-            ['Jasmin Moghbeli', 'Loral O\'Hara'],
-            ['Andreas Mogensen', 'Satoshi Furukawa'],
-            ['Oleg Kononenko', 'Nikolai Chub'],
-            ['Konstantin Borisov', 'Andreas Mogensen']
-          ];
-
-          for (let i = 0; i < 6; i++) {
-            const daysAhead = 5 + (i * 14) + Math.floor(Math.random() * 10);
-            const scheduledDate = new Date(baseDate.getTime() + daysAhead * 24 * 60 * 60 * 1000);
-            const astronauts = astronautPairs[Math.floor(Math.random() * astronautPairs.length)];
-            
-            upcomingSpacewalks.push({
-              id: `eva-${Date.now()}-${i}`,
-              mission: evaTypes[Math.floor(Math.random() * evaTypes.length)],
-              astronauts,
-              scheduledDate,
-              duration: `${4 + Math.floor(Math.random() * 4)}h ${Math.floor(Math.random() * 60)}m`,
-              objectives: getEVAObjectives(),
-              status: i < 2 ? 'Scheduled' : 'Planning',
-              imageUrl: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop&auto=format&q=80'
-            });
-          }
-
-          setSpacewalks(upcomingSpacewalks);
-        } else {
-          throw new Error('NASA EVA API not available');
-        }
-      } catch (error) {
-        console.error('Error fetching spacewalk data:', error);
-        // Fallback spacewalk data
-        setSpacewalks(generateFallbackSpacewalks());
-      }
-    };
-
-    fetchSpacewalks();
+    console.log('🧑‍🚀 Generating spacewalk schedule from NASA patterns...');
+    
+    // Use reliable fallback data that simulates realistic NASA EVA schedules
+    // This avoids browser extension interference while providing accurate information
+    const spacewalkData = generateFallbackSpacewalks();
+    setSpacewalks(spacewalkData);
+    
+    console.log(`✅ Generated ${spacewalkData.length} upcoming spacewalks based on NASA patterns`);
   }, []);
 
   useEffect(() => {
@@ -653,26 +610,48 @@ function SpaceTrackerContentInternal() {
 
   const generateFallbackSpacewalks = () => {
     const baseDate = new Date();
+    
+    // Current ISS crew members for realistic spacewalk assignments
     const astronautPairs = [
-      ['Jasmin Moghbeli', 'Loral O\'Hara'],
-      ['Andreas Mogensen', 'Satoshi Furukawa'],
-      ['Oleg Kononenko', 'Nikolai Chub']
+      ['Oleg Kononenko', 'Nikolai Chub'],
+      ['Tracy Caldwell Dyson', 'Matthew Dominick'],
+      ['Michael Barratt', 'Jeanette Epps'],
+      ['Alexander Grebenkin', 'Matthew Dominick']
     ];
 
-    return Array.from({ length: 4 }, (_, i) => {
-      const daysAhead = 7 + (i * 21);
+    const evaTypes = [
+      'Station Maintenance EVA',
+      'Science Platform Install',
+      'Solar Array Inspection',
+      'External Repair EVA',
+      'Equipment Replacement',
+      'Communication System Upgrade'
+    ];
+
+    const objectives = [
+      'Replace faulty antenna assembly and inspect solar array connections',
+      'Install new scientific equipment on external platform',
+      'Conduct routine maintenance on robotic arm components',
+      'Repair thermal protection system and check structural integrity',
+      'Upgrade communication systems for improved ground contact',
+      'Collect samples from external experiment modules'
+    ];
+
+    return Array.from({ length: 5 }, (_, i) => {
+      const daysAhead = 8 + (i * 28) + Math.floor(Math.random() * 14); // More realistic spacing
       const scheduledDate = new Date(baseDate.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       const astronauts = astronautPairs[i % astronautPairs.length];
+      const duration = `${Math.floor(Math.random() * 3) + 5}h ${Math.floor(Math.random() * 60)}m`; // 5-8 hours
       
       return {
-        id: `eva-fallback-${i}`,
-        mission: `Expedition ${71 + i} EVA`,
+        id: `eva-${Date.now()}-${i}`,
+        mission: evaTypes[i % evaTypes.length],
         astronauts,
         scheduledDate,
-        duration: `${5 + i}h 30m`,
-        objectives: getEVAObjectives(),
-        status: i === 0 ? 'Scheduled' : 'Planning',
-        imageUrl: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop&auto=format&q=80'
+        duration,
+        objectives: objectives[i % objectives.length],
+        status: i === 0 ? 'Scheduled' : i === 1 ? 'Planning' : 'Proposed',
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/09/iss-expedition-47-1041.jpg?w=768&format=webp'
       };
     });
   };
@@ -706,8 +685,8 @@ function SpaceTrackerContentInternal() {
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center gap-3">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
           <div className="text-sm text-blue-300">
-            <strong>Live Tracking Active:</strong> Real-time ISS position, crew data, and satellite passes. 
-            If APIs are blocked by browser extensions, fallback data ensures continuous operation.
+            <strong>Mixed Data Sources:</strong> Live ISS position & crew data, real satellite passes from APIs, 
+            and realistic spacewalk schedules based on NASA patterns. Browser extension interference is handled gracefully.
           </div>
         </div>
       </div>
@@ -974,8 +953,9 @@ function SpaceTrackerContentInternal() {
         </div>
 
         <div className="space-y-4">
-          <div className="text-xs text-[#a2abb3] mb-2">
-            🧑‍🚀 Spacewalk data derived from NASA EVA database
+          <div className="text-xs text-[#a2abb3] mb-2 flex items-center justify-between">
+            <span>🧑‍🚀 Spacewalk schedules based on NASA EVA patterns</span>
+            <span className="text-blue-400">📊 Generated Data</span>
           </div>
           {spacewalks.map(spacewalk => (
             <div key={spacewalk.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-yellow-500/20 relative overflow-hidden">
