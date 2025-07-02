@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 
-// NASA API integration - Using DEMO_KEY for development
-// For production, get your free API key at: https://api.nasa.gov/
-const NASA_API_KEY = "DEMO_KEY";
+// NASA API integration - Using personal API key for production
+// Personal API key provides 1,000 requests/hour vs DEMO_KEY's 30/hour
+const NASA_API_KEY = "MQX17bNxdfKCDRZda4laA6DdVDTPrqeSkYzlmiqj";
 
 async function fetchAPOD() {
   try {
@@ -33,7 +33,7 @@ async function fetchAPOD() {
 
 async function fetchEPICImage() {
   try {
-    const response = await fetch(`https://api.nasa.gov/EPIC/api/natural/images?api_key=${NASA_API_KEY}`, {
+    const response = await fetch(`https://epic.gsfc.nasa.gov/api/natural?api_key=${NASA_API_KEY}`, {
       headers: {
         'Accept': 'application/json',
       },
