@@ -29,15 +29,16 @@ const EVENT_TYPES = {
   comet: { icon: Star, color: "text-green-400", bg: "bg-green-900/30", label: "Comet" }
 };
 
-// Sample cosmic events data - in a real app, this would come from APIs
+// Generate cosmic events data - moved to a function to avoid hydration issues
 const generateCosmicEvents = (): CosmicEvent[] => {
-  const today = new Date();
+  // Use a fixed date for server-side rendering consistency
+  const baseDate = new Date('2024-07-02T00:00:00Z');
   return [
     {
       id: "1",
       title: "Geminids Meteor Shower Peak",
       type: "meteor_shower",
-      date: new Date(today.getFullYear(), 11, 14), // December 14
+      date: new Date(baseDate.getFullYear(), 11, 14), // December 14
       description: "One of the year's most reliable meteor showers, producing up to 120 meteors per hour at peak.",
       visibility: "Worldwide",
       peak_time: "2:00 AM",
@@ -47,7 +48,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "2", 
       title: "Total Solar Eclipse",
       type: "eclipse",
-      date: new Date(today.getFullYear() + 1, 3, 8), // April 8 next year
+      date: new Date(baseDate.getFullYear() + 1, 3, 8), // April 8 next year
       description: "A total solar eclipse visible across parts of North America.",
       visibility: "North America",
       location: "Path of totality: Mexico, USA, Canada"
@@ -56,7 +57,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "3",
       title: "SpaceX Starship IFT-4",
       type: "rocket_launch",
-      date: addDays(today, 7),
+      date: addDays(baseDate, 7),
       description: "Integrated Flight Test 4 of Starship and Super Heavy booster.",
       visibility: "Global (Live Stream)",
       location: "Starbase, Texas",
@@ -67,7 +68,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "4",
       title: "Venus-Jupiter Conjunction",
       type: "planetary_conjunction", 
-      date: addDays(today, 15),
+      date: addDays(baseDate, 15),
       description: "Venus and Jupiter will appear very close together in the sky.",
       visibility: "Worldwide",
       peak_time: "Evening twilight"
@@ -76,7 +77,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "5",
       title: "Perseids Meteor Shower",
       type: "meteor_shower",
-      date: new Date(today.getFullYear(), 7, 12), // August 12
+      date: new Date(baseDate.getFullYear(), 7, 12), // August 12
       description: "Swift and bright meteors from Comet Swift-Tuttle, peak at 60 meteors per hour.",
       visibility: "Northern Hemisphere",
       constellation: "Perseus",
@@ -86,7 +87,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "6",
       title: "NASA Artemis III Launch",
       type: "rocket_launch",
-      date: new Date(today.getFullYear() + 1, 8, 15), // September 15 next year
+      date: new Date(baseDate.getFullYear() + 1, 8, 15), // September 15 next year
       description: "Historic crewed mission to return humans to the Moon's surface.",
       visibility: "Global (Live Stream)",
       location: "Kennedy Space Center, Florida",
@@ -97,7 +98,7 @@ const generateCosmicEvents = (): CosmicEvent[] => {
       id: "7",
       title: "Comet Nishimura Closest Approach",
       type: "comet",
-      date: addDays(today, 45),
+      date: addDays(baseDate, 45),
       description: "Comet C/2023 P1 Nishimura makes its closest approach to Earth.",
       visibility: "Northern Hemisphere",
       magnitude: 4.5
@@ -107,15 +108,28 @@ const generateCosmicEvents = (): CosmicEvent[] => {
 
 export default function CosmicEventPlanner() {
   const [events, setEvents] = useState<CosmicEvent[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [notifications, setNotifications] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const cosmicEvents = generateCosmicEvents();
-    setEvents(cosmicEvents);
+    // This runs only on client side, avoiding hydration mismatch
+    setEvents(generateCosmicEvents());
+    setSelectedDate(new Date());
+    setMounted(true);
   }, []);
+
+  // Don't render time-sensitive content until mounted
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-3 text-white">Loading cosmic events...</span>
+      </div>
+    );
+  }
 
   const filteredEvents = events.filter(event => {
     if (filter === "all") return true;
@@ -123,14 +137,13 @@ export default function CosmicEventPlanner() {
   });
 
   const upcomingEvents = filteredEvents
-    .filter(event => isAfter(event.date, new Date()))
+    .filter(event => selectedDate ? isAfter(event.date, selectedDate) : true)
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .slice(0, 10);
 
-  const todayEvents = filteredEvents.filter(event => {
-    const today = new Date();
-    return event.date >= startOfDay(today) && event.date <= endOfDay(today);
-  });
+  const todayEvents = selectedDate ? filteredEvents.filter(event => {
+    return event.date >= startOfDay(selectedDate) && event.date <= endOfDay(selectedDate);
+  }) : [];
 
   const toggleNotification = (eventId: string) => {
     const newNotifications = new Set(notifications);
@@ -148,7 +161,7 @@ export default function CosmicEventPlanner() {
     const eventType = EVENT_TYPES[event.type];
     const Icon = eventType.icon;
     const isNotified = notifications.has(event.id);
-    const daysUntil = Math.ceil((event.date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    const daysUntil = selectedDate ? Math.ceil((event.date.getTime() - selectedDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
     return (
       <motion.div

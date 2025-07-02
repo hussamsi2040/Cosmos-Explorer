@@ -38,11 +38,11 @@ interface SatelliteAlert {
 }
 
 const generateSpacewalks = (): Spacewalk[] => {
-  const today = new Date();
+  const baseDate = new Date('2024-07-02T00:00:00Z');
   return [
     {
       id: "eva-1",
-      date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      date: new Date(baseDate.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       duration: "6h 30m",
       astronauts: ["Andreas Mogensen", "Satoshi Furukawa"],
       mission: "Expedition 70 EVA",
@@ -55,7 +55,7 @@ const generateSpacewalks = (): Spacewalk[] => {
     },
     {
       id: "eva-2",
-      date: new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      date: new Date(baseDate.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       duration: "7h 45m",
       astronauts: ["Jasmin Moghbeli", "Loral O'Hara"],
       mission: "Expedition 70 EVA",
@@ -69,33 +69,31 @@ const generateSpacewalks = (): Spacewalk[] => {
   ];
 };
 
-const generateAlerts = (): SatelliteAlert[] => {
+const generateInitialAlerts = (): SatelliteAlert[] => {
+  const baseDate = new Date('2024-07-02T00:00:00Z');
   const alerts: SatelliteAlert[] = [];
-  const now = new Date();
   
-  // Generate some sample alerts
-  if (Math.random() > 0.7) {
-    alerts.push({
-      id: "alert-1",
-      type: "debris",
-      severity: "medium",
-      message: "Space debris detected in trajectory - monitoring for potential conjunction",
-      timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000)
-    });
-  }
-  
-  if (Math.random() > 0.8) {
-    alerts.push({
-      id: "alert-2",
-      type: "maneuver",
-      severity: "low",
-      message: "Minor orbital adjustment completed successfully",
-      timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000)
-    });
-  }
+  // Generate some sample alerts with fixed data for consistency
+  alerts.push({
+    id: "alert-1",
+    type: "debris",
+    severity: "medium",
+    message: "Space debris detected in trajectory - monitoring for potential conjunction",
+    timestamp: new Date(baseDate.getTime() - 2 * 60 * 60 * 1000)
+  });
+
+  alerts.push({
+    id: "alert-2",
+    type: "maneuver",
+    severity: "low",
+    message: "Minor orbital adjustment completed successfully",
+    timestamp: new Date(baseDate.getTime() - 6 * 60 * 60 * 1000)
+  });
   
   return alerts;
 };
+
+let alertIdCounter = 0;
 
 export default function ISSTrackingTab() {
   const [issData, setIssData] = useState<ISSData | null>(null);
@@ -105,8 +103,18 @@ export default function ISSTrackingTab() {
   const [error, setError] = useState<string | null>(null);
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [lastAlertTime, setLastAlertTime] = useState<Date | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Initialize data only on client side
+    setSpacewalks(generateSpacewalks());
+    setAlerts(generateInitialAlerts());
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     async function fetchISSData() {
       setLoading(true);
       setError(null);
@@ -127,10 +135,10 @@ export default function ISSTrackingTab() {
 
           setIssData(newIssData);
           
-          // Generate random alerts occasionally
-          if (Math.random() > 0.9 && alertsEnabled) {
+          // Generate random alerts occasionally (only if alerts enabled and mounted)
+          if (Math.random() > 0.9 && alertsEnabled && mounted) {
             const newAlert: SatelliteAlert = {
-              id: `alert-${Date.now()}`,
+              id: `alert-${++alertIdCounter}`,
               type: "communication",
               severity: "low",
               message: "ISS communication window open - clear signal quality",
@@ -151,14 +159,13 @@ export default function ISSTrackingTab() {
     }
 
     fetchISSData();
-    setSpacewalks(generateSpacewalks());
-    setAlerts(generateAlerts());
-
     const interval = setInterval(fetchISSData, 10000); // update every 10s
     return () => clearInterval(interval);
-  }, [alertsEnabled]);
+  }, [alertsEnabled, mounted]);
 
   const toggleAlerts = () => {
+    if (!mounted) return;
+    
     setAlertsEnabled(prev => {
       const newState = !prev;
       if (newState) {
@@ -188,6 +195,15 @@ export default function ISSTrackingTab() {
       default: return Bell;
     }
   };
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-3 text-white">Initializing ISS tracker...</span>
+      </div>
+    );
+  }
 
   if (loading) return (
     <div className="flex items-center justify-center p-8">

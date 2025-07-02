@@ -17,6 +17,8 @@ interface Exoplanet {
   habitableZone: "too_hot" | "habitable" | "too_cold" | "unknown";
   composition: "rocky" | "gas_giant" | "ice_giant" | "super_earth" | "unknown";
   confirmed: boolean;
+  // Add consistent positioning for visualization
+  visualPosition: { x: number; y: number };
 }
 
 const DISCOVERY_METHODS = {
@@ -72,7 +74,7 @@ const COMPOSITION = {
   unknown: { color: "text-gray-400", label: "Unknown", emoji: "❓" }
 };
 
-// Sample exoplanet data (in real app, would come from NASA Exoplanet Archive)
+// Sample exoplanet data with fixed positions for consistent rendering
 const generateExoplanetData = (): Exoplanet[] => {
   const planets: Exoplanet[] = [
     {
@@ -87,7 +89,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 265,
       habitableZone: "habitable",
       composition: "super_earth",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 25, y: 30 }
     },
     {
       id: "proxima-b",
@@ -102,7 +105,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 234,
       habitableZone: "habitable",
       composition: "rocky",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 60, y: 20 }
     },
     {
       id: "trappist-1e",
@@ -117,7 +121,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 251,
       habitableZone: "habitable",
       composition: "rocky",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 80, y: 60 }
     },
     {
       id: "k2-18b",
@@ -132,7 +137,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 265,
       habitableZone: "habitable",
       composition: "super_earth",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 40, y: 70 }
     },
     {
       id: "hd-209458b",
@@ -146,7 +152,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 1400,
       habitableZone: "too_hot",
       composition: "gas_giant",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 15, y: 80 }
     },
     {
       id: "gliese-581g",
@@ -160,7 +167,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       stellarDistance: 20.4,
       habitableZone: "habitable",
       composition: "super_earth",
-      confirmed: false
+      confirmed: false,
+      visualPosition: { x: 70, y: 40 }
     },
     {
       id: "wolf-359c",
@@ -174,7 +182,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       equilibriumTemp: 180,
       habitableZone: "too_cold",
       composition: "super_earth",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 50, y: 15 }
     },
     {
       id: "toi-715b",
@@ -187,7 +196,8 @@ const generateExoplanetData = (): Exoplanet[] => {
       stellarDistance: 137,
       habitableZone: "habitable",
       composition: "super_earth",
-      confirmed: true
+      confirmed: true,
+      visualPosition: { x: 35, y: 50 }
     }
   ];
 
@@ -204,12 +214,17 @@ export default function ExoplanetExplorer() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"distance" | "discovery" | "size">("distance");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Load data only on client side to avoid hydration issues
     setExoplanets(generateExoplanetData());
+    setMounted(true);
   }, []);
 
   const filteredPlanets = useMemo(() => {
+    if (!mounted) return [];
+    
     return exoplanets
       .filter(planet => {
         const nameMatch = planet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -232,9 +247,11 @@ export default function ExoplanetExplorer() {
             return 0;
         }
       });
-  }, [exoplanets, filter, searchTerm, sortBy]);
+  }, [exoplanets, filter, searchTerm, sortBy, mounted]);
 
   const stats = useMemo(() => {
+    if (!mounted) return { habitable: 0, confirmed: 0, total: 0, closest: null };
+    
     const habitable = exoplanets.filter(p => p.habitableZone === "habitable").length;
     const confirmed = exoplanets.filter(p => p.confirmed).length;
     const closest = exoplanets.reduce((min, planet) => 
@@ -242,7 +259,7 @@ export default function ExoplanetExplorer() {
     );
     
     return { habitable, confirmed, total: exoplanets.length, closest };
-  }, [exoplanets]);
+  }, [exoplanets, mounted]);
 
   const PlanetVisualization = ({ planet }: { planet: Exoplanet }) => {
     const size = Math.max(20, Math.min(100, planet.planetRadius * 30));
@@ -255,16 +272,16 @@ export default function ExoplanetExplorer() {
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.1 }}
         onClick={() => setSelectedPlanet(planet)}
-        className="relative cursor-pointer group"
+        className="absolute cursor-pointer group"
         style={{
-          left: `${Math.random() * 70 + 10}%`,
-          top: `${Math.random() * 70 + 10}%`,
-          position: "absolute"
+          left: `${planet.visualPosition.x}%`,
+          top: `${planet.visualPosition.y}%`,
+          transform: 'translate(-50%, -50%)'
         }}
       >
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: planet.orbitalPeriod / 10, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: Math.max(5, planet.orbitalPeriod / 10), repeat: Infinity, ease: "linear" }}
           className={`rounded-full ${habitability.bg} border-2 border-current ${habitability.color} flex items-center justify-center`}
           style={{ width: size, height: size }}
         >
@@ -341,6 +358,15 @@ export default function ExoplanetExplorer() {
     );
   };
 
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-3 text-white">Loading exoplanet data...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -368,7 +394,9 @@ export default function ExoplanetExplorer() {
           <div className="text-sm text-gray-400">Confirmed Planets</div>
         </div>
         <div className="bg-purple-900/30 border border-purple-400/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-purple-400">{stats.closest.stellarDistance.toFixed(1)}</div>
+          <div className="text-2xl font-bold text-purple-400">
+            {stats.closest ? stats.closest.stellarDistance.toFixed(1) : '0'}
+          </div>
           <div className="text-sm text-gray-400">Closest (ly)</div>
         </div>
       </div>

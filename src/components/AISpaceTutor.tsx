@@ -83,6 +83,8 @@ const quickQuestions = [
   "Why is space cold?"
 ];
 
+let messageIdCounter = 0;
+
 // Simple keyword matching for educational responses
 const generateResponse = (question: string): Message => {
   const lowerQuestion = question.toLowerCase();
@@ -104,7 +106,7 @@ const generateResponse = (question: string): Message => {
       }
       
       return {
-        id: Date.now().toString(),
+        id: `bot_${++messageIdCounter}`,
         type: "bot",
         content: response,
         timestamp: new Date(),
@@ -116,7 +118,7 @@ const generateResponse = (question: string): Message => {
   // General space responses for common patterns
   if (lowerQuestion.includes("how") && lowerQuestion.includes("work")) {
     return {
-      id: Date.now().toString(),
+      id: `bot_${++messageIdCounter}`,
       type: "bot",
       content: "🔧 Great question about how things work in space! Space physics involves fascinating concepts like gravity, orbital mechanics, and the laws of physics in a vacuum. Could you be more specific about what space technology or phenomenon you'd like to understand?",
       timestamp: new Date(),
@@ -126,7 +128,7 @@ const generateResponse = (question: string): Message => {
   
   if (lowerQuestion.includes("why") || lowerQuestion.includes("what causes")) {
     return {
-      id: Date.now().toString(),
+      id: `bot_${++messageIdCounter}`,
       type: "bot",
       content: "🤔 Excellent question! Space is full of amazing phenomena with fascinating explanations. Could you tell me more about the specific space topic you're curious about? I can explain concepts related to planets, stars, spacecraft, physics, and more!",
       timestamp: new Date(),
@@ -136,7 +138,7 @@ const generateResponse = (question: string): Message => {
   
   if (lowerQuestion.includes("astronaut") || lowerQuestion.includes("space travel")) {
     return {
-      id: Date.now().toString(),
+      id: `bot_${++messageIdCounter}`,
       type: "bot",
       content: "👨‍🚀 Space travel and astronauts are fascinating topics! Astronauts undergo years of training to live and work in the unique environment of space. They deal with microgravity, radiation, isolation, and many other challenges. What specific aspect of astronaut life or space travel interests you most?",
       timestamp: new Date(),
@@ -146,7 +148,7 @@ const generateResponse = (question: string): Message => {
   
   // Default response with suggestions
   return {
-    id: Date.now().toString(),
+    id: `bot_${++messageIdCounter}`,
     type: "bot",
     content: `🌟 I'd love to help you learn about space! I have knowledge about many topics including planets, stars, galaxies, spacecraft, astronauts, and space physics.\n\n💡 **Try asking about:**\n${quickQuestions.slice(0, 4).map(q => `• ${q}`).join('\n')}\n\nOr ask me anything else about space - I'll do my best to explain it!`,
     timestamp: new Date(),
@@ -155,44 +157,54 @@ const generateResponse = (question: string): Message => {
 };
 
 export default function AISpaceTutor() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      type: "bot",
-      content: "🚀 Hello! I'm your AI Space Tutor. I'm here to help you explore the wonders of space and answer your cosmic questions!\n\nAsk me about planets, stars, spacecraft, black holes, or any other space topic you're curious about. I love sharing space knowledge! ✨",
-      timestamp: new Date(),
-      category: "Welcome"
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Initialize with welcome message only on client side
+    setMessages([
+      {
+        id: "welcome",
+        type: "bot",
+        content: "🚀 Hello! I'm your AI Space Tutor. I'm here to help you explore the wonders of space and answer your cosmic questions!\n\nAsk me about planets, stars, spacecraft, black holes, or any other space topic you're curious about. I love sharing space knowledge! ✨",
+        timestamp: new Date(),
+        category: "Welcome"
+      }
+    ]);
+    setMounted(true);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (mounted) {
+      scrollToBottom();
+    }
+  }, [messages, mounted]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: `user_${++messageIdCounter}`,
       type: "user",
       content: input,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setIsTyping(true);
 
     // Simulate thinking time
     setTimeout(() => {
-      const botResponse = generateResponse(input);
+      const botResponse = generateResponse(currentInput);
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
     }, 1000 + Math.random() * 1000);
@@ -200,8 +212,28 @@ export default function AISpaceTutor() {
 
   const handleQuickQuestion = (question: string) => {
     setInput(question);
-    // Auto-send the question
-    setTimeout(() => handleSendMessage(), 100);
+    // Auto-send the question after a brief delay
+    setTimeout(() => {
+      if (question.trim()) {
+        const userMessage: Message = {
+          id: `user_${++messageIdCounter}`,
+          type: "user",
+          content: question,
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setInput("");
+        setIsTyping(true);
+
+        // Generate response
+        setTimeout(() => {
+          const botResponse = generateResponse(question);
+          setMessages(prev => [...prev, botResponse]);
+          setIsTyping(false);
+        }, 1000 + Math.random() * 1000);
+      }
+    }, 100);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -210,6 +242,17 @@ export default function AISpaceTutor() {
       handleSendMessage();
     }
   };
+
+  if (!mounted) {
+    return (
+      <div className="flex flex-col h-[700px] bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-center flex-1">
+          <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-3 text-white">Initializing AI Space Tutor...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[700px] bg-white/5 border border-white/10 rounded-2xl overflow-hidden">

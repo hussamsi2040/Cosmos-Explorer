@@ -56,8 +56,9 @@ const RISK_LEVELS = {
   critical: { color: "text-red-400", bg: "bg-red-900/30", label: "Critical Risk" }
 };
 
-// Simulated space debris data (in real app, would come from space surveillance networks)
+// Generate debris data with fixed values for consistent rendering
 const generateDebrisData = (): DebrisObject[] => {
+  const baseDate = new Date('2024-07-02T00:00:00Z');
   const debris: DebrisObject[] = [];
   
   // ISS
@@ -71,21 +72,21 @@ const generateDebrisData = (): DebrisObject[] => {
     riskLevel: "low",
     origin: "International",
     launchDate: "1998",
-    lastUpdate: new Date()
+    lastUpdate: baseDate
   });
 
-  // Sample debris objects
+  // Fixed debris objects with consistent data
   const debrisData = [
-    { name: "Cosmos 1408 Debris", type: "satellite_debris", altitude: 485, origin: "Russia", risk: "high" },
-    { name: "Fengyun-1C Fragment", type: "satellite_debris", altitude: 850, origin: "China", risk: "medium" },
-    { name: "Iridium 33 Debris", type: "satellite_debris", altitude: 790, origin: "USA", risk: "medium" },
-    { name: "Starlink-1007", type: "operational_satellite", altitude: 550, origin: "SpaceX", risk: "low" },
-    { name: "Falcon 9 R/B", type: "rocket_body", altitude: 300, origin: "SpaceX", risk: "medium" },
-    { name: "Ariane 5 Upper Stage", type: "rocket_body", altitude: 35786, origin: "ESA", risk: "low" },
-    { name: "Hubble Space Telescope", type: "operational_satellite", altitude: 547, origin: "NASA", risk: "low" },
-    { name: "Unknown Fragment #4821", type: "unknown", altitude: 650, origin: "Unknown", risk: "high" },
-    { name: "Sentinel-1A", type: "operational_satellite", altitude: 693, origin: "ESA", risk: "low" },
-    { name: "Long March 3B R/B", type: "rocket_body", altitude: 250, origin: "China", risk: "critical" }
+    { name: "Cosmos 1408 Debris", type: "satellite_debris", altitude: 485, origin: "Russia", risk: "high", size: "Medium (1-5m)", speed: 7.45, launch: "2010" },
+    { name: "Fengyun-1C Fragment", type: "satellite_debris", altitude: 850, origin: "China", risk: "medium", size: "Small (< 1m)", speed: 7.12, launch: "2007" },
+    { name: "Iridium 33 Debris", type: "satellite_debris", altitude: 790, origin: "USA", risk: "medium", size: "Medium (1-5m)", speed: 7.25, launch: "2009" },
+    { name: "Starlink-1007", type: "operational_satellite", altitude: 550, origin: "SpaceX", risk: "low", size: "Small (< 1m)", speed: 7.58, launch: "2019" },
+    { name: "Falcon 9 R/B", type: "rocket_body", altitude: 300, origin: "SpaceX", risk: "medium", size: "Large (> 5m)", speed: 7.73, launch: "2023" },
+    { name: "Ariane 5 Upper Stage", type: "rocket_body", altitude: 35786, origin: "ESA", risk: "low", size: "Large (> 5m)", speed: 3.07, launch: "2015" },
+    { name: "Hubble Space Telescope", type: "operational_satellite", altitude: 547, origin: "NASA", risk: "low", size: "Large (> 5m)", speed: 7.59, launch: "1990" },
+    { name: "Unknown Fragment #4821", type: "unknown", altitude: 650, origin: "Unknown", risk: "high", size: "Small (< 1m)", speed: 7.48 },
+    { name: "Sentinel-1A", type: "operational_satellite", altitude: 693, origin: "ESA", risk: "low", size: "Medium (1-5m)", speed: 7.44, launch: "2014" },
+    { name: "Long March 3B R/B", type: "rocket_body", altitude: 250, origin: "China", risk: "critical", size: "Large (> 5m)", speed: 7.78, launch: "2024" }
   ];
 
   debrisData.forEach((item, index) => {
@@ -93,13 +94,13 @@ const generateDebrisData = (): DebrisObject[] => {
       id: `debris_${index}`,
       name: item.name,
       type: item.type as any,
-      altitude: item.altitude + Math.random() * 20 - 10, // Add some variation
-      speed: 7.5 + Math.random() * 2, // Typical orbital speeds
-      size: ["Small (< 1m)", "Medium (1-5m)", "Large (> 5m)"][Math.floor(Math.random() * 3)],
+      altitude: item.altitude,
+      speed: item.speed,
+      size: item.size,
       riskLevel: item.risk as any,
       origin: item.origin,
-      launchDate: Math.random() > 0.5 ? (2000 + Math.floor(Math.random() * 24)).toString() : undefined,
-      lastUpdate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000) // Last 7 days
+      launchDate: item.launch,
+      lastUpdate: new Date(baseDate.getTime() - (index + 1) * 24 * 60 * 60 * 1000) // Stagger update times
     });
   });
 
@@ -111,15 +112,25 @@ export default function SpaceDebrisTracker() {
   const [filter, setFilter] = useState<string>("all");
   const [riskFilter, setRiskFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Simulate loading debris data
-    setTimeout(() => {
+    // Load data only on client side to avoid hydration issues
+    const loadData = () => {
       setDebrisObjects(generateDebrisData());
       setLoading(false);
-    }, 1000);
+      setMounted(true);
+    };
 
-    // Update positions every 30 seconds
+    // Simulate loading time
+    const timer = setTimeout(loadData, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Update positions every 30 seconds (only on client side)
     const interval = setInterval(() => {
       setDebrisObjects(prev => prev.map(obj => ({
         ...obj,
@@ -128,7 +139,7 @@ export default function SpaceDebrisTracker() {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [mounted]);
 
   const filteredObjects = debrisObjects.filter(obj => {
     const typeMatch = filter === "all" || obj.type === filter;

@@ -11,6 +11,16 @@ interface SpaceWeatherData {
   kpIndex: number;
 }
 
+// Generate consistent solar wind data for initial render
+const generateSolarWindData = () => {
+  // Use fixed values for consistent server/client rendering
+  return {
+    speed: 425, // km/s - typical value
+    density: 8.5, // protons/cm³ - typical value
+    temperature: 75000 // K - typical value
+  };
+};
+
 async function fetchSpaceWeatherData(): Promise<SpaceWeatherData> {
   const today = new Date();
   const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -25,12 +35,8 @@ async function fetchSpaceWeatherData(): Promise<SpaceWeatherData> {
     fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json').then(r => r.json()).catch(() => [])
   ]);
 
-  // Simulate solar wind data (in real app, you'd use actual APIs)
-  const solarWind = {
-    speed: Math.floor(Math.random() * 200) + 300, // km/s
-    density: (Math.random() * 10 + 5).toFixed(1), // protons/cm³
-    temperature: Math.floor(Math.random() * 50000) + 50000 // K
-  };
+  // Use consistent solar wind data
+  const solarWind = generateSolarWindData();
 
   // Calculate current Kp index from aurora data
   const kpIndex = auroraData.length > 1 ? parseFloat(auroraData[auroraData.length - 1][1]) || 2.0 : 2.0;
@@ -63,8 +69,25 @@ export default function SpaceWeatherTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Initialize with default data first to avoid hydration issues
+    const defaultData: SpaceWeatherData = {
+      solarFlares: [],
+      geomagneticStorms: [],
+      auroraForecast: [],
+      solarWind: generateSolarWindData(),
+      kpIndex: 2.0
+    };
+    
+    setData(defaultData);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     async function fetchData() {
       setLoading(true);
       setError(null);
@@ -82,9 +105,18 @@ export default function SpaceWeatherTab() {
     // Update every 15 minutes
     const interval = setInterval(fetchData, 15 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [mounted]);
 
-  if (loading) return <div className="text-white p-6">Loading space weather data...</div>;
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-3 text-white">Initializing space weather monitor...</span>
+      </div>
+    );
+  }
+
+  if (loading && !data) return <div className="text-white p-6">Loading space weather data...</div>;
   if (error) return <div className="text-red-400 p-6">{error}</div>;
   if (!data) return <div className="text-gray-400 p-6">No space weather data available.</div>;
 
