@@ -522,43 +522,45 @@ function EventPlannerInternal() {
                         <div className="text-[#a2abb3] text-sm">{event.type}</div>
                       </div>
                     </div>
-                <div className="text-right">
-                  <div className="text-white font-medium">
-                    {event.date.toLocaleDateString()}
+                    <div className="text-right">
+                      <div className="text-white font-medium">
+                        {event.date.toLocaleDateString()}
+                      </div>
+                      <div className="text-[#a2abb3] text-sm">
+                        {event.date.toLocaleTimeString()}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-[#a2abb3] text-sm">
-                    {event.date.toLocaleTimeString()}
+                  
+                  <div className="space-y-2 text-sm">
+                    <div className="text-white">{event.description}</div>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-[#a2abb3] font-semibold">Visibility:</span>
+                        <span className="text-white ml-1">{event.visibility}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#a2abb3] font-semibold">Duration:</span>
+                        <span className="text-white ml-1">{event.duration}</span>
+                      </div>
+                    </div>
+                    {event.peakRate && (
+                      <div className="text-xs">
+                        <span className="text-[#a2abb3] font-semibold">Peak Rate:</span>
+                        <span className="text-white ml-1">{event.peakRate}</span>
+                      </div>
+                    )}
+                    {event.magnitude && (
+                      <div className="text-xs">
+                        <span className="text-[#a2abb3] font-semibold">Magnitude:</span>
+                        <span className="text-white ml-1">{event.magnitude}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              
-              <div className="space-y-2 text-sm">
-                <div className="text-white">{event.description}</div>
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-[#a2abb3] font-semibold">Visibility:</span>
-                    <span className="text-white ml-1">{event.visibility}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#a2abb3] font-semibold">Duration:</span>
-                    <span className="text-white ml-1">{event.duration}</span>
-                  </div>
-                </div>
-                {event.peakRate && (
-                  <div className="text-xs">
-                    <span className="text-[#a2abb3] font-semibold">Peak Rate:</span>
-                    <span className="text-white ml-1">{event.peakRate}</span>
-                  </div>
-                )}
-                {event.magnitude && (
-                  <div className="text-xs">
-                    <span className="text-[#a2abb3] font-semibold">Magnitude:</span>
-                    <span className="text-white ml-1">{event.magnitude}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
