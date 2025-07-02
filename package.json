@@ -20,7 +20,7 @@
     "react-calendar": "^4.8.0",
     "framer-motion": "^11.0.8",
     "react-hot-toast": "^2.4.1",
-    "lucide-react": "^0.344.0"
+    "lucide-react": "^0.454.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
