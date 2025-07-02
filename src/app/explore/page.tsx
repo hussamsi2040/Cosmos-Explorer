@@ -7,23 +7,33 @@ import SpaceCareersTab from "../../components/SpaceCareersTab";
 import CosmicChallengesTab from "../../components/CosmicChallengesTab";
 import LessonPathTab from "../../components/LessonPathTab";
 import ISSCrewLogTab from "../../components/ISSCrewLogTab";
+import ISSTrackingTab from "../../components/ISSTrackingTab";
 import MissionDashboard from "../../components/MissionDashboard";
 import PayloadExplorer from "../../components/PayloadExplorer";
 import LaunchGame from "../../components/LaunchGame";
+import CosmicEventPlanner from "../../components/CosmicEventPlanner";
+import AISpaceTutor from "../../components/AISpaceTutor";
+import SpaceDebrisTracker from "../../components/SpaceDebrisTracker";
+import ExoplanetExplorer from "../../components/ExoplanetExplorer";
 
 const ExplorePage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const tabs = [
     { id: "dashboard", label: "🧭 Mission Dashboard", component: MissionDashboard },
+    { id: "iss-tracker", label: "🛰️ ISS Live Tracker", component: ISSTrackingTab },
+    { id: "space-weather", label: "🌞 Space Weather", component: SpaceWeatherTab },
+    { id: "cosmic-events", label: "📅 Cosmic Events", component: CosmicEventPlanner },
+    { id: "exoplanets", label: "🪐 Exoplanet Explorer", component: ExoplanetExplorer },
+    { id: "space-debris", label: "🗑️ Space Debris Tracker", component: SpaceDebrisTracker },
+    { id: "ai-tutor", label: "🤖 AI Space Tutor", component: AISpaceTutor },
     { id: "payloads", label: "📦 Payload Explorer", component: PayloadExplorer },
     { id: "game", label: "🎮 Launch Game", component: LaunchGame },
     { id: "rockets", label: "🚀 Rockets & Spaceflight", component: RocketsTab },
-    { id: "iss", label: "🛰️ ISS Crew Log", component: ISSCrewLogTab },
-    { id: "weather", label: "🌞 Space Weather", component: SpaceWeatherTab },
-    { id: "careers", label: "👨‍🚀 Space Careers", component: SpaceCareersTab },
+    { id: "iss-crew", label: "👨‍� ISS Crew Log", component: ISSCrewLogTab },
+    { id: "careers", label: "� Space Careers", component: SpaceCareersTab },
     { id: "challenges", label: "🎯 Cosmic Challenges", component: CosmicChallengesTab },
-    { id: "lessons", label: "🤖 AI Lesson Path", component: LessonPathTab },
+    { id: "lessons", label: "📚 AI Lesson Path", component: LessonPathTab },
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
@@ -72,20 +82,34 @@ const ExplorePage = () => {
           </div>
         </header>
         
-        <div className="px-40 flex flex-1 justify-center py-5">
-          <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
+        <div className="px-10 flex flex-1 justify-center py-5">
+          <div className="layout-content-container flex flex-col max-w-[1400px] flex-1">
             <div className="flex flex-wrap justify-between gap-3 p-4">
-              <h1 className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Explore</h1>
+              <h1 className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Explore the Cosmos</h1>
+              <p className="text-gray-400 text-sm mt-2">
+                Comprehensive space exploration tools with real-time data and interactive experiences
+              </p>
+            </div>
+            
+            {/* Featured Tools Banner */}
+            <div className="px-4 mb-6">
+              <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-400/30 rounded-lg p-4">
+                <h3 className="text-white font-bold mb-2">🚀 New Enhanced Features</h3>
+                <p className="text-gray-300 text-sm">
+                  Explore space with our comprehensive suite of tools: track the ISS in real-time, monitor space weather, 
+                  discover exoplanets, plan cosmic events, chat with our AI tutor, and monitor space debris!
+                </p>
+              </div>
             </div>
             
             {/* Tab Navigation */}
             <div className="px-4 mb-6">
-              <div className="flex flex-wrap gap-2 border-b border-white/20">
+              <div className="flex flex-wrap gap-2 border-b border-white/20 pb-4">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-t-lg font-medium transition-all duration-200 ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
                       activeTab === tab.id
                         ? "bg-blue-500 text-white shadow-lg"
                         : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white"

@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Noto_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
 });
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
   title: "Cosmic Classroom",
-  description: "Explore the wonders of space and Earth through daily images and events",
+  description: "Your gateway to the cosmos - explore space with interactive tools and real-time data",
 };
 
 export default function RootLayout({
@@ -27,10 +26,31 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${notoSans.variable} antialiased`}
-        style={{ fontFamily: '"Space Grotesk", "Noto Sans", sans-serif' }}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: '#1f2937',
+              color: '#f3f4f6',
+              border: '1px solid #374151',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#1f2937',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#1f2937',
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
