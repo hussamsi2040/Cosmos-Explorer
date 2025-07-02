@@ -75,8 +75,10 @@ const getMarsImageOfTheWeek = () => {
     }
   ];
 
-  // Rotate images daily based on current date
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  // Rotate images daily based on current date (deterministic for SSR/client consistency)
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
   const selectedImage = marsImages[dayOfYear % marsImages.length];
   
   // Use fallback Unsplash Mars images if NASA images aren't available
@@ -294,12 +296,13 @@ function CosmosContent() {
   const [apodError, setApodError] = useState<string | undefined>(undefined);
   const [epicError, setEpicError] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
-
-  const marsWeather = getMarsWeather();
-  const marsImage = getMarsImageOfTheWeek();
-  const earthVsMars = getEarthVsMars();
-  const earthPhenomena = getEarthPhenomena();
-  const todayQuote = spaceQuotes[Math.floor(Math.random() * spaceQuotes.length)];
+  
+  // Client-side only data to prevent hydration mismatch
+  const [marsWeather, setMarsWeather] = useState<any>(null);
+  const [marsImage, setMarsImage] = useState<any>(null);
+  const [earthVsMars, setEarthVsMars] = useState<any>(null);
+  const [earthPhenomena, setEarthPhenomena] = useState<any>(null);
+  const [todayQuote, setTodayQuote] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -322,10 +325,17 @@ function CosmosContent() {
       setIsLoading(false);
     };
 
+    // Initialize client-side data to prevent hydration mismatch
+    setMarsWeather(getMarsWeather());
+    setMarsImage(getMarsImageOfTheWeek());
+    setEarthVsMars(getEarthVsMars());
+    setEarthPhenomena(getEarthPhenomena());
+    setTodayQuote(spaceQuotes[Math.floor(Math.random() * spaceQuotes.length)]);
+
     fetchData();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !marsWeather || !marsImage || !earthVsMars || !earthPhenomena || !todayQuote) {
     return (
       <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
         <div className="text-white text-center p-8 flex items-center justify-center gap-3">
