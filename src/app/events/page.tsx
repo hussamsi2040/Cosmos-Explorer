@@ -477,141 +477,147 @@ function CosmicEventsContentInternal() {
         </div>
       )}
 
-      {/* Astronomical Events */}
-      <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
-      <div className="p-4">
-        
-        {/* Filter Controls */}
-        <div className="flex gap-2 mb-4 flex-wrap">
-          <div className="flex gap-2">
-            {months.slice(0, 7).map(month => (
-              <button
-                key={month}
-                onClick={() => setSelectedMonth(month)}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                  selectedMonth === month
-                    ? 'bg-purple-500 text-white'
-                    : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-                }`}
-              >
-                {month}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            {eventTypes.map(type => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(type)}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                  selectedType === type
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="text-xs text-[#a2abb3] mb-2 col-span-full">
-            🌙 Real astronomical event calculations and meteor shower dates
-          </div>
-          {filteredEvents.slice(0, 6).map(event => (
-            <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20 relative overflow-hidden">
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">
-                      {event.type === 'Meteor Shower' ? '☄️' : 
-                       event.type === 'Lunar Phase' ? '🌙' : 
-                       event.type === 'Planetary' ? '🪐' : '✨'}
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold">{event.name}</h4>
-                      <div className="text-[#a2abb3] text-sm">{event.type}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-white font-medium">
-                      {event.date.toLocaleDateString()}
-                    </div>
-                    <div className="text-[#a2abb3] text-sm">
-                      {event.date.toLocaleTimeString()}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 text-sm">
-                  <div className="text-white">{event.description}</div>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-[#a2abb3] font-semibold">Visibility:</span>
-                      <span className="text-white ml-1">{event.visibility}</span>
-                    </div>
-                    <div>
-                      <span className="text-[#a2abb3] font-semibold">Duration:</span>
-                      <span className="text-white ml-1">{event.duration}</span>
-                    </div>
-                  </div>
-                </div>
+      {activeTab === 'events' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
+          <div className="p-4">
+            
+            {/* Filter Controls */}
+            <div className="flex gap-2 mb-4 flex-wrap">
+              <div className="flex gap-2">
+                {months.slice(0, 7).map(month => (
+                  <button
+                    key={month}
+                    onClick={() => setSelectedMonth(month)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      selectedMonth === month
+                        ? 'bg-purple-500 text-white'
+                        : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
+                    }`}
+                  >
+                    {month}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                {eventTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedType(type)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      selectedType === type
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Space Weather Alerts */}
-      <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Space Weather Alerts</h2>
-      <div className="p-4">
-        <div className="space-y-4">
-          <div className="text-xs text-[#a2abb3] mb-2">
-            🌞 Real-time space weather alerts from NOAA Space Weather Prediction Center
-          </div>
-          {spaceWeatherAlerts.map(alert => (
-            <div key={alert.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-red-500/20 relative overflow-hidden">
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">
-                      {alert.type === 'Solar Flare' ? '☀️' :
-                       alert.type === 'Geomagnetic Storm' ? '🌪️' :
-                       alert.type === 'Aurora Activity' ? '🌌' : '⚠️'}
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg">{alert.title}</h4>
-                      <div className="text-[#a2abb3] text-sm">{alert.type} • {alert.source}</div>
-                    </div>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    alert.severity === 'High Risk' ? 'bg-red-500/20 text-red-400' :
-                    alert.severity === 'Medium Risk' ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-green-500/20 text-green-400'
-                  }`}>
-                    {alert.severity}
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="text-white text-sm">{alert.description}</div>
-                  <div className="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                      <div className="text-[#a2abb3] font-semibold">Issued</div>
-                      <div className="text-white">{alert.issuedAt.toLocaleDateString()} {alert.issuedAt.toLocaleTimeString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-[#a2abb3] font-semibold">Valid Until</div>
-                      <div className="text-white">{alert.validUntil.toLocaleDateString()} {alert.validUntil.toLocaleTimeString()}</div>
-                    </div>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="text-xs text-[#a2abb3] mb-2 col-span-full">
+                🌙 Real astronomical event calculations and meteor shower dates
               </div>
+              {filteredEvents.slice(0, 6).map(event => (
+                <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl">
+                          {event.type === 'Meteor Shower' ? '☄️' : 
+                           event.type === 'Lunar Phase' ? '🌙' : 
+                           event.type === 'Planetary' ? '🪐' : '✨'}
+                        </div>
+                        <div>
+                          <h4 className="text-white font-semibold">{event.name}</h4>
+                          <div className="text-[#a2abb3] text-sm">{event.type}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white font-medium">
+                          {event.date.toLocaleDateString()}
+                        </div>
+                        <div className="text-[#a2abb3] text-sm">
+                          {event.date.toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="text-white">{event.description}</div>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="text-[#a2abb3] font-semibold">Visibility:</span>
+                          <span className="text-white ml-1">{event.visibility}</span>
+                        </div>
+                        <div>
+                          <span className="text-[#a2abb3] font-semibold">Duration:</span>
+                          <span className="text-white ml-1">{event.duration}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'weather' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Space Weather Alerts</h2>
+          <div className="p-4">
+            <div className="space-y-4">
+              <div className="text-xs text-[#a2abb3] mb-2">
+                🌞 Real-time space weather alerts from NOAA Space Weather Prediction Center
+              </div>
+              {spaceWeatherAlerts.map(alert => (
+                <div key={alert.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-red-500/20 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl">
+                          {alert.type === 'Solar Flare' ? '☀️' :
+                           alert.type === 'Geomagnetic Storm' ? '🌪️' :
+                           alert.type === 'Aurora Activity' ? '🌌' : '⚠️'}
+                        </div>
+                        <div>
+                          <h4 className="text-white font-semibold text-lg">{alert.title}</h4>
+                          <div className="text-[#a2abb3] text-sm">{alert.type} • {alert.source}</div>
+                        </div>
+                      </div>
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        alert.severity === 'High Risk' ? 'bg-red-500/20 text-red-400' :
+                        alert.severity === 'Medium Risk' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-green-500/20 text-green-400'
+                      }`}>
+                        {alert.severity}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="text-white text-sm">{alert.description}</div>
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div>
+                          <div className="text-[#a2abb3] font-semibold">Issued</div>
+                          <div className="text-white">{alert.issuedAt.toLocaleDateString()} {alert.issuedAt.toLocaleTimeString()}</div>
+                        </div>
+                        <div>
+                          <div className="text-[#a2abb3] font-semibold">Valid Until</div>
+                          <div className="text-white">{alert.validUntil.toLocaleDateString()} {alert.validUntil.toLocaleTimeString()}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
