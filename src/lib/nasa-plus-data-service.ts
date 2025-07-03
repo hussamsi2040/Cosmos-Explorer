@@ -357,22 +357,11 @@ export function ensureDataDirectory(): boolean {
 }
 
 /**
- * Run the daily scraper programmatically (for testing)
+ * Run the daily scraper programmatically (server-side only)
+ * This function is not available in browser context
  */
 export async function runDailyScraper(): Promise<NASAPlusData> {
-  try {
-    console.log('🚀 Running daily scraper programmatically...');
-    
-    // Import and run the scraper
-    const { runDailyScrape } = require('../../scripts/daily-nasa-scraper.js');
-    const result = await runDailyScrape();
-    
-    console.log('✅ Daily scraper completed programmatically');
-    return result;
-  } catch (error) {
-    console.error('❌ Failed to run daily scraper:', error);
-    throw error;
-  }
+  throw new Error('Daily scraper can only be run server-side via npm scripts. Use: npm run scrape');
 }
 
 // Export types for TypeScript

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getNASAPlusContent, getDataStatus, type NASAPlusData } from '@/lib/nasa-plus-data-service';
+// Removed direct import of data service to avoid Node.js modules in browser
 import CentralVideoPlayer from '@/components/CentralVideoPlayer';
 
 // NASA+ Dynamic Data Types
@@ -260,26 +260,26 @@ export default function NASATV() {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
-        console.log('🚀 Fetching dynamic NASA+ content via scraper...');
+        console.log('🚀 Loading NASA+ content from daily scraped data...');
         
-        // Use the data service for NASA+ content
-        const nasaData = await getNASAPlusContent();
-        const dataStatusInfo = getDataStatus();
+        // Use the API route for NASA+ content (server-side data service)
+        const response = await fetch('/api/nasa-plus');
+        const nasaData = await response.json();
         
         // Also fetch NASA news for additional content
         const news = await fetchNASANews();
 
-        setLiveEvents(nasaData.liveEvents);
-        setNasaShows(nasaData.shows);
-        setNasaSeries(nasaData.series);
+        setLiveEvents(nasaData.liveEvents || []);
+        setNasaShows(nasaData.shows || []);
+        setNasaSeries(nasaData.series || []);
         setNasaNews(news);
-        setDataStatus(dataStatusInfo);
+        setDataStatus(nasaData.dataStatus);
         setLastUpdated(new Date());
         
-        console.log('✅ NASA+ content loaded from data service successfully');
-        console.log(`📊 Loaded: ${nasaData.shows.length} shows, ${nasaData.liveEvents.length} events, ${nasaData.series.length} series`);
+        console.log('✅ NASA+ content loaded from API successfully');
+        console.log(`📊 Loaded: ${nasaData.shows?.length || 0} shows, ${nasaData.liveEvents?.length || 0} events, ${nasaData.series?.length || 0} series`);
       } catch (error) {
-        console.error('Failed to fetch NASA+ data via scraper:', error);
+        console.error('Failed to load NASA+ data from API:', error);
         
         // Fallback to static content if scraper fails
         const [events, shows, series, news] = await Promise.all([
