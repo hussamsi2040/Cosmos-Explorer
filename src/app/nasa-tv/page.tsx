@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getCachedNASAPlusContent } from '@/lib/nasa-plus-scraper';
 
 // NASA+ Dynamic Data Types
 interface LiveEvent {
@@ -257,8 +258,26 @@ export default function NASATV() {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
-        console.log('Fetching dynamic NASA+ content...');
+        console.log('🚀 Fetching dynamic NASA+ content via scraper...');
         
+        // Use the scraper for real NASA+ content
+        const scrapedContent = await getCachedNASAPlusContent();
+        
+        // Also fetch NASA news for additional content
+        const news = await fetchNASANews();
+
+        setLiveEvents(scrapedContent.liveEvents);
+        setNasaShows(scrapedContent.shows);
+        setNasaSeries(scrapedContent.series);
+        setNasaNews(news);
+        setLastUpdated(new Date());
+        
+        console.log('✅ Dynamic NASA+ content loaded via scraper successfully');
+        console.log(`📊 Loaded: ${scrapedContent.shows.length} shows, ${scrapedContent.liveEvents.length} events, ${scrapedContent.series.length} series`);
+      } catch (error) {
+        console.error('Failed to fetch NASA+ data via scraper:', error);
+        
+        // Fallback to static content if scraper fails
         const [events, shows, series, news] = await Promise.all([
           fetchNASAPlusEvents(),
           fetchNASAPlusContent(),
@@ -271,10 +290,6 @@ export default function NASATV() {
         setNasaSeries(series);
         setNasaNews(news);
         setLastUpdated(new Date());
-        
-        console.log('✅ Dynamic NASA+ content loaded successfully');
-      } catch (error) {
-        console.error('Failed to fetch NASA+ data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -282,7 +297,7 @@ export default function NASATV() {
 
     fetchAllData();
 
-    // Refresh data every 5 minutes
+    // Refresh data every 5 minutes to get fresh scraped content
     const refreshInterval = setInterval(fetchAllData, 5 * 60 * 1000);
     return () => clearInterval(refreshInterval);
   }, []);
@@ -310,8 +325,8 @@ export default function NASATV() {
       <div className="min-h-screen bg-[#1a1b1d] text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <div className="text-white text-lg font-semibold">Loading NASA+ Content...</div>
-          <div className="text-[#a2abb3] text-sm">Fetching live data from NASA's streaming platform</div>
+          <div className="text-white text-lg font-semibold">Scraping NASA+ Content...</div>
+          <div className="text-[#a2abb3] text-sm">Dynamically fetching real data from plus.nasa.gov</div>
         </div>
       </div>
     );
