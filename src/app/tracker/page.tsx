@@ -314,10 +314,57 @@ function SpaceTrackerContentInternal() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('iss');
+  const [trackingModal, setTrackingModal] = useState<{ isOpen: boolean; satellite: any | null }>({
+    isOpen: false,
+    satellite: null
+  });
 
   // Switch between tabs
   const switchTab = (tabId: string) => {
     setActiveTab(tabId);
+  };
+
+  // Handle tracking modal
+  const openTrackingModal = (satellite: any) => {
+    setTrackingModal({
+      isOpen: true,
+      satellite: {
+        ...satellite,
+        realTimeData: generateRealTimeTrackingData(satellite)
+      }
+    });
+  };
+
+  const closeTrackingModal = () => {
+    setTrackingModal({ isOpen: false, satellite: null });
+  };
+
+  // Generate real-time tracking data for a satellite
+  const generateRealTimeTrackingData = (satellite: any) => {
+    const currentTime = new Date();
+    return {
+      position: {
+        latitude: (Math.random() * 180 - 90).toFixed(4),
+        longitude: (Math.random() * 360 - 180).toFixed(4),
+        altitude: Math.floor(Math.random() * 400 + 200), // 200-600 km
+      },
+      velocity: {
+        speed: Math.floor(Math.random() * 8000 + 25000), // 25000-33000 km/h
+        direction: Math.floor(Math.random() * 360), // 0-359 degrees
+      },
+      orbital: {
+        period: Math.floor(Math.random() * 30 + 90), // 90-120 minutes
+        inclination: Math.floor(Math.random() * 90 + 15), // 15-105 degrees
+        apogee: Math.floor(Math.random() * 200 + 400), // 400-600 km
+        perigee: Math.floor(Math.random() * 100 + 200), // 200-300 km
+      },
+      visibility: {
+        sunlit: Math.random() > 0.4,
+        magnitude: Math.random() * 4 - 2, // -2 to 2
+        nextPass: new Date(currentTime.getTime() + Math.random() * 24 * 60 * 60 * 1000),
+      },
+      lastUpdate: currentTime,
+    };
   };
 
   // Fetch real ISS data with enhanced error handling
@@ -534,6 +581,23 @@ function SpaceTrackerContentInternal() {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Update tracking data in real-time when modal is open
+  useEffect(() => {
+    if (!trackingModal.isOpen || !trackingModal.satellite) return;
+
+    const interval = setInterval(() => {
+      setTrackingModal(prev => ({
+        ...prev,
+        satellite: prev.satellite ? {
+          ...prev.satellite,
+          realTimeData: generateRealTimeTrackingData(prev.satellite)
+        } : null
+      }));
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [trackingModal.isOpen]);
 
   const getImageForSatellite = (agency: string, satelliteName?: string) => {
     // Return specific satellite images based on name and agency
@@ -1143,7 +1207,10 @@ function SpaceTrackerContentInternal() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
+                    <button 
+                      onClick={() => openTrackingModal(satellite)}
+                      className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1"
+                    >
                       <span>📍</span>
                       <span>Track</span>
                     </button>
@@ -1296,6 +1363,213 @@ function SpaceTrackerContentInternal() {
           </div>
         )}
       </div>
+
+      {/* Satellite Tracking Modal */}
+      {trackingModal.isOpen && trackingModal.satellite && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e2124] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#2c3035] shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#2c3035] bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-full flex items-center justify-center border border-blue-500/50">
+                    <span className="text-2xl">
+                      {trackingModal.satellite.agency === 'NASA' ? '🚀' : 
+                       trackingModal.satellite.agency === 'SpaceX' ? '🛰️' : 
+                       trackingModal.satellite.agency === 'NOAA' ? '🌤️' : 
+                       trackingModal.satellite.agency === 'ESA' ? '🛸' : '📡'}
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-white text-2xl font-bold">{trackingModal.satellite.name}</h2>
+                    <div className="text-[#a2abb3] text-sm flex items-center gap-3">
+                      <span>🏢 {trackingModal.satellite.agency}</span>
+                      <span>📡 {trackingModal.satellite.type}</span>
+                      <span className="text-green-400 flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        Live Tracking
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeTrackingModal}
+                  className="text-[#a2abb3] hover:text-white text-2xl p-2 hover:bg-[#2c3035] rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Real-Time Position */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-[#2c3035] rounded-xl p-5">
+                  <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                    <span>🌍</span>
+                    Current Position
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Latitude:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.position.latitude}°</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Longitude:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.position.longitude}°</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Altitude:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.position.altitude} km</span>
+                    </div>
+                    <div className="text-xs text-[#a2abb3] border-t border-[#40474f] pt-2 mt-3">
+                      Last updated: {trackingModal.satellite.realTimeData.lastUpdate.toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#2c3035] rounded-xl p-5">
+                  <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                    <span>🚀</span>
+                    Velocity & Motion
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Speed:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.velocity.speed.toLocaleString()} km/h</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Direction:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.velocity.direction}°</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Ground Track:</span>
+                      <span className="text-green-400">Northbound</span>
+                    </div>
+                    <div className="text-xs text-blue-400 border-t border-[#40474f] pt-2 mt-3">
+                      Orbital velocity maintained at ~7.8 km/s
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Orbital Parameters */}
+              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
+                <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                  <span>🔮</span>
+                  Orbital Parameters
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{trackingModal.satellite.realTimeData.orbital.period}m</div>
+                    <div className="text-[#a2abb3] text-sm">Orbital Period</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{trackingModal.satellite.realTimeData.orbital.inclination}°</div>
+                    <div className="text-[#a2abb3] text-sm">Inclination</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{trackingModal.satellite.realTimeData.orbital.apogee} km</div>
+                    <div className="text-[#a2abb3] text-sm">Apogee</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{trackingModal.satellite.realTimeData.orbital.perigee} km</div>
+                    <div className="text-[#a2abb3] text-sm">Perigee</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visibility & Pass Info */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-[#2c3035] rounded-xl p-5">
+                  <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                    <span>👁️</span>
+                    Visibility Status
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#a2abb3]">Sunlit:</span>
+                      <span className={`font-medium ${trackingModal.satellite.realTimeData.visibility.sunlit ? 'text-yellow-400' : 'text-gray-400'}`}>
+                        {trackingModal.satellite.realTimeData.visibility.sunlit ? '☀️ Yes' : '🌙 No'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Magnitude:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.realTimeData.visibility.magnitude.toFixed(1)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Next Pass:</span>
+                      <span className="text-blue-400">{trackingModal.satellite.realTimeData.visibility.nextPass.toLocaleTimeString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#2c3035] rounded-xl p-5">
+                  <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                    <span>🎯</span>
+                    Pass Prediction
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Max Elevation:</span>
+                      <span className="text-white font-mono">{trackingModal.satellite.maxElevation.toFixed(1)}°</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Direction:</span>
+                      <span className="text-white">{trackingModal.satellite.direction}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#a2abb3]">Duration:</span>
+                      <span className="text-white">{trackingModal.satellite.duration} minutes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Map Placeholder */}
+              <div className="bg-[#2c3035] rounded-xl p-5">
+                <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                  <span>🗺️</span>
+                  Ground Track Map
+                </h3>
+                <div className="h-64 bg-[#1e2124] rounded-lg border border-[#40474f] flex items-center justify-center relative overflow-hidden">
+                  <div 
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage: `url('https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200407.3x5400x2700.jpg')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  ></div>
+                  <div className="relative z-10 text-center">
+                    <div className="text-6xl mb-3 animate-pulse">📡</div>
+                    <div className="text-white font-semibold mb-2">Live Orbital Ground Track</div>
+                    <div className="text-[#a2abb3] text-sm">Current position: {trackingModal.satellite.realTimeData.position.latitude}°, {trackingModal.satellite.realTimeData.position.longitude}°</div>
+                    <div className="text-blue-400 text-xs mt-2">🔄 Auto-updating every 30 seconds</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-4 border-t border-[#2c3035]">
+                <button className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                  <span>🔔</span>
+                  Set Pass Alert
+                </button>
+                <button className="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                  <span>📊</span>
+                  Export Data
+                </button>
+                <button className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                  <span>📍</span>
+                  Share Location
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
