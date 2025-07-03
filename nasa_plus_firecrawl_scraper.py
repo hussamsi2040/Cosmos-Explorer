@@ -215,10 +215,10 @@ class NASAPlusFirecrawlScraper:
 
 def main():
     """Main function to run the scraper"""
-    # You need to set your Firecrawl API key here
-    API_KEY = "YOUR_FIRECRAWL_API_KEY_HERE"  # Replace with your actual API key
+    # Firecrawl API key
+    API_KEY = "fc-8d9a8363bd874121af40813178449815"
     
-    if API_KEY == "YOUR_FIRECRAWL_API_KEY_HERE":
+    if not API_KEY or API_KEY == "YOUR_FIRECRAWL_API_KEY_HERE":
         print("❌ Please set your Firecrawl API key in the script!")
         print("🔗 Get your API key from: https://firecrawl.dev")
         return
