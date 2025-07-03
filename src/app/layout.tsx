@@ -15,7 +15,7 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Cosmic Classroom",
+  title: "Cosmos Explorer",
   description: "Explore the wonders of space and Earth through daily images and events",
 };
 

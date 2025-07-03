@@ -1,8 +1,8 @@
-# 🌌 Cosmic Classroom
+# 🌌 Cosmos Explorer
 
 A comprehensive space education platform powered by Next.js, featuring real-time NASA data, AI-powered assistance, and interactive space exploration tools.
 
-![Cosmic Classroom](https://img.shields.io/badge/Space-Education-blue?style=for-the-badge&logo=rocket)
+![Cosmos Explorer](https://img.shields.io/badge/Space-Education-blue?style=for-the-badge&logo=rocket)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![AI Powered](https://img.shields.io/badge/AI-Powered-purple?style=for-the-badge&logo=openai)
@@ -65,8 +65,8 @@ A comprehensive space education platform powered by Next.js, featuring real-time
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/cosmic-classroom.git
-   cd cosmic-classroom
+   git clone https://github.com/your-username/cosmos-explorer.git
+   cd cosmos-explorer
    ```
 
 2. **Install dependencies**
@@ -212,8 +212,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Documentation**: Check our [docs](./docs) folder
-- **Issues**: Report bugs on [GitHub Issues](https://github.com/your-username/cosmic-classroom/issues)
-- **Discussions**: Join conversations in [GitHub Discussions](https://github.com/your-username/cosmic-classroom/discussions)
+- **Issues**: Report bugs on [GitHub Issues](https://github.com/your-username/cosmos-explorer/issues)
+- **Discussions**: Join conversations in [GitHub Discussions](https://github.com/your-username/cosmos-explorer/discussions)
 
 ---
 
