@@ -578,11 +578,16 @@ export default function NASATV() {
 
             {/* Featured Series Grid */}
             <div className="p-4">
-              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">
-                Featured Series
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
+                  Featured Series
+                </h2>
+                <div className="text-[#a2abb3] text-sm">
+                  {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).length} with thumbnails
+                </div>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {(nasaSeries as any[]).map((series) => (
+                {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).map((series) => (
                   <Link
                     key={series.slug}
                     href={`/cosmos-explorer/nasa-tv/${series.slug}`}
@@ -593,6 +598,9 @@ export default function NASATV() {
                         src={series.thumbnail}
                         alt={series.name}
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1541185934-01b600ea069c?w=400&h=225&fit=crop&auto=format&q=80";
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
@@ -602,6 +610,12 @@ export default function NASATV() {
                   </Link>
                 ))}
               </div>
+              {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).length === 0 && (
+                <div className="text-center py-8">
+                  <div className="text-[#a2abb3] text-lg mb-2">📡</div>
+                  <p className="text-[#a2abb3]">Loading series thumbnails...</p>
+                </div>
+              )}
             </div>
 
             {/* Central Video Player */}
