@@ -359,19 +359,19 @@ function CosmicEventsContentInternal() {
               {activeTab === 'events' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
             </button>
             <button 
-              onClick={() => setActiveTab('luna')}
+              onClick={() => setActiveTab('weather')}
               className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
-                activeTab === 'luna' 
+                activeTab === 'weather' 
                   ? 'bg-blue-500 text-white shadow-lg transform scale-105' 
                   : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
               }`}
             >
-              <div className="text-lg">🤖</div>
+              <div className="text-lg">🌞</div>
               <div className="flex flex-col items-start">
-                <span className="font-semibold">Luna AI Assistant</span>
-                <span className="text-xs opacity-80">Space concepts explained</span>
+                <span className="font-semibold">Space Weather</span>
+                <span className="text-xs opacity-80">Solar activity alerts</span>
               </div>
-              {activeTab === 'luna' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+              {activeTab === 'weather' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
             </button>
           </div>
         </div>
