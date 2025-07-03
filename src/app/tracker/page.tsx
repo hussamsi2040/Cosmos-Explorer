@@ -786,16 +786,7 @@ function SpaceTrackerContentInternal() {
         <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Real-Time Space Tracker</p>
       </div>
 
-      {/* Status Notice */}
-      <div className="px-4 pb-2">
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center gap-3">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <div className="text-sm text-blue-300">
-            <strong>Mixed Data Sources:</strong> Live ISS position & crew data, real satellite passes from APIs, 
-            and historic NASA EVA mission records with real YouTube videos. Browser extension interference is handled gracefully.
-          </div>
-        </div>
-      </div>
+
 
             {/* Tab Navigation */}
       <div className="border-b border-[#2c3035] px-4 mb-6">
@@ -1135,65 +1126,7 @@ function SpaceTrackerContentInternal() {
               🚀 Historic EVA Mission Archive
             </h2>
             <div className="p-4">
-        {/* EVA Mission Gallery */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks', '_blank')}>
-            <img 
-              src="https://science.nasa.gov/wp-content/uploads/2023/11/iss-expedition-70-eva-moghbeli-ohara.jpg?w=768&format=webp" 
-              alt="Recent EVA Mission"
-              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🚀 Recent EVA Missions
-            </div>
-            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              🎥 Videos
-            </div>
-          </div>
-          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/solar-arrays', '_blank')}>
-            <img 
-              src="https://science.nasa.gov/wp-content/uploads/2023/06/iss-expedition-69-irosa-installation.jpg?w=768&format=webp" 
-              alt="Solar Array Installation"
-              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              ⚡ iROSA Installation
-            </div>
-            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              🎥 Watch
-            </div>
-          </div>
-          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/emergency', '_blank')}>
-            <img 
-              src="https://science.nasa.gov/wp-content/uploads/2023/04/iss-expedition-68-emergency-eva.jpg?w=768&format=webp" 
-              alt="Emergency EVA"
-              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🚨 Emergency EVAs
-            </div>
-            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              🎥 Record
-            </div>
-          </div>
-          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/russian-segment', '_blank')}>
-            <img 
-              src="https://science.nasa.gov/wp-content/uploads/2023/10/iss-expedition-70-russian-eva-kononenko-chub.jpg?w=768&format=webp" 
-              alt="Russian EVA Operations"
-              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🇷🇺 Russian EVAs
-            </div>
-            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-              🎥 Footage
-            </div>
-          </div>
-        </div>
+
 
         <div className="space-y-4">
           <div className="text-xs text-[#a2abb3] mb-2 flex items-center justify-between">
@@ -1277,22 +1210,17 @@ function SpaceTrackerContentInternal() {
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="flex gap-3">
+                <div>
                   <button 
                     onClick={() => window.open(`https://www.youtube.com/watch?v=${spacewalk.videoId}`, '_blank')}
-                    className="flex-1 bg-red-600/20 border border-red-600/30 rounded-lg p-3 text-center text-red-300 hover:bg-red-600/30 transition-colors"
+                    className="w-full bg-red-600/20 border border-red-600/30 rounded-lg p-3 text-center text-red-300 hover:bg-red-600/30 transition-colors"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <span>📺</span>
                       <span className="font-medium">Watch on YouTube</span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => window.open(`https://www.nasa.gov/mission/station/spacewalks/`, '_blank')}
-                    className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3 text-blue-300 hover:bg-blue-500/30 transition-colors"
-                  >
-                    <span>�</span>
-                  </button>
+                  
                 </div>
               </div>
             </div>
