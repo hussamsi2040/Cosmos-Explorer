@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import LaunchGame from "../../components/LaunchGame";
+import Link from "next/link";
 
 const GamesPage = () => {
   const [activeGame, setActiveGame] = useState("launch");
@@ -53,10 +54,11 @@ const GamesPage = () => {
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <a href="/" className="text-white text-sm font-medium leading-normal">Today</a>
-              <a href="/explore" className="text-white text-sm font-medium leading-normal">Explore</a>
-              <a href="/learn" className="text-white text-sm font-medium leading-normal">Learn</a>
-              <a href="/games" className="text-white text-sm font-medium leading-normal">Games</a>
+              <Link href="/cosmos-explorer" className="text-white text-sm font-medium leading-normal">Today</Link>
+              <Link href="/cosmos-explorer/nasa-tv" className="text-white text-sm font-medium leading-normal">NASA TV</Link>
+              <Link href="/tracker" className="text-white text-sm font-medium leading-normal">Tracker</Link>
+              <Link href="/events" className="text-white text-sm font-medium leading-normal">Events</Link>
+              <Link href="/games" className="text-white text-sm font-medium leading-normal">Games</Link>
             </div>
             <div className="flex gap-2">
               <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#292f38] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">

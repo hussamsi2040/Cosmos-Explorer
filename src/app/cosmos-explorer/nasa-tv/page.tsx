@@ -598,28 +598,29 @@ export default function NASATV() {
               </div>
             )}
 
-            {/* NASA+ Series Highlights */}
+            {/* Featured Series Grid */}
             <div className="p-4">
-              <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Featured Series on NASA+</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {nasaSeries.slice(0, 8).map((series: any) => (
+              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">
+                Featured Series
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {(nasaSeries as any[]).map((series) => (
                   <Link
-                    key={series.name}
+                    key={series.slug}
                     href={`/cosmos-explorer/nasa-tv/${series.slug}`}
-                    className="group bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-purple-500/50 cursor-pointer transition-all duration-300 hover:scale-105"
+                    className="group relative block"
                   >
-                    <div className="relative">
+                    <div className="relative h-0 pb-[150%] overflow-hidden rounded-lg bg-[#292f38]">
                       <img
                         src={series.thumbnail}
                         alt={series.name}
-                        className="w-full h-40 object-cover"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                       <div className="absolute bottom-2 left-2 text-white">
-                        <h4 className="font-bold text-sm">{series.name}</h4>
-                        <p className="text-xs text-[#a2abb3]">{series.episodes} Episodes</p>
-                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
+                    <h3 className="mt-2 text-white text-sm font-semibold line-clamp-2 group-hover:text-red-400 transition-colors">
+                      {series.name}
+                    </h3>
                   </Link>
                 ))}
               </div>
