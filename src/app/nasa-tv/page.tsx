@@ -448,20 +448,38 @@ export default function NASATV() {
         <div className="p-4">
           <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Explore NASA+</h3>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {categories.map(category => (
-              <button
-                key={category.name}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
-                  selectedCategory === category.name
-                    ? 'bg-red-500 text-white shadow-lg scale-105'
-                    : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
-                }`}
-              >
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
-              </button>
-            ))}
+            {categories.map(category => {
+              const categoryCount = category.name === "Live & Upcoming" 
+                ? liveEvents.length 
+                : nasaShows.filter(show => show.category === category.name).length;
+              
+              return (
+                <button
+                  key={category.name}
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
+                    selectedCategory === category.name
+                      ? 'bg-red-500 text-white shadow-lg scale-105'
+                      : categoryCount > 0
+                        ? 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
+                        : 'bg-[#1a1b1d] text-[#555] cursor-not-allowed opacity-50'
+                  }`}
+                  disabled={categoryCount === 0}
+                >
+                  <span>{category.icon}</span>
+                  <span>{category.name}</span>
+                  {categoryCount > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      selectedCategory === category.name
+                        ? 'bg-white/20 text-white'
+                        : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      {categoryCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -492,7 +510,7 @@ export default function NASATV() {
                       <div className="text-blue-400 text-sm font-medium">{event.date} • {event.time}</div>
                     </div>
                     <div className="text-2xl">
-                      {event.type === 'Launch' ? '🚀' : event.type === 'Live Stream' ? '�' : '��️'}
+                      {event.type === 'Launch' ? '🚀' : event.type === 'Live Stream' ? '🎥' : '📺'}
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
@@ -518,42 +536,65 @@ export default function NASATV() {
           <h3 className="text-white text-lg font-semibold mb-4">
             {selectedCategory === "Live & Upcoming" ? `Featured Shows • ${nasaShows.length} available` : `${selectedCategory} • ${filteredContent.length} shows`}
           </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {(selectedCategory === "Live & Upcoming" ? nasaShows.slice(0, 6) : filteredContent.slice(0, 12)).map((content: any) => (
-               <div 
-                 key={content.id}
-                 onClick={() => openContent(content)}
-                 className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
-               >
-                <div className="relative">
-                  <img 
-                    src={content.thumbnail} 
-                    alt={content.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                      <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
-                    </div>
-                  </div>
-                  <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    {content.duration}
-                  </div>
-                  <div className="absolute top-3 left-3 bg-red-600/80 text-white text-xs px-2 py-1 rounded">
-                    {content.publishDate}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h4 className="text-white font-semibold text-lg mb-2 line-clamp-2">{content.title}</h4>
-                  <p className="text-[#a2abb3] text-sm mb-3 line-clamp-2">{content.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-red-400 text-xs">{content.category}</span>
-                    <span className="text-[#a2abb3] text-xs">{content.series}</span>
-                  </div>
-                </div>
+          
+          {/* Empty State for Categories with No Content */}
+          {selectedCategory !== "Live & Upcoming" && filteredContent.length === 0 && (
+            <div className="bg-[#1e2124] rounded-xl border border-[#2c3035] p-8 text-center">
+              <div className="text-4xl mb-4">
+                {categories.find(cat => cat.name === selectedCategory)?.icon || '📺'}
               </div>
-            ))}
-          </div>
+              <h4 className="text-white text-lg font-semibold mb-2">No {selectedCategory} Content Available</h4>
+              <p className="text-[#a2abb3] text-sm mb-4">
+                We don't have any {selectedCategory.toLowerCase()} content in our current scraped data. 
+                The daily scraper will collect more content from NASA+ automatically.
+              </p>
+              <div className="flex items-center justify-center gap-4 text-xs text-[#a2abb3]">
+                <span>🔄 Auto-updates daily</span>
+                <span>📡 Content from plus.nasa.gov</span>
+                <span>⏰ Next scrape: Tomorrow 6 AM</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Content Grid - Only show if there's content */}
+          {(selectedCategory === "Live & Upcoming" || filteredContent.length > 0) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(selectedCategory === "Live & Upcoming" ? nasaShows.slice(0, 6) : filteredContent.slice(0, 12)).map((content: any) => (
+                <div 
+                  key={content.id}
+                  onClick={() => openContent(content)}
+                  className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
+                >
+                 <div className="relative">
+                   <img 
+                     src={content.thumbnail} 
+                     alt={content.title}
+                     className="w-full h-48 object-cover"
+                   />
+                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                       <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
+                     </div>
+                   </div>
+                   <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                     {content.duration}
+                   </div>
+                   <div className="absolute top-3 left-3 bg-red-600/80 text-white text-xs px-2 py-1 rounded">
+                     {content.publishDate}
+                   </div>
+                 </div>
+                 <div className="p-4">
+                   <h4 className="text-white font-semibold text-lg mb-2 line-clamp-2">{content.title}</h4>
+                   <p className="text-[#a2abb3] text-sm mb-3 line-clamp-2">{content.description}</p>
+                   <div className="flex items-center justify-between">
+                     <span className="text-red-400 text-xs">{content.category}</span>
+                     <span className="text-[#a2abb3] text-xs">{content.series}</span>
+                   </div>
+                 </div>
+               </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Dynamic NASA Series */}

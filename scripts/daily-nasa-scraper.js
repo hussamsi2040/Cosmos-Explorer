@@ -204,16 +204,18 @@ async function scrapeNASAPlusSeries() {
 function inferCategory(title) {
   const titleLower = title.toLowerCase();
   
-  if (titleLower.includes('webb') || titleLower.includes('telescope')) return 'James Webb';
-  if (titleLower.includes('mars') || titleLower.includes('rover')) return 'Mars';
-  if (titleLower.includes('astronaut') || titleLower.includes('crew')) return 'Astronauts';
-  if (titleLower.includes('launch') || titleLower.includes('rocket')) return 'Launches';
-  if (titleLower.includes('earth') || titleLower.includes('climate')) return 'Earth & Climate';
-  if (titleLower.includes('asteroid') || titleLower.includes('planetary')) return 'Asteroids';
-  if (titleLower.includes('artemis') || titleLower.includes('moon')) return 'Artemis';
-  if (titleLower.includes('documentary') || titleLower.includes('story')) return 'Documentaries';
-  if (titleLower.includes('technology') || titleLower.includes('engineering')) return 'Technology';
+  // Specific keyword mapping to match UI categories
+  if (titleLower.includes('webb') || titleLower.includes('telescope') || titleLower.includes('james webb')) return 'James Webb';
+  if (titleLower.includes('mars') || titleLower.includes('rover') || titleLower.includes('red planet')) return 'Mars';
+  if (titleLower.includes('astronaut') || titleLower.includes('crew') || titleLower.includes('space station') || titleLower.includes('iss')) return 'Astronauts';
+  if (titleLower.includes('launch') || titleLower.includes('rocket') || titleLower.includes('falcon') || titleLower.includes('spacex') || titleLower.includes('mission')) return 'Launches';
+  if (titleLower.includes('earth') || titleLower.includes('climate') || titleLower.includes('pace') || titleLower.includes('planet') || titleLower.includes('ocean')) return 'Earth & Climate';
+  if (titleLower.includes('asteroid') || titleLower.includes('planetary') || titleLower.includes('defense') || titleLower.includes('impact') || titleLower.includes('defenders')) return 'Asteroids';
+  if (titleLower.includes('artemis') || titleLower.includes('moon') || titleLower.includes('lunar') || titleLower.includes('lander')) return 'Artemis';
+  if (titleLower.includes('technology') || titleLower.includes('engineering') || titleLower.includes('alloy') || titleLower.includes('heat shield') || titleLower.includes('aeronautics') || titleLower.includes('aircraft')) return 'Technology';
+  if (titleLower.includes('hubble') || titleLower.includes('galaxy') || titleLower.includes('universe') || titleLower.includes('cosmic') || titleLower.includes('space')) return 'James Webb';
   
+  // Fallback to documentaries for unmatched content
   return 'Documentaries';
 }
 
