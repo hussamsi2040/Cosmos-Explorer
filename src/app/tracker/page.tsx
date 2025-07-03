@@ -990,43 +990,7 @@ function SpaceTrackerContentInternal() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          {/* Current Crew */}
-          <div className="bg-[#1e2124] rounded-xl p-6 border border-green-500/20 relative overflow-hidden">
-            <div 
-              className="absolute inset-0 opacity-10 bg-cover bg-center"
-              style={{
-                backgroundImage: "url('https://images.unsplash.com/photo-1604613453506-d8992efad17b?w=400&h=300&fit=crop&auto=format&q=80')"
-              }}
-            ></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="text-2xl">👨‍🚀</div>
-                <h3 className="text-white font-semibold text-lg">Current Crew</h3>
-              </div>
-            
-              {peopleData && (
-                <div className="space-y-3">
-                  <div className="text-white text-2xl font-bold">{peopleData.number} People in Space</div>
-                  <div className="space-y-2">
-                    {peopleData.people.slice(0, 7).map((person: any, index: number) => (
-                      <div key={index} className="flex justify-between items-center bg-[#2c3035] rounded-lg p-3">
-                        <div>
-                          <div className="text-white font-medium">{person.name}</div>
-                          <div className="text-[#a2abb3] text-xs">{person.craft}</div>
-                        </div>
-                        <div className="text-green-400 text-xs">🟢 Active</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-xs text-[#a2abb3]">
-                    📡 Real-time crew data from Open Notify API
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+
             </div>
           </div>
         )}
