@@ -1720,28 +1720,14 @@ function SpaceTrackerContentInternal() {
                   
                   {/* Speed indicator */}
                   <div className="absolute top-3 right-3 bg-black/70 rounded-lg p-2 text-xs">
-                    <div className="text-white font-semibold">� Velocity</div>
+                    <div className="text-white font-semibold">🚀 Velocity</div>
                     <div className="text-blue-400">{trackingModal.satellite.realTimeData.velocity.speed.toLocaleString()} km/h</div>
                     <div className="text-[#a2abb3]">{trackingModal.satellite.realTimeData.velocity.direction}° heading</div>
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-4 border-t border-[#2c3035]">
-                <button className="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>�</span>
-                  Export Tracking Data
-                </button>
-                <button className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>�</span>
-                  Live Sky Map
-                </button>
-                <button className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>�</span>
-                  Share Tracking
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
