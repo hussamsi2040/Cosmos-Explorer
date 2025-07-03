@@ -215,6 +215,10 @@ export default function NASATV() {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  
+  // Content Player State
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [showContentModal, setShowContentModal] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -267,6 +271,16 @@ export default function NASATV() {
 
   const openNASAPlus = () => {
     window.open('https://plus.nasa.gov/', '_blank');
+  };
+
+  const openContent = (content: any) => {
+    setSelectedContent(content);
+    setShowContentModal(true);
+  };
+
+  const closeContentModal = () => {
+    setShowContentModal(false);
+    setSelectedContent(null);
   };
 
   if (isLoading) {
@@ -436,7 +450,7 @@ export default function NASATV() {
                       <div className="text-blue-400 text-sm font-medium">{event.date} • {event.time}</div>
                     </div>
                     <div className="text-2xl">
-                      {event.type === 'Launch' ? '🚀' : event.type === 'Live Stream' ? '�' : '�🛰️'}
+                      {event.type === 'Launch' ? '🚀' : event.type === 'Live Stream' ? '�' : '��️'}
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
@@ -462,13 +476,13 @@ export default function NASATV() {
           <h3 className="text-white text-lg font-semibold mb-4">
             {selectedCategory === "Live & Upcoming" ? `Featured Shows • ${nasaShows.length} available` : `${selectedCategory} • ${filteredContent.length} shows`}
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(selectedCategory === "Live & Upcoming" ? nasaShows.slice(0, 6) : filteredContent.slice(0, 12)).map((content: any) => (
-              <div 
-                key={content.id}
-                onClick={openNASAPlus}
-                className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
-              >
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {(selectedCategory === "Live & Upcoming" ? nasaShows.slice(0, 6) : filteredContent.slice(0, 12)).map((content: any) => (
+               <div 
+                 key={content.id}
+                 onClick={() => openContent(content)}
+                 className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
+               >
                 <div className="relative">
                   <img 
                     src={content.thumbnail} 
@@ -504,13 +518,13 @@ export default function NASATV() {
         <div className="p-4">
           <h3 className="text-white text-lg font-semibold mb-4">NASA+ Series • {nasaSeries.length} active series</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-            {nasaSeries.map(series => (
-              <div 
-                key={series.name} 
-                onClick={openNASAPlus}
-                className="bg-[#1e2124] rounded-xl p-3 border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-105"
-                title={series.description}
-              >
+                         {nasaSeries.map(series => (
+               <div 
+                 key={series.name} 
+                 onClick={() => openContent(series)}
+                 className="bg-[#1e2124] rounded-xl p-3 border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-105"
+                 title={series.description}
+               >
                 <div className="text-center">
                   <div className="text-2xl mb-2">{series.icon}</div>
                   <h4 className="text-white font-medium text-sm mb-1">{series.name}</h4>
@@ -581,6 +595,162 @@ export default function NASATV() {
           </div>
         </nav>
       </div>
+
+      {/* Content Player Modal */}
+      {showContentModal && selectedContent && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e2124] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#2c3035] shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#2c3035] bg-gradient-to-r from-red-500/10 to-blue-500/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="text-3xl">
+                    {selectedContent.episodes ? selectedContent.icon : '🎬'}
+                  </div>
+                  <div>
+                    <h2 className="text-white text-2xl font-bold">
+                      {selectedContent.title || selectedContent.name}
+                    </h2>
+                    <div className="text-[#a2abb3] text-sm flex items-center gap-3">
+                      <span>{selectedContent.category || selectedContent.description}</span>
+                      {selectedContent.duration && (
+                        <span>• Duration: {selectedContent.duration}</span>
+                      )}
+                      {selectedContent.episodes && (
+                        <span>• {selectedContent.episodes} Episodes</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeContentModal}
+                  className="text-[#a2abb3] hover:text-white text-2xl p-2 hover:bg-[#2c3035] rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Content Body */}
+            <div className="p-6">
+              {/* Video Player Section */}
+              <div className="mb-6">
+                <div className="relative bg-black rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-900/20 to-blue-900/20">
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">🚀</div>
+                      <div className="text-white text-xl font-bold mb-2">
+                        {selectedContent.title || selectedContent.name}
+                      </div>
+                      <div className="text-[#a2abb3] mb-4">
+                        This content is available on NASA+ streaming platform
+                      </div>
+                      <button 
+                        onClick={openNASAPlus}
+                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition-colors flex items-center gap-2 mx-auto"
+                      >
+                        <span>📺</span>
+                        <span>Watch on NASA+</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Details */}
+              <div className="space-y-6">
+                {/* Description */}
+                <div>
+                  <h3 className="text-white text-lg font-semibold mb-3">About</h3>
+                  <p className="text-[#a2abb3] leading-relaxed">
+                    {selectedContent.description || `Explore ${selectedContent.name || selectedContent.title} and dive deep into NASA's incredible universe of content. This ${selectedContent.episodes ? 'series' : 'show'} offers unique insights into space exploration, scientific discovery, and the wonders of our universe.`}
+                  </p>
+                </div>
+
+                {/* Series Info */}
+                {selectedContent.episodes && (
+                  <div>
+                    <h3 className="text-white text-lg font-semibold mb-3">Series Information</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Episodes</div>
+                        <div className="text-white font-bold text-lg">{selectedContent.episodes}</div>
+                      </div>
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Category</div>
+                        <div className="text-white font-bold text-lg">Series</div>
+                      </div>
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Platform</div>
+                        <div className="text-white font-bold text-lg">NASA+</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show Info */}
+                {!selectedContent.episodes && selectedContent.duration && (
+                  <div>
+                    <h3 className="text-white text-lg font-semibold mb-3">Show Details</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Duration</div>
+                        <div className="text-white font-bold">{selectedContent.duration}</div>
+                      </div>
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Category</div>
+                        <div className="text-white font-bold">{selectedContent.category}</div>
+                      </div>
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Series</div>
+                        <div className="text-white font-bold">{selectedContent.series}</div>
+                      </div>
+                      <div className="bg-[#2c3035] rounded-lg p-3">
+                        <div className="text-[#a2abb3] text-xs mb-1">Year</div>
+                        <div className="text-white font-bold">{selectedContent.publishDate}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Related Content */}
+                <div>
+                  <h3 className="text-white text-lg font-semibold mb-3">More NASA+ Content</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {nasaShows.slice(0, 3).map(show => (
+                      <div 
+                        key={show.id}
+                        onClick={() => openContent(show)}
+                        className="bg-[#2c3035] rounded-lg p-3 cursor-pointer hover:bg-[#373c42] transition-colors"
+                      >
+                        <div className="text-white font-medium text-sm mb-1">{show.title}</div>
+                        <div className="text-[#a2abb3] text-xs">{show.duration} • {show.series}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <button 
+                  onClick={openNASAPlus}
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+                >
+                  <span>🚀</span>
+                  <span>Watch Full Content on NASA+</span>
+                </button>
+                <button 
+                  onClick={closeContentModal}
+                  className="bg-[#2c3035] hover:bg-[#373c42] text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                >
+                  Close Preview
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
