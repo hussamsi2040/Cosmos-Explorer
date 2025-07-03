@@ -782,28 +782,12 @@ export default function NASATV() {
 
                              {/* Action Buttons */}
                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                 {selectedContent.nasaUrl ? (
-                   <button 
-                     onClick={() => window.open(selectedContent.nasaUrl, '_blank')}
-                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
-                   >
-                     <span>🎬</span>
-                     <span>Watch "{selectedContent.title || selectedContent.name}" on NASA+</span>
-                   </button>
-                 ) : (
-                   <button 
-                     onClick={openNASAPlus}
-                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
-                   >
-                     <span>🚀</span>
-                     <span>Watch Full Content on NASA+</span>
-                   </button>
-                 )}
                  <button 
-                   onClick={openNASAPlus}
-                   className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-8 py-3 rounded-lg font-medium transition-colors border border-blue-500/30"
+                   onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
+                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
                  >
-                   Browse More NASA+ Content
+                   <span>🚀</span>
+                   <span>Watch Full Content on NASA+</span>
                  </button>
                  <button 
                    onClick={closeVideoPlayer}

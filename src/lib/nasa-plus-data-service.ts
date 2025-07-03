@@ -43,7 +43,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "April 16, 2025",
       videoQuality: "4K",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/video/planetary-defenders/",
+      nasaUrl: "https://plus.nasa.gov/",
       scrapedAt: new Date().toISOString()
     },
     {
@@ -57,7 +57,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "2024",
       videoQuality: "4K",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/video/cosmic-dawn/"
+      nasaUrl: "https://plus.nasa.gov/"
     },
     {
       id: 'far-out-science',
@@ -70,7 +70,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "2024",
       videoQuality: "HD",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/series/far-out/"
+      nasaUrl: "https://plus.nasa.gov/"
     },
     {
       id: 'down-to-earth',
@@ -83,7 +83,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "2024",
       videoQuality: "HD",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/series/down-to-earth/"
+      nasaUrl: "https://plus.nasa.gov/"
     },
     {
       id: 'x59-quesst',
@@ -96,7 +96,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "2024",
       videoQuality: "HD",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/video/x-59-nasa-quest-for-quiet-supersonic-flight/"
+      nasaUrl: "https://plus.nasa.gov/"
     },
     {
       id: 'other-worlds-europa',
@@ -109,7 +109,7 @@ const FALLBACK_DATA: NASAPlusData = {
       publishDate: "2024",
       videoQuality: "4K",
       rating: "TV-G",
-      nasaUrl: "https://plus.nasa.gov/series/other-worlds/"
+      nasaUrl: "https://plus.nasa.gov/"
     }
   ],
   liveEvents: [

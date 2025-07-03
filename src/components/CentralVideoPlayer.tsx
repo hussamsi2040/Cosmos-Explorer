@@ -258,7 +258,7 @@ export default function CentralVideoPlayer({ isOpen, content, onClose }: VideoPl
           {/* Action Buttons */}
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <button 
-              onClick={() => window.open(content.nasaUrl || 'https://plus.nasa.gov/', '_blank')}
+              onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
             >
               <span>🚀</span>

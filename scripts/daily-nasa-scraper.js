@@ -88,20 +88,20 @@ async function scrapeNASAPlusHomepage() {
           const category = inferCategory(title);
           const series = inferSeries(title);
           
-          shows.push({
-            id: `scraped-${Date.now()}-${index}`,
-            title: title,
-            duration: generateRealisticDuration(),
-            description: `${title} - Explore this fascinating content from NASA's streaming platform, featuring cutting-edge space exploration and scientific discovery.`,
-            thumbnail: selectThumbnailForCategory(category),
-            category: category,
-            series: series,
-            publishDate: generateRecentDate(),
-            videoQuality: Math.random() > 0.5 ? '4K' : 'HD',
-            rating: 'TV-G',
-            nasaUrl: `https://plus.nasa.gov/video/${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}/`,
-            scrapedAt: new Date().toISOString()
-          });
+                     shows.push({
+             id: `scraped-${Date.now()}-${index}`,
+             title: title,
+             duration: generateRealisticDuration(),
+             description: `${title} - Explore this fascinating content from NASA's streaming platform, featuring cutting-edge space exploration and scientific discovery.`,
+             thumbnail: selectThumbnailForCategory(category),
+             category: category,
+             series: series,
+             publishDate: generateRecentDate(),
+             videoQuality: Math.random() > 0.5 ? '4K' : 'HD',
+             rating: 'TV-G',
+             nasaUrl: "https://plus.nasa.gov/", // Always use main NASA+ page since generated URLs don't exist
+             scrapedAt: new Date().toISOString()
+           });
           videoCount++;
         }
       } catch (e) {
