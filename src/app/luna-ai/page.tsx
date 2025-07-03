@@ -71,22 +71,7 @@ const spaceConcepts: SpaceConcept[] = [
   }
 ];
 
-// Luna AI responses
-const lunaResponses = {
-  'black holes': 'Black holes are fascinating cosmic objects! They form when massive stars collapse under their own gravity. The boundary around a black hole is called the event horizon - once something crosses this point, it can never escape. Even light cannot get out, which is why we call them "black" holes. They\'re not actually holes though - they\'re incredibly dense objects that warp spacetime around them!',
-  
-  'solar system': 'Our solar system is like a cosmic neighborhood! At the center is our Sun, a medium-sized star that provides light and heat. Eight planets orbit the Sun: Mercury, Venus, Earth, Mars (the rocky inner planets), and Jupiter, Saturn, Uranus, Neptune (the gas and ice giants). We also have moons, asteroids, comets, and dwarf planets like Pluto. Everything is held together by the Sun\'s gravity!',
-  
-  'rocket propulsion': 'Rockets work on Newton\'s third law: for every action, there\'s an equal and opposite reaction! They burn fuel to create hot gases that shoot out the bottom at high speed. This pushes the rocket upward. It\'s like when you blow up a balloon and let it go - the air rushing out one way pushes the balloon the other way. Rockets need to reach about 25,000 mph to escape Earth\'s gravity!',
-  
-  'space stations': 'Space stations are like homes in space! The International Space Station (ISS) orbits Earth about 250 miles up, traveling at 17,500 mph. Astronauts live there for months, conducting experiments in microgravity. They grow food, exercise to stay healthy, and help us learn how humans can live in space for future missions to Mars and beyond!',
-  
-  'neutron stars': 'Neutron stars are the universe\'s ultimate extreme objects! When a massive star explodes in a supernova, its core can collapse into a neutron star - a city-sized object so dense that a teaspoon would weigh as much as Mount Everest! They spin incredibly fast, sometimes hundreds of times per second, and have magnetic fields trillions of times stronger than Earth\'s.',
-  
-  'mars exploration': 'Mars is our next frontier! We\'ve sent rovers like Curiosity and Perseverance to explore the Red Planet. Mars has seasons, polar ice caps, and evidence of ancient rivers and lakes. NASA plans to send humans to Mars in the 2030s! The journey takes about 7 months, and astronauts would stay for over a year before Earth and Mars align again for the return trip.',
-  
-  'default': 'That\'s a great space question! Space is full of amazing phenomena. Did you know that in space, there\'s no sound because there\'s no air to carry sound waves? Or that astronauts on the ISS see 16 sunrises and sunsets every day because they orbit Earth so fast? What specific aspect of space would you like to explore?'
-};
+// AI-only responses - no more fallback content
 
 // Prevent SSR for this component
 const LunaAIContent = dynamic(() => Promise.resolve(LunaAIContentInternal), {
@@ -106,7 +91,7 @@ function LunaAIContentInternal() {
     {
       id: '1',
       type: 'luna',
-      content: 'Hello! I\'m Luna, your AI assistant for space exploration! 🌙 I\'m powered by advanced AI and ready to help you understand the wonders of the cosmos. Ask me about planets, stars, rockets, space missions, black holes, or any space concept you\'re curious about!',
+      content: 'Hello! I\'m Luna, your fully AI-powered assistant for space exploration! 🌙 I\'m powered by OpenRouter\'s advanced o4-mini model and ready to provide real-time, intelligent answers about the cosmos. Ask me anything about planets, stars, rockets, space missions, black holes, or any space concept - I\'ll give you authentic AI-generated responses!',
       timestamp: new Date()
     }
   ]);
@@ -168,7 +153,7 @@ function LunaAIContentInternal() {
           "messages": [
             {
               "role": "system",
-              "content": "You are Luna, a friendly AI assistant specializing in space education for the Cosmic Classroom app. You explain space concepts in an engaging, educational way suitable for all ages. Always include interesting facts and use emojis when appropriate. Keep responses informative but conversational, around 2-3 sentences. Focus on space, astronomy, rockets, planets, and space exploration topics. After your response, suggest 3 follow-up questions that would help the user learn more about the topic, formatted as: FOLLOW_UP: question1|question2|question3"
+              "content": "You are Luna, a highly knowledgeable AI assistant specializing in space education for the Cosmic Classroom app. You have extensive knowledge about astronomy, astrophysics, space exploration, rockets, planets, stars, galaxies, space missions, and all cosmic phenomena. Explain concepts in an engaging, educational way suitable for all ages - from beginners to advanced learners. Always include fascinating facts, use relevant emojis, and make complex topics accessible. Keep responses informative but conversational, around 2-4 sentences. Be accurate with scientific information while maintaining enthusiasm for space exploration. After your response, suggest 3 follow-up questions that would help the user learn more about the topic, formatted as: FOLLOW_UP: question1|question2|question3"
             },
             {
               "role": "user", 
@@ -185,7 +170,7 @@ function LunaAIContentInternal() {
       }
 
       const data = await response.json();
-      const fullResponse = data.choices[0]?.message?.content || getFallbackResponse(userInput);
+      const fullResponse = data.choices[0]?.message?.content || "I'm having trouble connecting to my AI brain right now. Please try asking your question again in a moment! 🤖✨";
       
       // Extract follow-up questions if present
       const followUpMatch = fullResponse.match(/FOLLOW_UP:\s*(.+)$/);
@@ -202,34 +187,11 @@ function LunaAIContentInternal() {
     } catch (error) {
       console.error('OpenRouter API failed:', error);
       setFollowUpQuestions(getDefaultFollowUpQuestions(userInput));
-      return getFallbackResponse(userInput);
+      return "I'm experiencing some technical difficulties connecting to my AI brain right now! 🤖⚡ This might be due to network issues or API limitations. Please try asking your question again in a moment. If this continues, you might want to check your internet connection or try a simpler question. I'm excited to help you explore space once I'm back online! 🚀✨";
     }
   };
 
-  const getFallbackResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    for (const [key, response] of Object.entries(lunaResponses)) {
-      if (key !== 'default' && input.includes(key)) {
-        return response;
-      }
-    }
-    
-    // Check for general space terms
-    if (input.includes('space') || input.includes('universe') || input.includes('cosmos')) {
-      return 'Space is absolutely incredible! The universe is about 13.8 billion years old and contains over 2 trillion galaxies. Each galaxy has billions of stars, and many of those stars have planets. We\'re literally made of stardust - the heavy elements in our bodies were forged in the cores of ancient stars! What specific aspect of space fascinates you most? 🌌';
-    }
-    
-    if (input.includes('astronaut') || input.includes('spacewalk')) {
-      return 'Astronauts are real-life space explorers! They train for years to live and work in microgravity. During spacewalks (EVAs), they wear spacesuits that act like personal spacecraft, protecting them from the vacuum of space and extreme temperatures. Fun fact: spacesuits cost about $500 million each and take 6 hours to put on properly! 🚀';
-    }
-    
-    if (input.includes('moon') || input.includes('lunar')) {
-      return 'The Moon is Earth\'s faithful companion! 🌙 It\'s about 238,900 miles away and causes our ocean tides. The Moon is slowly moving away from Earth at about 1.5 inches per year. The Apollo missions landed 12 astronauts on the Moon between 1969-1972. NASA\'s Artemis program plans to return humans to the Moon soon, including the first woman!';
-    }
-    
-    return lunaResponses.default;
-  };
+  // Removed getFallbackResponse - now using 100% AI-generated responses
 
   const getDefaultFollowUpQuestions = (userInput: string): string[] => {
     const input = userInput.toLowerCase();
