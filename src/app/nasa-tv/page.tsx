@@ -22,6 +22,9 @@ interface NASAShow {
   thumbnail: string;
   series: string;
   publishDate: string;
+  videoQuality?: string;
+  rating?: string;
+  nasaUrl?: string;
 }
 
 interface NASASeries {
@@ -69,68 +72,86 @@ async function fetchNASAPlusEvents(): Promise<LiveEvent[]> {
 // Fetch real NASA+ shows and documentaries
 async function fetchNASAPlusContent(): Promise<NASAShow[]> {
   try {
-    // Real NASA+ content from their platform
+    // Real NASA+ content from their platform - using actual plus.nasa.gov data
     const shows: NASAShow[] = [
+      {
+        id: 'planetary-defenders',
+        title: "Planetary Defenders",
+        duration: "01:15:08",
+        category: "Asteroids",
+        description: "How would humanity respond if we discovered an asteroid headed for Earth? NASA's Planetary Defenders is a gripping documentary that delves into the high-stakes world of asteroid detection and planetary defense.",
+        thumbnail: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400&h=225&fit=crop&auto=format&q=80",
+        series: "Documentaries",
+        publishDate: "April 16, 2025",
+        videoQuality: "4K",
+        rating: "TV-G",
+        nasaUrl: "https://plus.nasa.gov/video/planetary-defenders/"
+      },
       {
         id: 'cosmic-dawn',
         title: "Cosmic Dawn: The Untold Story of the James Webb Space Telescope",
         duration: "02:30:13",
         category: "Documentaries",
-        description: "For over three decades, NASA and an international team pushed the limits to build the most powerful space observatory ever created.",
+        description: "For over three decades, NASA and an international team of scientists and engineers pushed the limits of technology, innovation, and perseverance to build and launch the most powerful space observatory ever created.",
         thumbnail: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=225&fit=crop&auto=format&q=80",
         series: "James Webb Space Telescope",
-        publishDate: "2024"
+        publishDate: "2024",
+        videoQuality: "4K",
+        rating: "TV-G",
+        nasaUrl: "https://plus.nasa.gov/video/cosmic-dawn/"
       },
       {
         id: 'far-out-science',
         title: "Far Out: Science You Can Eat",
         duration: "00:28:45",
         category: "Kennedy Space Center",
-        description: "Join host Megan Cruz as she explores NASA's Kennedy Space Center labs designing rovers and space farming.",
+        description: "Join host Megan Cruz as she explores NASA's Kennedy Space Center, where cutting-edge labs are designing rovers to dig up moon dirt for 3D-printed habitats, zapping moon dust off spacesuits with electricity, and testing growth methods for space farming.",
         thumbnail: "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400&h=225&fit=crop&auto=format&q=80",
         series: "Far Out",
-        publishDate: "2024"
+        publishDate: "2024",
+        videoQuality: "HD",
+        rating: "TV-G",
+        nasaUrl: "https://plus.nasa.gov/series/far-out/"
       },
-      {
-        id: 'planetary-defenders',
-        title: "NASA's Planetary Defenders",
-        duration: "01:49:41",
-        category: "Documentaries",
-        description: "How would humanity respond if we discovered an asteroid headed for Earth? A gripping look at planetary defense.",
-        thumbnail: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=225&fit=crop&auto=format&q=80",
-        series: "Documentaries",
-        publishDate: "2024"
-      },
-      {
-        id: 'down-to-earth',
-        title: "Down to Earth: The Astronaut's Perspective",
-        duration: "00:34:06",
-        category: "Astronauts",
-        description: "Astronauts share their unique perspective on Earth from space and the overview effect.",
-        thumbnail: "https://images.unsplash.com/photo-1612892483236-52d32a0e0ac1?w=400&h=225&fit=crop&auto=format&q=80",
-        series: "Down to Earth",
-        publishDate: "2024"
-      },
-      {
-        id: 'x59-quesst',
-        title: "X-59: NASA's Quest for Quiet Supersonic Flight",
-        duration: "00:30:02",
-        category: "Aeronautics",
-        description: "Teams across NASA and Lockheed Martin build the X-59 aircraft to achieve quiet supersonic flight.",
-        thumbnail: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=225&fit=crop&auto=format&q=80",
-        series: "Technology",
-        publishDate: "2024"
-      },
-      {
-        id: 'other-worlds-europa',
-        title: "Other Worlds: Europa",
-        duration: "00:26:23",
-        category: "Documentaries", 
-        description: "Explore Jupiter's mysterious moon Europa and its hidden ocean beneath the ice.",
-        thumbnail: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400&h=225&fit=crop&auto=format&q=80",
-        series: "Other Worlds",
-        publishDate: "2024"
-      }
+              {
+          id: 'down-to-earth',
+          title: "Down to Earth: The Astronaut's Perspective",
+          duration: "00:34:06",
+          category: "Astronauts",
+          description: "Astronauts share their unique perspective on Earth from space and the overview effect.",
+          thumbnail: "https://images.unsplash.com/photo-1612892483236-52d32a0e0ac1?w=400&h=225&fit=crop&auto=format&q=80",
+          series: "Down to Earth",
+          publishDate: "2024",
+          videoQuality: "HD",
+          rating: "TV-G",
+          nasaUrl: "https://plus.nasa.gov/series/down-to-earth/"
+        },
+        {
+          id: 'x59-quesst',
+          title: "X-59: NASA's Quest for Quiet Supersonic Flight",
+          duration: "00:30:02",
+          category: "Aeronautics",
+          description: "Teams across NASA and Lockheed Martin come together to build the X-59 aircraft, a decades-long project seeking to achieve quiet supersonic flight and revolutionize commercial air travel.",
+          thumbnail: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=225&fit=crop&auto=format&q=80",
+          series: "Technology",
+          publishDate: "2024",
+          videoQuality: "HD",
+          rating: "TV-G",
+          nasaUrl: "https://plus.nasa.gov/video/x-59-nasa-quest-for-quiet-supersonic-flight/"
+        },
+        {
+          id: 'other-worlds-europa',
+          title: "Other Worlds: Europa",
+          duration: "00:26:23",
+          category: "Documentaries", 
+          description: "Explore Jupiter's mysterious moon Europa and its hidden ocean beneath the ice. This episode delves into the potential for life in Europa's subsurface ocean.",
+          thumbnail: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400&h=225&fit=crop&auto=format&q=80",
+          series: "Other Worlds",
+          publishDate: "2024",
+          videoQuality: "4K",
+          rating: "TV-G",
+          nasaUrl: "https://plus.nasa.gov/series/other-worlds/"
+        }
     ];
 
     return shows;
@@ -197,6 +218,7 @@ async function fetchNASANews() {
 const categories = [
   { name: "Live & Upcoming", icon: "🔴" },
   { name: "Documentaries", icon: "🎬" },
+  { name: "Asteroids", icon: "☄️" },
   { name: "Launches", icon: "🚀" },
   { name: "Astronauts", icon: "👨‍🚀" },
   { name: "James Webb", icon: "🔭" },
@@ -688,30 +710,37 @@ export default function NASATV() {
                   </div>
                 )}
 
-                {/* Show Info */}
-                {!selectedContent.episodes && selectedContent.duration && (
-                  <div>
-                    <h3 className="text-white text-lg font-semibold mb-3">Show Details</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Duration</div>
-                        <div className="text-white font-bold">{selectedContent.duration}</div>
-                      </div>
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Category</div>
-                        <div className="text-white font-bold">{selectedContent.category}</div>
-                      </div>
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Series</div>
-                        <div className="text-white font-bold">{selectedContent.series}</div>
-                      </div>
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Year</div>
-                        <div className="text-white font-bold">{selectedContent.publishDate}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                                 {/* Show Info */}
+                 {!selectedContent.episodes && selectedContent.duration && (
+                   <div>
+                     <h3 className="text-white text-lg font-semibold mb-3">Show Details</h3>
+                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                       <div className="bg-[#2c3035] rounded-lg p-3">
+                         <div className="text-[#a2abb3] text-xs mb-1">Duration</div>
+                         <div className="text-white font-bold">{selectedContent.duration}</div>
+                       </div>
+                       <div className="bg-[#2c3035] rounded-lg p-3">
+                         <div className="text-[#a2abb3] text-xs mb-1">Category</div>
+                         <div className="text-white font-bold">{selectedContent.category}</div>
+                       </div>
+                       <div className="bg-[#2c3035] rounded-lg p-3">
+                         <div className="text-[#a2abb3] text-xs mb-1">Series</div>
+                         <div className="text-white font-bold">{selectedContent.series}</div>
+                       </div>
+                       <div className="bg-[#2c3035] rounded-lg p-3">
+                         <div className="text-[#a2abb3] text-xs mb-1">Quality</div>
+                         <div className="text-white font-bold">{selectedContent.videoQuality || 'HD'}</div>
+                       </div>
+                       <div className="bg-[#2c3035] rounded-lg p-3">
+                         <div className="text-[#a2abb3] text-xs mb-1">Rating</div>
+                         <div className="text-white font-bold">{selectedContent.rating || 'TV-G'}</div>
+                       </div>
+                     </div>
+                     <div className="mt-4 text-center">
+                       <div className="text-[#a2abb3] text-sm">Published: {selectedContent.publishDate}</div>
+                     </div>
+                   </div>
+                 )}
 
                 {/* Related Content */}
                 <div>
@@ -731,22 +760,38 @@ export default function NASATV() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <button 
-                  onClick={openNASAPlus}
-                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
-                >
-                  <span>🚀</span>
-                  <span>Watch Full Content on NASA+</span>
-                </button>
-                <button 
-                  onClick={closeContentModal}
-                  className="bg-[#2c3035] hover:bg-[#373c42] text-white px-8 py-3 rounded-lg font-medium transition-colors"
-                >
-                  Close Preview
-                </button>
-              </div>
+                             {/* Action Buttons */}
+               <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                 {selectedContent.nasaUrl ? (
+                   <button 
+                     onClick={() => window.open(selectedContent.nasaUrl, '_blank')}
+                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+                   >
+                     <span>🎬</span>
+                     <span>Watch "{selectedContent.title || selectedContent.name}" on NASA+</span>
+                   </button>
+                 ) : (
+                   <button 
+                     onClick={openNASAPlus}
+                     className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+                   >
+                     <span>🚀</span>
+                     <span>Watch Full Content on NASA+</span>
+                   </button>
+                 )}
+                 <button 
+                   onClick={openNASAPlus}
+                   className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-8 py-3 rounded-lg font-medium transition-colors border border-blue-500/30"
+                 >
+                   Browse More NASA+ Content
+                 </button>
+                 <button 
+                   onClick={closeContentModal}
+                   className="bg-[#2c3035] hover:bg-[#373c42] text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                 >
+                   Close Preview
+                 </button>
+               </div>
             </div>
           </div>
         </div>
