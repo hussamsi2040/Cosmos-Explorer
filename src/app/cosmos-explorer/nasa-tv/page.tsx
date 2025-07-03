@@ -544,7 +544,7 @@ export default function NASATV() {
                 {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).map((series) => (
                   <a
                     key={series.slug}
-                    href="https://plus.nasa.gov/"
+                    href={series.url || "https://plus.nasa.gov/"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group relative block cursor-pointer"
