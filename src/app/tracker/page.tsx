@@ -792,12 +792,13 @@ function SpaceTrackerContentInternal() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'iss' && (
-        <div>
-          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-            🛰️ International Space Station
-          </h2>
-          <div className="p-4">
+      <div className="min-h-[600px]">
+        {activeTab === 'iss' && (
+          <div className="fade-in">
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+              🛰️ International Space Station Live Tracker
+            </h2>
+            <div className="p-4">
         {/* ISS Hero Image */}
         <div className="mb-6 relative">
           <img 
@@ -871,17 +872,17 @@ function SpaceTrackerContentInternal() {
             </div>
           </div>
         </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Satellite Tracking */}
-      {activeTab === 'satellites' && (
-        <div>
-          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-            📡 Upcoming Satellite Passes
-          </h2>
-          <div className="p-4">
+        {/* Satellite Tracking */}
+        {activeTab === 'satellites' && (
+          <div className="fade-in">
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+              📡 Satellite Pass Tracker
+            </h2>
+            <div className="p-4">
         {/* Satellite Gallery - Real Photos */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
@@ -1023,17 +1024,17 @@ function SpaceTrackerContentInternal() {
             </div>
           ))}
         </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Spacewalk Alerts */}
-      {activeTab === 'spacewalks' && (
-        <div>
-          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-            🚀 Upcoming Spacewalks
-          </h2>
-          <div className="p-4">
+        {/* Spacewalk Alerts */}
+        {activeTab === 'spacewalks' && (
+          <div className="fade-in">
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+              🚀 Spacewalk Schedule
+            </h2>
+            <div className="p-4">
         {/* Spacewalk Gallery */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
@@ -1115,9 +1116,10 @@ function SpaceTrackerContentInternal() {
             </div>
           ))}
         </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -1167,5 +1169,21 @@ function SpaceTrackerClient() {
 }
 
 export default function SpaceTracker() {
-  return <SpaceTrackerClient />;
+  return (
+    <div>
+      <style jsx global>{`
+        .fade-in {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+      `}</style>
+      <SpaceTrackerClient />
+    </div>
+  );
 }
