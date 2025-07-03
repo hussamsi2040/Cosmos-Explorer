@@ -1529,209 +1529,172 @@ function SpaceTrackerContentInternal() {
                   <span>🗺️</span>
                   Live Global Position Tracking
                 </h3>
-                <div className="h-80 bg-[#1e2124] rounded-lg border border-[#40474f] relative overflow-hidden">
-                  {/* World Map SVG */}
-                  <svg
-                    viewBox="0 0 800 400"
-                    className="w-full h-full"
+                <div className="h-80 bg-[#0f1419] rounded-lg border border-[#40474f] relative overflow-hidden">
+                  {/* NASA Blue Marble Earth Background */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center"
                     style={{
-                      background: 'linear-gradient(to bottom, #1a2035 0%, #2a3555 50%, #1a2035 100%)'
+                      backgroundImage: "url('https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200407.3x5400x2700.jpg')",
+                      filter: 'brightness(0.7) contrast(1.1)'
                     }}
-                  >
-                    {/* World map outlines */}
-                    <defs>
-                      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#40474f" strokeWidth="0.5" opacity="0.3"/>
-                      </pattern>
-                    </defs>
-                    
-                    {/* Grid background */}
-                    <rect width="800" height="400" fill="url(#grid)" />
-                    
-                    {/* Continents simplified outlines */}
-                    <g fill="#3a4553" stroke="#4a5563" strokeWidth="1">
-                      {/* North America */}
-                      <path d="M 100,100 L 250,80 L 280,120 L 260,160 L 200,180 L 120,160 Z" />
-                      {/* South America */}
-                      <path d="M 200,200 L 220,180 L 240,220 L 230,280 L 210,300 L 190,280 Z" />
-                      {/* Europe */}
-                      <path d="M 380,80 L 420,70 L 440,90 L 430,110 L 400,120 L 370,100 Z" />
-                      {/* Africa */}
-                      <path d="M 380,120 L 420,110 L 440,160 L 450,220 L 430,260 L 400,240 L 370,180 Z" />
-                      {/* Asia */}
-                      <path d="M 440,60 L 600,50 L 650,80 L 680,120 L 650,140 L 580,130 L 480,100 Z" />
-                      {/* Australia */}
-                      <path d="M 580,260 L 640,250 L 660,270 L 650,290 L 600,295 L 570,280 Z" />
-                    </g>
-                    
+                  ></div>
+                  
+                  {/* Coordinate Grid Overlay */}
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400">
                     {/* Latitude lines */}
-                    <g stroke="#40474f" strokeWidth="0.5" opacity="0.4">
-                      <line x1="0" y1="100" x2="800" y2="100" />
-                      <line x1="0" y1="200" x2="800" y2="200" />
-                      <line x1="0" y1="300" x2="800" y2="300" />
+                    <g stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="2,2">
+                      {Array.from({length: 9}, (_, i) => {
+                        const y = (i * 400) / 8;
+                        return <line key={i} x1="0" y1={y} x2="800" y2={y} />;
+                      })}
                     </g>
                     
                     {/* Longitude lines */}
-                    <g stroke="#40474f" strokeWidth="0.5" opacity="0.4">
-                      <line x1="200" y1="0" x2="200" y2="400" />
-                      <line x1="400" y1="0" x2="400" y2="400" />
-                      <line x1="600" y1="0" x2="600" y2="400" />
+                    <g stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="2,2">
+                      {Array.from({length: 13}, (_, i) => {
+                        const x = (i * 800) / 12;
+                        return <line key={i} x1={x} y1="0" x2={x} y2="400" />;
+                      })}
                     </g>
                     
-                    {/* Satellite Position */}
-                    <g>
-                      {/* Convert lat/lon to SVG coordinates */}
-                      {(() => {
-                        const lat = parseFloat(trackingModal.satellite.realTimeData.position.latitude);
-                        const lon = parseFloat(trackingModal.satellite.realTimeData.position.longitude);
-                        
-                        // Convert coordinates to SVG space
-                        const x = ((lon + 180) / 360) * 800;
-                        const y = ((90 - lat) / 180) * 400;
-                        
-                        return (
-                          <g>
-                            {/* Orbital path trail */}
+                    {/* Equator line */}
+                    <line x1="0" y1="200" x2="800" y2="200" stroke="rgba(255, 255, 0, 0.4)" strokeWidth="2" strokeDasharray="4,4" />
+                    
+                    {/* Prime Meridian */}
+                    <line x1="400" y1="0" x2="400" y2="400" stroke="rgba(255, 255, 0, 0.4)" strokeWidth="2" strokeDasharray="4,4" />
+                  </svg>
+                  
+                  {/* Satellite Position and Tracking */}
+                  <div className="absolute inset-0">
+                    {(() => {
+                      const lat = parseFloat(trackingModal.satellite.realTimeData.position.latitude);
+                      const lon = parseFloat(trackingModal.satellite.realTimeData.position.longitude);
+                      
+                      // Convert lat/lon to pixel coordinates
+                      const mapWidth = 800;
+                      const mapHeight = 400;
+                      const x = ((lon + 180) / 360) * mapWidth;
+                      const y = ((90 - lat) / 180) * mapHeight;
+                      
+                      return (
+                        <>
+                          {/* Orbital Trail */}
+                          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400">
+                            {/* Previous positions trail */}
+                            {Array.from({length: 12}, (_, i) => {
+                              const trailLat = lat + (i * 1.5) - 6;
+                              const trailLon = lon - (i * 3) + 15;
+                              const trailX = ((trailLon + 180) / 360) * mapWidth;
+                              const trailY = ((90 - trailLat) / 180) * mapHeight;
+                              const opacity = 0.8 - (i * 0.06);
+                              
+                              if (trailX >= 0 && trailX <= mapWidth && trailY >= 0 && trailY <= mapHeight) {
+                                return (
+                                  <circle 
+                                    key={i}
+                                    cx={trailX % mapWidth} 
+                                    cy={trailY} 
+                                    r="3" 
+                                    fill="#60a5fa" 
+                                    opacity={opacity}
+                                  />
+                                );
+                              }
+                              return null;
+                            })}
+                            
+                            {/* Future orbit prediction */}
+                            {Array.from({length: 8}, (_, i) => {
+                              const futureLat = lat - (i * 2);
+                              const futureLon = lon + (i * 4);
+                              const futureX = ((futureLon + 180) / 360) * mapWidth;
+                              const futureY = ((90 - futureLat) / 180) * mapHeight;
+                              const opacity = 0.4 - (i * 0.04);
+                              
+                              if (futureX >= 0 && futureX <= mapWidth && futureY >= 0 && futureY <= mapHeight) {
+                                return (
+                                  <circle 
+                                    key={`future-${i}`}
+                                    cx={futureX % mapWidth} 
+                                    cy={futureY} 
+                                    r="2" 
+                                    fill="#34d399" 
+                                    opacity={opacity}
+                                  />
+                                );
+                              }
+                              return null;
+                            })}
+                            
+                            {/* Coverage Area */}
                             <circle 
                               cx={x} 
                               cy={y} 
-                              r="60" 
+                              r="80" 
                               fill="none" 
                               stroke="rgba(59, 130, 246, 0.3)" 
                               strokeWidth="2" 
-                              strokeDasharray="5,5"
+                              strokeDasharray="8,4"
                               className="animate-pulse"
                             />
                             <circle 
                               cx={x} 
                               cy={y} 
-                              r="40" 
+                              r="50" 
                               fill="none" 
                               stroke="rgba(59, 130, 246, 0.2)" 
                               strokeWidth="1" 
                             />
-                            
-                            {/* Satellite icon */}
-                            <g transform={`translate(${x}, ${y})`}>
+                          </svg>
+                          
+                          {/* Main Satellite Icon */}
+                          <div 
+                            className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20"
+                            style={{
+                              left: `${(x / mapWidth) * 100}%`,
+                              top: `${(y / mapHeight) * 100}%`
+                            }}
+                          >
+                            {/* Satellite with detailed design */}
+                            <div className="relative">
+                              {/* Pulsing rings */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-8 h-8 border-2 border-green-400 rounded-full animate-ping opacity-75"></div>
+                                <div className="absolute w-6 h-6 border border-blue-400 rounded-full animate-pulse"></div>
+                              </div>
+                              
                               {/* Satellite body */}
-                              <rect 
-                                x="-6" 
-                                y="-4" 
-                                width="12" 
-                                height="8" 
-                                fill="#fbbf24" 
-                                stroke="#f59e0b" 
-                                strokeWidth="1" 
-                                rx="1"
-                              />
-                              
-                              {/* Solar panels */}
-                              <rect 
-                                x="-14" 
-                                y="-2" 
-                                width="6" 
-                                height="4" 
-                                fill="#3b82f6" 
-                                stroke="#2563eb" 
-                                strokeWidth="0.5"
-                              />
-                              <rect 
-                                x="8" 
-                                y="-2" 
-                                width="6" 
-                                height="4" 
-                                fill="#3b82f6" 
-                                stroke="#2563eb" 
-                                strokeWidth="0.5"
-                              />
-                              
-                              {/* Antenna */}
-                              <line 
-                                x1="0" 
-                                y1="-4" 
-                                x2="0" 
-                                y2="-8" 
-                                stroke="#ffffff" 
-                                strokeWidth="1"
-                              />
-                              <circle 
-                                cx="0" 
-                                cy="-8" 
-                                r="1" 
-                                fill="#ffffff"
-                              />
-                              
-                              {/* Pulsing signal */}
-                              <circle 
-                                cx="0" 
-                                cy="0" 
-                                r="4" 
-                                fill="none" 
-                                stroke="rgba(34, 197, 94, 0.6)" 
-                                strokeWidth="2" 
-                                className="animate-ping"
-                              />
-                            </g>
-                            
-                            {/* Position label */}
-                            <text 
-                              x={x + 20} 
-                              y={y - 10} 
-                              fill="#ffffff" 
-                              fontSize="10" 
-                              fontFamily="monospace"
-                            >
-                              {trackingModal.satellite.name}
-                            </text>
-                            <text 
-                              x={x + 20} 
-                              y={y + 5} 
-                              fill="#a2abb3" 
-                              fontSize="8" 
-                              fontFamily="monospace"
-                            >
-                              {lat.toFixed(2)}°, {lon.toFixed(2)}°
-                            </text>
-                            <text 
-                              x={x + 20} 
-                              y={y + 18} 
-                              fill="#3b82f6" 
-                              fontSize="8" 
-                              fontFamily="monospace"
-                            >
-                              {trackingModal.satellite.realTimeData.position.altitude} km
-                            </text>
-                          </g>
-                        );
-                      })()}
-                    </g>
-                    
-                    {/* Ground track visualization */}
-                    <g>
-                      {/* Previous positions */}
-                      {Array.from({length: 5}, (_, i) => {
-                        const lat = parseFloat(trackingModal.satellite.realTimeData.position.latitude) + (i * 2);
-                        const lon = parseFloat(trackingModal.satellite.realTimeData.position.longitude) - (i * 5);
-                        const x = ((lon + 180) / 360) * 800;
-                        const y = ((90 - lat) / 180) * 400;
-                        const opacity = 0.8 - (i * 0.15);
-                        
-                        if (x >= 0 && x <= 800 && y >= 0 && y <= 400) {
-                          return (
-                            <circle 
-                              key={i}
-                              cx={x % 800} 
-                              cy={y} 
-                              r="2" 
-                              fill="#3b82f6" 
-                              opacity={opacity}
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-                    </g>
-                  </svg>
+                              <div className="relative w-6 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-sm border border-yellow-300 flex items-center justify-center">
+                                {/* Solar panels */}
+                                <div className="absolute -left-3 top-0 w-2 h-4 bg-blue-500 border border-blue-400 rounded-sm"></div>
+                                <div className="absolute -right-3 top-0 w-2 h-4 bg-blue-500 border border-blue-400 rounded-sm"></div>
+                                
+                                {/* Antenna */}
+                                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-white"></div>
+                                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
+                                
+                                {/* Signal indicator */}
+                                <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Satellite Information Label */}
+                          <div 
+                            className="absolute z-30 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-white/20"
+                            style={{
+                              left: `${Math.min((x / mapWidth) * 100 + 5, 85)}%`,
+                              top: `${Math.max((y / mapHeight) * 100 - 8, 5)}%`
+                            }}
+                          >
+                            <div className="text-white font-semibold text-xs">{trackingModal.satellite.name}</div>
+                            <div className="text-blue-400 text-xs font-mono">{lat.toFixed(3)}°, {lon.toFixed(3)}°</div>
+                            <div className="text-green-400 text-xs">{trackingModal.satellite.realTimeData.position.altitude} km altitude</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
                   
                   {/* Map controls overlay */}
                   <div className="absolute top-3 left-3 bg-black/70 rounded-lg p-2 text-xs">
