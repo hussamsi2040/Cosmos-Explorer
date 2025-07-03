@@ -235,13 +235,21 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
     }
 
     const shows = [];
-    for (const series of seriesList) {
+    for (const series of seriesList as any[]) {
       const seriesSlug = series.url.split('/').filter(Boolean).pop();
+      series.slug = seriesSlug;
       const seriesJsonFile = path.join(DATA_DIR, `plus.nasa.gov_series_${seriesSlug}_.json`);
 
       if (fs.existsSync(seriesJsonFile)) {
         const showFileContent = fs.readFileSync(seriesJsonFile, 'utf8');
         const showData = JSON.parse(showFileContent);
+        
+        if (showData.metadata && showData.metadata.ogImage) {
+          const ogImage = Array.isArray(showData.metadata.ogImage) ? showData.metadata.ogImage[0] : showData.metadata.ogImage;
+          series.thumbnail = ogImage;
+        } else {
+          series.thumbnail = "https://images.unsplash.com/photo-1541185934-01b600ea069c?w=400&h=225&fit=crop&auto=format&q=80";
+        }
         
         const showRegex = /\[(\d{2}:\d{2}:\d{2})\]\([^)]+\)\n\n#### \[([^\]]+)\]\(([^)]+)\)\n\n([^…]+)/g;
         let showMatch;
@@ -252,7 +260,7 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
             duration: showMatch[1],
             category: series.name,
             description: showMatch[4].trim(),
-            thumbnail: showData.metadata.ogImage || 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=225&fit=crop&auto=format&q=80',
+            thumbnail: series.thumbnail,
             series: series.name,
             publishDate: '2024',
             videoQuality: 'HD',
