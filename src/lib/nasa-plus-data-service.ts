@@ -251,7 +251,12 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
           series.thumbnail = "https://images.unsplash.com/photo-1541185934-01b600ea069c?w=400&h=225&fit=crop&auto=format&q=80";
         }
         
-        const showRegex = /\[(\d{2}:\d{2}:\d{2})\]\([^)]+\)\n\n#### \[([^\]]+)\]\(([^)]+)\)\n\n([^…]+)/g;
+        // Use og:description from metadata for clean descriptions
+        const ogDescription = showData.metadata?.['og:description'] || 
+                            showData.metadata?.description || 
+                            `Explore episodes from the ${series.name} series on NASA+`;
+        
+        const showRegex = /\[(\d{2}:\d{2}:\d{2})\]\([^)]+\)\n\n#### \[([^\]]+)\]\(([^)]+)\)/g;
         let showMatch;
         while ((showMatch = showRegex.exec(showData.markdown)) !== null) {
           shows.push({
@@ -259,7 +264,7 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
             title: showMatch[2].trim(),
             duration: showMatch[1],
             category: series.name,
-            description: showMatch[4].trim(),
+            description: ogDescription,
             thumbnail: series.thumbnail,
             series: series.name,
             publishDate: '2024',
