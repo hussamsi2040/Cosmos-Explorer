@@ -658,23 +658,16 @@ export default function NASATV() {
               {/* Video Player Section */}
               <div className="mb-6">
                 <div className="relative bg-black rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-900/20 to-blue-900/20">
-                    <div className="text-center">
-                      <div className="text-6xl mb-4">🚀</div>
-                      <div className="text-white text-xl font-bold mb-2">
-                        {selectedContent.title || selectedContent.name}
-                      </div>
-                      <div className="text-[#a2abb3] mb-4">
-                        This content is available on NASA+ streaming platform
-                      </div>
-                      <button 
-                        onClick={openNASAPlus}
-                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition-colors flex items-center gap-2 mx-auto"
-                      >
-                        <span>📺</span>
-                        <span>Watch on NASA+</span>
-                      </button>
-                    </div>
+                  <iframe
+                    src="https://www.youtube.com/embed/DIgkvm2nmHc?autoplay=0&rel=0&modestbranding=1&controls=1"
+                    title={selectedContent.title || selectedContent.name}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="absolute top-0 left-0 w-full h-full rounded-xl"
+                  />
+                  <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs">
+                    NASA Official Stream
                   </div>
                 </div>
               </div>
