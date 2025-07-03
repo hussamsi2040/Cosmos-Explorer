@@ -120,7 +120,7 @@ export default function SeriesPage() {
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <Link href="/cosmos-explorer" className="text-white text-sm font-medium leading-normal">Today</Link>
+              <Link href="/luna-ai" className="text-white text-sm font-medium leading-normal">Luna AI Assistant</Link>
               <Link href="/cosmos-explorer/nasa-tv" className="text-white text-sm font-medium leading-normal">NASA TV</Link>
               <Link href="/tracker" className="text-white text-sm font-medium leading-normal">Tracker</Link>
               <Link href="/events" className="text-white text-sm font-medium leading-normal">Events</Link>

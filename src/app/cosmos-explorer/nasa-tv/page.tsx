@@ -356,7 +356,7 @@ export default function NASATV() {
               <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
               <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
               <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer/nasa-tv">NASA TV</a>
-              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
+                              <a className="text-white text-sm font-medium leading-normal" href="/luna-ai">Luna AI Assistant</a>
             </div>
           </div>
         </header>
