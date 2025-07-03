@@ -122,6 +122,8 @@ export default function NASATV() {
 
   const playVideo = (content: any) => {
     setSelectedVideo(content);
+    // Open NASA+ in new window for actual viewing
+    window.open('https://plus.nasa.gov/', '_blank');
   };
 
   return (
@@ -156,21 +158,45 @@ export default function NASATV() {
           <p className="text-white tracking-light text-[22px] font-bold leading-tight">📺 NASA+ Live Streaming</p>
         </div>
 
+        {/* NASA+ Portal Notice */}
+        <div className="p-4">
+          <div className="bg-red-600/10 border border-red-500/30 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="text-red-400 text-xl">🚀</div>
+              <div>
+                <div className="text-white font-semibold mb-1">Official NASA+ Streaming Portal</div>
+                <div className="text-[#a2abb3] text-sm">
+                  This page previews NASA+ content. Click any video or button to access the official NASA+ streaming platform at <span className="text-red-400">plus.nasa.gov</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Featured Video Player */}
         <div className="p-4">
           <div className="relative bg-[#1e2124] rounded-xl overflow-hidden mb-4 border border-[#2c3035]">
+            {/* NASA+ Preview Image */}
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
-                title={selectedVideo.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute top-0 left-0 w-full h-full rounded-xl"
-              />
+              <div 
+                className="absolute inset-0 bg-cover bg-center rounded-xl cursor-pointer group"
+                style={{
+                  backgroundImage: "url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=675&fit=crop&auto=format&q=80')"
+                }}
+                onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
+              >
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                  <div className="bg-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-0 h-0 border-l-[24px] border-l-white border-t-[16px] border-t-transparent border-b-[16px] border-b-transparent ml-2"></div>
+                  </div>
+                </div>
+                <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                  ● LIVE on NASA+
+                </div>
+              </div>
             </div>
             
-            {/* Video Overlay Info */}
+            {/* Video Info Overlay */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -189,6 +215,15 @@ export default function NASATV() {
                   {selectedVideo.time && (
                     <div className="text-blue-400 text-sm font-medium">{selectedVideo.time}</div>
                   )}
+                  <div className="mt-3">
+                    <button 
+                      onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
+                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
+                    >
+                      <span>🚀</span>
+                      <span>Watch on NASA+</span>
+                    </button>
+                  </div>
                 </div>
                 <div className="text-right">
                   {(selectedVideo as any).duration && (
@@ -253,8 +288,14 @@ export default function NASATV() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[#a2abb3] text-xs">{event.type}</span>
-                    <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-lg text-xs transition-colors">
-                      Watch Now
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open('https://plus.nasa.gov/', '_blank');
+                      }}
+                      className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1 rounded-lg text-xs transition-colors"
+                    >
+                      Watch on NASA+
                     </button>
                   </div>
                 </div>
@@ -330,18 +371,28 @@ export default function NASATV() {
 
         {/* NASA+ Info Footer */}
         <div className="p-4">
-          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 rounded-xl p-6">
             <div className="text-center">
               <div className="text-3xl mb-3">🚀</div>
               <h3 className="text-white text-xl font-bold mb-2">NASA+ | Stream the Universe</h3>
               <p className="text-[#a2abb3] text-sm mb-4">
-                Explore hundreds of videos and live content from NASA's missions, discoveries, and the wonders of space exploration.
+                Explore hundreds of videos and live content from NASA's missions, discoveries, and the wonders of space exploration on the official NASA+ streaming platform.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#a2abb3]">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#a2abb3] mb-6">
                 <span className="flex items-center gap-1">🌍 Free to stream worldwide</span>
                 <span className="flex items-center gap-1">📱 Available on all devices</span>
                 <span className="flex items-center gap-1">🔴 Live mission coverage</span>
                 <span className="flex items-center gap-1">🎬 On-demand documentaries</span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+                <button 
+                  onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
+                >
+                  <span>🚀</span>
+                  <span>Launch NASA+ Official Site</span>
+                </button>
+                <span className="text-[#a2abb3] text-xs">plus.nasa.gov</span>
               </div>
             </div>
           </div>
