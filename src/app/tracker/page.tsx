@@ -1209,14 +1209,10 @@ function SpaceTrackerContentInternal() {
                   <div className="flex gap-2">
                     <button 
                       onClick={() => openTrackingModal(satellite)}
-                      className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1"
+                      className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 font-medium"
                     >
                       <span>📍</span>
-                      <span>Track</span>
-                    </button>
-                    <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
-                      <span>⏰</span>
-                      <span>Remind</span>
+                      <span>Track Live</span>
                     </button>
                   </div>
                 </div>
@@ -1527,43 +1523,260 @@ function SpaceTrackerContentInternal() {
                 </div>
               </div>
 
-              {/* Interactive Map Placeholder */}
+              {/* Real-Time World Map with Satellite Position */}
               <div className="bg-[#2c3035] rounded-xl p-5">
                 <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
                   <span>🗺️</span>
-                  Ground Track Map
+                  Live Global Position Tracking
                 </h3>
-                <div className="h-64 bg-[#1e2124] rounded-lg border border-[#40474f] flex items-center justify-center relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0 opacity-20"
+                <div className="h-80 bg-[#1e2124] rounded-lg border border-[#40474f] relative overflow-hidden">
+                  {/* World Map SVG */}
+                  <svg
+                    viewBox="0 0 800 400"
+                    className="w-full h-full"
                     style={{
-                      backgroundImage: `url('https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200407.3x5400x2700.jpg')`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
+                      background: 'linear-gradient(to bottom, #1a2035 0%, #2a3555 50%, #1a2035 100%)'
                     }}
-                  ></div>
-                  <div className="relative z-10 text-center">
-                    <div className="text-6xl mb-3 animate-pulse">📡</div>
-                    <div className="text-white font-semibold mb-2">Live Orbital Ground Track</div>
-                    <div className="text-[#a2abb3] text-sm">Current position: {trackingModal.satellite.realTimeData.position.latitude}°, {trackingModal.satellite.realTimeData.position.longitude}°</div>
-                    <div className="text-blue-400 text-xs mt-2">🔄 Auto-updating every 30 seconds</div>
+                  >
+                    {/* World map outlines */}
+                    <defs>
+                      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#40474f" strokeWidth="0.5" opacity="0.3"/>
+                      </pattern>
+                    </defs>
+                    
+                    {/* Grid background */}
+                    <rect width="800" height="400" fill="url(#grid)" />
+                    
+                    {/* Continents simplified outlines */}
+                    <g fill="#3a4553" stroke="#4a5563" strokeWidth="1">
+                      {/* North America */}
+                      <path d="M 100,100 L 250,80 L 280,120 L 260,160 L 200,180 L 120,160 Z" />
+                      {/* South America */}
+                      <path d="M 200,200 L 220,180 L 240,220 L 230,280 L 210,300 L 190,280 Z" />
+                      {/* Europe */}
+                      <path d="M 380,80 L 420,70 L 440,90 L 430,110 L 400,120 L 370,100 Z" />
+                      {/* Africa */}
+                      <path d="M 380,120 L 420,110 L 440,160 L 450,220 L 430,260 L 400,240 L 370,180 Z" />
+                      {/* Asia */}
+                      <path d="M 440,60 L 600,50 L 650,80 L 680,120 L 650,140 L 580,130 L 480,100 Z" />
+                      {/* Australia */}
+                      <path d="M 580,260 L 640,250 L 660,270 L 650,290 L 600,295 L 570,280 Z" />
+                    </g>
+                    
+                    {/* Latitude lines */}
+                    <g stroke="#40474f" strokeWidth="0.5" opacity="0.4">
+                      <line x1="0" y1="100" x2="800" y2="100" />
+                      <line x1="0" y1="200" x2="800" y2="200" />
+                      <line x1="0" y1="300" x2="800" y2="300" />
+                    </g>
+                    
+                    {/* Longitude lines */}
+                    <g stroke="#40474f" strokeWidth="0.5" opacity="0.4">
+                      <line x1="200" y1="0" x2="200" y2="400" />
+                      <line x1="400" y1="0" x2="400" y2="400" />
+                      <line x1="600" y1="0" x2="600" y2="400" />
+                    </g>
+                    
+                    {/* Satellite Position */}
+                    <g>
+                      {/* Convert lat/lon to SVG coordinates */}
+                      {(() => {
+                        const lat = parseFloat(trackingModal.satellite.realTimeData.position.latitude);
+                        const lon = parseFloat(trackingModal.satellite.realTimeData.position.longitude);
+                        
+                        // Convert coordinates to SVG space
+                        const x = ((lon + 180) / 360) * 800;
+                        const y = ((90 - lat) / 180) * 400;
+                        
+                        return (
+                          <g>
+                            {/* Orbital path trail */}
+                            <circle 
+                              cx={x} 
+                              cy={y} 
+                              r="60" 
+                              fill="none" 
+                              stroke="rgba(59, 130, 246, 0.3)" 
+                              strokeWidth="2" 
+                              strokeDasharray="5,5"
+                              className="animate-pulse"
+                            />
+                            <circle 
+                              cx={x} 
+                              cy={y} 
+                              r="40" 
+                              fill="none" 
+                              stroke="rgba(59, 130, 246, 0.2)" 
+                              strokeWidth="1" 
+                            />
+                            
+                            {/* Satellite icon */}
+                            <g transform={`translate(${x}, ${y})`}>
+                              {/* Satellite body */}
+                              <rect 
+                                x="-6" 
+                                y="-4" 
+                                width="12" 
+                                height="8" 
+                                fill="#fbbf24" 
+                                stroke="#f59e0b" 
+                                strokeWidth="1" 
+                                rx="1"
+                              />
+                              
+                              {/* Solar panels */}
+                              <rect 
+                                x="-14" 
+                                y="-2" 
+                                width="6" 
+                                height="4" 
+                                fill="#3b82f6" 
+                                stroke="#2563eb" 
+                                strokeWidth="0.5"
+                              />
+                              <rect 
+                                x="8" 
+                                y="-2" 
+                                width="6" 
+                                height="4" 
+                                fill="#3b82f6" 
+                                stroke="#2563eb" 
+                                strokeWidth="0.5"
+                              />
+                              
+                              {/* Antenna */}
+                              <line 
+                                x1="0" 
+                                y1="-4" 
+                                x2="0" 
+                                y2="-8" 
+                                stroke="#ffffff" 
+                                strokeWidth="1"
+                              />
+                              <circle 
+                                cx="0" 
+                                cy="-8" 
+                                r="1" 
+                                fill="#ffffff"
+                              />
+                              
+                              {/* Pulsing signal */}
+                              <circle 
+                                cx="0" 
+                                cy="0" 
+                                r="4" 
+                                fill="none" 
+                                stroke="rgba(34, 197, 94, 0.6)" 
+                                strokeWidth="2" 
+                                className="animate-ping"
+                              />
+                            </g>
+                            
+                            {/* Position label */}
+                            <text 
+                              x={x + 20} 
+                              y={y - 10} 
+                              fill="#ffffff" 
+                              fontSize="10" 
+                              fontFamily="monospace"
+                            >
+                              {trackingModal.satellite.name}
+                            </text>
+                            <text 
+                              x={x + 20} 
+                              y={y + 5} 
+                              fill="#a2abb3" 
+                              fontSize="8" 
+                              fontFamily="monospace"
+                            >
+                              {lat.toFixed(2)}°, {lon.toFixed(2)}°
+                            </text>
+                            <text 
+                              x={x + 20} 
+                              y={y + 18} 
+                              fill="#3b82f6" 
+                              fontSize="8" 
+                              fontFamily="monospace"
+                            >
+                              {trackingModal.satellite.realTimeData.position.altitude} km
+                            </text>
+                          </g>
+                        );
+                      })()}
+                    </g>
+                    
+                    {/* Ground track visualization */}
+                    <g>
+                      {/* Previous positions */}
+                      {Array.from({length: 5}, (_, i) => {
+                        const lat = parseFloat(trackingModal.satellite.realTimeData.position.latitude) + (i * 2);
+                        const lon = parseFloat(trackingModal.satellite.realTimeData.position.longitude) - (i * 5);
+                        const x = ((lon + 180) / 360) * 800;
+                        const y = ((90 - lat) / 180) * 400;
+                        const opacity = 0.8 - (i * 0.15);
+                        
+                        if (x >= 0 && x <= 800 && y >= 0 && y <= 400) {
+                          return (
+                            <circle 
+                              key={i}
+                              cx={x % 800} 
+                              cy={y} 
+                              r="2" 
+                              fill="#3b82f6" 
+                              opacity={opacity}
+                            />
+                          );
+                        }
+                        return null;
+                      })}
+                    </g>
+                  </svg>
+                  
+                  {/* Map controls overlay */}
+                  <div className="absolute top-3 left-3 bg-black/70 rounded-lg p-2 text-xs">
+                    <div className="text-white font-semibold mb-1">🛰️ Live Tracking</div>
+                    <div className="text-green-400 flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span>Real-time position</span>
+                    </div>
+                  </div>
+                  
+                  {/* Coordinates display */}
+                  <div className="absolute bottom-3 right-3 bg-black/70 rounded-lg p-2 text-xs font-mono">
+                    <div className="text-white">
+                      Lat: {trackingModal.satellite.realTimeData.position.latitude}°
+                    </div>
+                    <div className="text-white">
+                      Lon: {trackingModal.satellite.realTimeData.position.longitude}°
+                    </div>
+                    <div className="text-blue-400">
+                      Alt: {trackingModal.satellite.realTimeData.position.altitude} km
+                    </div>
+                  </div>
+                  
+                  {/* Speed indicator */}
+                  <div className="absolute top-3 right-3 bg-black/70 rounded-lg p-2 text-xs">
+                    <div className="text-white font-semibold">� Velocity</div>
+                    <div className="text-blue-400">{trackingModal.satellite.realTimeData.velocity.speed.toLocaleString()} km/h</div>
+                    <div className="text-[#a2abb3]">{trackingModal.satellite.realTimeData.velocity.direction}° heading</div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4 border-t border-[#2c3035]">
-                <button className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>🔔</span>
-                  Set Pass Alert
-                </button>
                 <button className="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>📊</span>
-                  Export Data
+                  <span>�</span>
+                  Export Tracking Data
+                </button>
+                <button className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                  <span>�</span>
+                  Live Sky Map
                 </button>
                 <button className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <span>📍</span>
-                  Share Location
+                  <span>�</span>
+                  Share Tracking
                 </button>
               </div>
             </div>
