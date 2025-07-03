@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 // Removed direct import of data service to avoid Node.js modules in browser
 import CentralVideoPlayer from '@/components/CentralVideoPlayer';
 
@@ -337,510 +338,293 @@ export default function NASATV() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1b1d] text-white">
-      {/* Header - Consistent with app design */}
-      <div className="bg-gradient-to-r from-red-500/20 to-blue-500/20 border-b border-red-500/30 p-4">
-        <div className="flex items-center justify-between max-w-[960px] mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="text-3xl">📺</div>
-            <div>
-              <h1 className="text-white text-[32px] font-bold leading-tight tracking-[-0.015em]">NASA+</h1>
-              <p className="text-[#a2abb3] text-base">Stream the universe • Live from NASA</p>
+    <div className="relative flex size-full min-h-screen flex-col bg-[#111418] dark group/design-root overflow-x-hidden">
+      <div className="layout-container flex h-full grow flex-col">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#292f38] px-10 py-3">
+          <div className="flex items-center gap-4 text-white">
+            <div className="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
+              </svg>
             </div>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Cosmic Classroom</h2>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-white font-semibold">
-                {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
-              </div>
-              <div className="text-[#a2abb3] text-sm">Eastern Time</div>
+          <div className="flex flex-1 justify-end gap-8">
+            <div className="flex items-center gap-9">
+              <Link href="/" className="text-white text-sm font-medium leading-normal">Today</Link>
+              <Link href="/explore" className="text-white text-sm font-medium leading-normal">Explore</Link>
+              <Link href="/learn" className="text-white text-sm font-medium leading-normal">Learn</Link>
+              <Link href="/games" className="text-white text-sm font-medium leading-normal">Games</Link>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-red-400 font-semibold">LIVE</span>
+            <div className="flex gap-2">
+              <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#292f38] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+                <div className="text-white" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+                  </svg>
+                </div>
+              </button>
+              <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#292f38] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+                <div className="text-white" data-icon="User" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+                  </svg>
+                </div>
+              </button>
             </div>
+            <div
+              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              style={{
+                backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCvhvQwziuIKrHHCbgWuuZ0IgZpKnsQ3_TojyWFbS1AQgtP05L9HSM8kBPibkPH_AkoRyWqp45GOELtYgqhxIUYlzwl-nN8STtXsah3QjndKQjtd-AFdGx45kQhgp2IA2c0GkngYKH378N2_REvdz4cSRv8jZplkBrv0EDK1ZPeM-8ucfj8GobPxDzjQe6RPLu--tqA5z4_KJP0LXaCJGNdshEsQLl9qv2EP9GVkV_qKV4R3jfJeeMrzzmvr5EQERF5N1R9kzHQ2Rs")'
+              }}
+            ></div>
           </div>
-        </div>
-      </div>
+        </header>
 
-      <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto">
-        <div className="flex flex-wrap justify-between gap-3 p-4">
-          <p className="text-white tracking-light text-[22px] font-bold leading-tight">📺 NASA+ Live Streaming</p>
-          {lastUpdated && (
-            <div className="text-[#a2abb3] text-sm flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span>Updated {lastUpdated.toLocaleTimeString()}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Data Source Notice */}
-        <div className="p-4">
-          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="text-blue-400 text-xl">📁</div>
-              <div>
-                <div className="text-white font-semibold mb-1">Daily Scraped NASA+ Content</div>
-                <div className="text-[#a2abb3] text-sm">
-                  Content scraped daily from <span className="text-blue-400">plus.nasa.gov</span> • Stored locally for performance • {liveEvents.length} live events • {nasaShows.length} shows available
-                  {dataStatus && <span> • Data {dataStatus.ageString}</span>}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Featured Live Stream */}
-        <div className="p-4">
-          <div className="relative bg-[#1e2124] rounded-xl overflow-hidden mb-4 border border-[#2c3035]">
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <div 
-                className="absolute inset-0 bg-cover bg-center rounded-xl cursor-pointer group"
-                style={{
-                  backgroundImage: "url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=675&fit=crop&auto=format&q=80')"
-                }}
-                onClick={openNASAPlus}
-              >
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                  <div className="bg-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300">
-                    <div className="w-0 h-0 border-l-[24px] border-l-white border-t-[16px] border-t-transparent border-b-[16px] border-b-transparent ml-2"></div>
-                  </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  ● LIVE on NASA+
-                </div>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
-              <div className="flex items-center justify-between">
+        <div className="px-40 flex flex-1 justify-center py-5">
+          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+            {/* Page Header */}
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">📺</div>
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
-                      LIVE NOW
-                    </div>
-                    <span className="text-[#a2abb3] text-sm">Official NASA Stream</span>
-                  </div>
-                  <h2 className="text-white text-xl font-bold mb-2">NASA+ Official Live Stream</h2>
-                  <p className="text-[#a2abb3] text-sm mb-2">
-                    24/7 coverage of NASA missions, ISS operations, launches, and space exploration activities
-                  </p>
-                  <div className="mt-3">
-                    <button 
-                      onClick={openNASAPlus}
-                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
-                    >
-                      <span>🚀</span>
-                      <span>Watch Live on NASA+</span>
-                    </button>
-                  </div>
+                  <h1 className="text-white text-[32px] font-bold leading-tight tracking-[-0.015em]">NASA+</h1>
+                  <p className="text-[#a2abb3] text-base">Stream the universe • Live from NASA</p>
                 </div>
+              </div>
+              <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <div className="text-white font-mono text-lg">24/7</div>
-                  <div className="text-[#a2abb3] text-sm">NASA+</div>
+                  <div className="text-white font-semibold">
+                    {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
+                  </div>
+                  <div className="text-[#a2abb3] text-sm">Eastern Time</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-red-400 font-semibold">LIVE</span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Category Navigation */}
-        <div className="p-4">
-          <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Explore NASA+</h3>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {categories.map(category => {
-              const categoryCount = category.name === "Live & Upcoming" 
-                ? liveEvents.length 
-                : nasaShows.filter(show => show.category === category.name).length;
-              
-              return (
-                <button
-                  key={category.name}
-                  onClick={() => setSelectedCategory(category.name)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
-                    selectedCategory === category.name
-                      ? 'bg-red-500 text-white shadow-lg scale-105'
-                      : categoryCount > 0
-                        ? 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
-                        : 'bg-[#1a1b1d] text-[#555] cursor-not-allowed opacity-50'
-                  }`}
-                  disabled={categoryCount === 0}
-                >
-                  <span>{category.icon}</span>
-                  <span>{category.name}</span>
-                  {categoryCount > 0 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      selectedCategory === category.name
-                        ? 'bg-white/20 text-white'
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {categoryCount}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Live Events Section */}
-        {selectedCategory === "Live & Upcoming" && (
-          <div className="p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <h3 className="text-white text-lg font-semibold">Live & Upcoming Events</h3>
-              <span className="text-[#a2abb3] text-sm">• {liveEvents.length} events</span>
+            <div className="flex flex-wrap justify-between gap-3 p-4">
+              <p className="text-white tracking-light text-[22px] font-bold leading-tight">📺 NASA+ Live Streaming</p>
+              {lastUpdated && (
+                <div className="text-[#a2abb3] text-sm flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span>Updated {lastUpdated.toLocaleTimeString()}</span>
+                </div>
+              )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {liveEvents.map(event => (
-                <div 
-                  key={event.id}
-                  onClick={openNASAPlus}
-                  className="bg-[#1e2124] rounded-xl p-4 border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className={`px-3 py-1 rounded-full text-xs font-medium mb-2 ${
-                        event.status === 'LIVE' ? 'bg-red-500 text-white' : 'bg-yellow-500 text-white'
-                      }`}>
-                        {event.status}
-                      </div>
-                      <h4 className="text-white font-semibold text-lg">{event.title}</h4>
-                      <p className="text-[#a2abb3] text-sm mb-2">{event.description}</p>
-                      <div className="text-blue-400 text-sm font-medium">{event.date} • {event.time}</div>
-                    </div>
-                    <div className="text-2xl">
-                      {event.type === 'Launch' ? '🚀' : event.type === 'Live Stream' ? '🎥' : '📺'}
+
+            {/* Data Source Notice */}
+            <div className="p-4">
+              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-blue-400 text-xl">📁</div>
+                  <div>
+                    <div className="text-white font-semibold mb-1">Daily Scraped NASA+ Content</div>
+                    <div className="text-[#a2abb3] text-sm">
+                      Content scraped daily from <span className="text-blue-400">plus.nasa.gov</span> • Stored locally for performance • {liveEvents.length} live events • {nasaShows.length} shows available
+                      {dataStatus && <span> • Data {dataStatus.ageString}</span>}
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Featured Live Stream */}
+            <div className="p-4">
+              <div className="relative bg-[#1e2124] rounded-xl overflow-hidden mb-4 border border-[#2c3035]">
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <div
+                    className="absolute inset-0 bg-cover bg-center rounded-xl cursor-pointer group"
+                    style={{
+                      backgroundImage: "url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=675&fit=crop&auto=format&q=80')"
+                    }}
+                    onClick={openNASAPlus}
+                  >
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                      <div className="bg-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-0 h-0 border-l-[24px] border-l-white border-t-[16px] border-t-transparent border-b-[16px] border-b-transparent ml-2"></div>
+                      </div>
+                    </div>
+                    <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                      ● LIVE on NASA+
+                    </div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-[#a2abb3] text-xs">{event.type}</span>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openNASAPlus();
-                      }}
-                      className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1 rounded-lg text-xs transition-colors"
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
+                          LIVE NOW
+                        </div>
+                        <span className="text-[#a2abb3] text-sm">Official NASA Stream</span>
+                      </div>
+                      <h2 className="text-white text-xl font-bold mb-2">NASA+ Official Live Stream</h2>
+                      <p className="text-[#a2abb3] text-sm mb-2">
+                        24/7 coverage of NASA missions, ISS operations, launches, and space exploration activities
+                      </p>
+                      <div className="mt-3">
+                        <button
+                          onClick={openNASAPlus}
+                          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
+                        >
+                          <span>🚀</span>
+                          <span>Watch Live on NASA+</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-mono text-lg">24/7</div>
+                      <div className="text-[#a2abb3] text-sm">NASA+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Navigation */}
+            <div className="p-4">
+              <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Explore NASA+</h3>
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {categories.map(category => {
+                  const categoryCount = category.name === "Live & Upcoming"
+                    ? liveEvents.length
+                    : nasaShows.filter(show => show.category === category.name).length;
+
+                  return (
+                    <button
+                      key={category.name}
+                      onClick={() => setSelectedCategory(category.name)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
+                        selectedCategory === category.name
+                          ? 'bg-red-500 text-white shadow-lg scale-105'
+                          : categoryCount > 0
+                            ? 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
+                            : 'bg-[#1a1b1d] text-[#555] cursor-not-allowed opacity-50'
+                      }`}
+                      disabled={categoryCount === 0}
                     >
-                      Watch on NASA+
+                      <span>{category.icon}</span>
+                      <span>{category.name}</span>
+                      {categoryCount > 0 && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                          selectedCategory === category.name
+                            ? 'bg-white/20 text-white'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {categoryCount}
+                        </span>
+                      )}
                     </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Live Events Section */}
+            {selectedCategory === "Live & Upcoming" && (
+              <div className="p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <h3 className="text-white text-lg font-semibold">Live & Upcoming Events</h3>
+                  <span className="text-[#a2abb3] text-sm">• {liveEvents.length} events</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {liveEvents.map(event => (
+                    <div
+                      key={event.id}
+                      onClick={openNASAPlus}
+                      className="bg-[#1e2124] rounded-xl p-4 border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`px-2 py-1 rounded-full text-xs font-semibold ${event.status === 'LIVE' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                            {event.status}
+                          </div>
+                          <div className="text-[#a2abb3] text-sm">{event.type}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-semibold">{event.time}</div>
+                          <div className="text-[#a2abb3] text-xs">{event.date}</div>
+                        </div>
+                      </div>
+                      <h4 className="text-white font-semibold mb-2">{event.title}</h4>
+                      <p className="text-[#a2abb3] text-sm">{event.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* NASA+ Content Grid */}
+            {selectedCategory !== "Live & Upcoming" && (
+              <div className="p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h3 className="text-white text-lg font-semibold">{selectedCategory}</h3>
+                  <span className="text-[#a2abb3] text-sm">• {filteredContent.length} shows</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {filteredContent.map((show: any) => (
+                    <div
+                      key={show.id}
+                      onClick={() => openContent(show)}
+                      className="group cursor-pointer bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105"
+                    >
+                      <div className="relative">
+                        <img
+                          src={show.thumbnail}
+                          alt={show.title}
+                          className="w-full h-32 object-cover group-hover:opacity-80 transition-opacity"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div className="absolute bottom-2 left-2 text-white text-xs font-bold">{show.duration}</div>
+                        <div className="absolute top-2 right-2 bg-black/50 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>
+                        </div>
+                      </div>
+                      <div className="p-3">
+                        <div className="text-blue-400 text-xs font-semibold mb-1">{show.series}</div>
+                        <h4 className="text-white text-sm font-semibold truncate" title={show.title}>{show.title}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* NASA+ Series Highlights */}
+            <div className="p-4">
+              <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Featured Series on NASA+</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {nasaSeries.slice(0, 8).map(series => (
+                  <div
+                    key={series.name}
+                    className="bg-gradient-to-br from-[#2c3035]/80 to-[#1e2124]/80 rounded-xl p-4 flex flex-col items-center justify-center text-center border border-[#373c42] hover:border-purple-500/50 cursor-pointer transition-all duration-300 hover:scale-105"
+                  >
+                    <div className="text-4xl mb-2">{series.icon}</div>
+                    <h4 className="text-white font-semibold mb-1">{series.name}</h4>
+                    <div className="text-[#a2abb3] text-xs">{series.episodes} Episodes</div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Content Grid */}
-        <div className="p-4">
-          <h3 className="text-white text-lg font-semibold mb-4">
-            {selectedCategory === "Live & Upcoming" ? `Featured Shows • ${nasaShows.length} available` : `${selectedCategory} • ${filteredContent.length} shows`}
-          </h3>
-          
-          {/* Empty State for Categories with No Content */}
-          {selectedCategory !== "Live & Upcoming" && filteredContent.length === 0 && (
-            <div className="bg-[#1e2124] rounded-xl border border-[#2c3035] p-8 text-center">
-              <div className="text-4xl mb-4">
-                {categories.find(cat => cat.name === selectedCategory)?.icon || '📺'}
-              </div>
-              <h4 className="text-white text-lg font-semibold mb-2">No {selectedCategory} Content Available</h4>
-              <p className="text-[#a2abb3] text-sm mb-4">
-                We don't have any {selectedCategory.toLowerCase()} content in our current scraped data. 
-                The daily scraper will collect more content from NASA+ automatically.
-              </p>
-              <div className="flex items-center justify-center gap-4 text-xs text-[#a2abb3]">
-                <span>🔄 Auto-updates daily</span>
-                <span>📡 Content from plus.nasa.gov</span>
-                <span>⏰ Next scrape: Tomorrow 6 AM</span>
+                ))}
               </div>
             </div>
-          )}
-          
-          {/* Content Grid - Only show if there's content */}
-          {(selectedCategory === "Live & Upcoming" || filteredContent.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(selectedCategory === "Live & Upcoming" ? nasaShows.slice(0, 6) : filteredContent.slice(0, 12)).map((content: any) => (
-                <div 
-                  key={content.id}
-                  onClick={() => openContent(content)}
-                  className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
-                >
-                 <div className="relative">
-                   <img 
-                     src={content.thumbnail} 
-                     alt={content.title}
-                     className="w-full h-48 object-cover"
-                   />
-                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
-                       <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
-                     </div>
-                   </div>
-                   <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                     {content.duration}
-                   </div>
-                   <div className="absolute top-3 left-3 bg-red-600/80 text-white text-xs px-2 py-1 rounded">
-                     {content.publishDate}
-                   </div>
-                 </div>
-                 <div className="p-4">
-                   <h4 className="text-white font-semibold text-lg mb-2 line-clamp-2">{content.title}</h4>
-                   <p className="text-[#a2abb3] text-sm mb-3 line-clamp-2">{content.description}</p>
-                   <div className="flex items-center justify-between">
-                     <span className="text-red-400 text-xs">{content.category}</span>
-                     <span className="text-[#a2abb3] text-xs">{content.series}</span>
-                   </div>
-                 </div>
-               </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Dynamic NASA Series */}
-        <div className="p-4">
-          <h3 className="text-white text-lg font-semibold mb-4">NASA+ Series • {nasaSeries.length} active series</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                         {nasaSeries.map(series => (
-               <div 
-                 key={series.name} 
-                 onClick={() => openContent(series)}
-                 className="bg-[#1e2124] rounded-xl p-3 border border-[#2c3035] hover:border-red-500/50 cursor-pointer transition-all duration-300 hover:scale-105"
-                 title={series.description}
-               >
-                <div className="text-center">
-                  <div className="text-2xl mb-2">{series.icon}</div>
-                  <h4 className="text-white font-medium text-sm mb-1">{series.name}</h4>
-                  <p className="text-[#a2abb3] text-xs">{series.episodes} Episodes</p>
-                </div>
-              </div>
-            ))}
+            {/* Central Video Player */}
+            {showVideoPlayer && selectedContent && (
+              <CentralVideoPlayer
+                isOpen={showVideoPlayer}
+                content={selectedContent}
+                onClose={closeVideoPlayer}
+              />
+            )}
           </div>
         </div>
-
-        {/* Latest NASA News */}
-        <div className="p-4">
-          <h3 className="text-white text-lg font-semibold mb-4">Latest NASA News • Live Updates</h3>
-          <div className="space-y-3">
-            {nasaNews.map((article, index) => (
-              <div key={index} className="bg-[#1e2124] rounded-xl p-4 border border-[#2c3035] hover:border-blue-500/50 transition-all duration-300">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-white font-semibold mb-2">{article.title}</h4>
-                    <p className="text-[#a2abb3] text-sm mb-2">{article.summary}</p>
-                    <span className="text-blue-400 text-xs">{article.published}</span>
-                  </div>
-                  <div className="text-blue-400 text-sm">📰</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* NASA+ Info Footer */}
-        <div className="p-4">
-          <div className="bg-gradient-to-r from-red-500/10 to-blue-500/10 border border-red-500/20 rounded-xl p-6">
-            <div className="text-center">
-              <div className="text-3xl mb-3">🚀</div>
-              <h3 className="text-white text-xl font-bold mb-2">NASA+ | Stream the Universe</h3>
-              <p className="text-[#a2abb3] text-sm mb-4">
-                Experience hundreds of videos and live content from NASA's missions, discoveries, and space exploration on the official streaming platform. Content updates in real-time.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#a2abb3] mb-6">
-                <span className="flex items-center gap-1">🌍 Free worldwide</span>
-                <span className="flex items-center gap-1">📱 All devices</span>
-                <span className="flex items-center gap-1">🔴 Live coverage</span>
-                <span className="flex items-center gap-1">🔄 Auto-updates</span>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
-                <button 
-                  onClick={openNASAPlus}
-                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
-                >
-                  <span>🚀</span>
-                  <span>Launch NASA+ Official Site</span>
-                </button>
-                <span className="text-[#a2abb3] text-xs">plus.nasa.gov • Updated {lastUpdated?.toLocaleTimeString()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Navigation */}
-        <nav className="bg-[#1e2124] border-t border-[#2c3035] px-4 py-3 mt-8">
-          <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-            <a className="text-white text-sm font-medium leading-normal hover:text-red-400 transition-colors" href="/cosmos-explorer">Home</a>
-            <a className="text-red-400 text-sm font-medium leading-normal" href="/nasa-tv">NASA TV</a>
-            <a className="text-white text-sm font-medium leading-normal hover:text-red-400 transition-colors" href="/tracker">Tracker</a>
-            <a className="text-white text-sm font-medium leading-normal hover:text-red-400 transition-colors" href="/events">Events</a>
-            <a className="text-white text-sm font-medium leading-normal hover:text-red-400 transition-colors" href="/explore">Explore</a>
-            <a className="text-white text-sm font-medium leading-normal hover:text-red-400 transition-colors" href="/games">Games</a>
-          </div>
-        </nav>
       </div>
-
-      {/* Central Video Player */}
-      <CentralVideoPlayer
-        isOpen={showVideoPlayer}
-        content={selectedContent}
-        onClose={closeVideoPlayer}
-      />
-      
-      {/* Legacy Modal - Remove this entire section */}
-      {false && selectedContent && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1e2124] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#2c3035] shadow-2xl">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-[#2c3035] bg-gradient-to-r from-red-500/10 to-blue-500/10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-3xl">
-                    {selectedContent.episodes ? selectedContent.icon : '🎬'}
-                  </div>
-                  <div>
-                    <h2 className="text-white text-2xl font-bold">
-                      {selectedContent.title || selectedContent.name}
-                    </h2>
-                    <div className="text-[#a2abb3] text-sm flex items-center gap-3">
-                      <span>{selectedContent.category || selectedContent.description}</span>
-                      {selectedContent.duration && (
-                        <span>• Duration: {selectedContent.duration}</span>
-                      )}
-                      {selectedContent.episodes && (
-                        <span>• {selectedContent.episodes} Episodes</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  onClick={closeVideoPlayer}
-                  className="text-[#a2abb3] hover:text-white text-2xl p-2 hover:bg-[#2c3035] rounded-lg transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            {/* Content Body */}
-            <div className="p-6">
-              {/* Video Player Section */}
-              <div className="mb-6">
-                <div className="relative bg-black rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                  <iframe
-                    src="https://www.youtube.com/embed/DIgkvm2nmHc?autoplay=0&rel=0&modestbranding=1&controls=1"
-                    title={selectedContent.title || selectedContent.name}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="absolute top-0 left-0 w-full h-full rounded-xl"
-                  />
-                  <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs">
-                    NASA Official Stream
-                  </div>
-                </div>
-              </div>
-
-              {/* Content Details */}
-              <div className="space-y-6">
-                {/* Description */}
-                <div>
-                  <h3 className="text-white text-lg font-semibold mb-3">About</h3>
-                  <p className="text-[#a2abb3] leading-relaxed">
-                    {selectedContent.description || `Explore ${selectedContent.name || selectedContent.title} and dive deep into NASA's incredible universe of content. This ${selectedContent.episodes ? 'series' : 'show'} offers unique insights into space exploration, scientific discovery, and the wonders of our universe.`}
-                  </p>
-                </div>
-
-                {/* Series Info */}
-                {selectedContent.episodes && (
-                  <div>
-                    <h3 className="text-white text-lg font-semibold mb-3">Series Information</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Episodes</div>
-                        <div className="text-white font-bold text-lg">{selectedContent.episodes}</div>
-                      </div>
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Category</div>
-                        <div className="text-white font-bold text-lg">Series</div>
-                      </div>
-                      <div className="bg-[#2c3035] rounded-lg p-3">
-                        <div className="text-[#a2abb3] text-xs mb-1">Platform</div>
-                        <div className="text-white font-bold text-lg">NASA+</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                                 {/* Show Info */}
-                 {!selectedContent.episodes && selectedContent.duration && (
-                   <div>
-                     <h3 className="text-white text-lg font-semibold mb-3">Show Details</h3>
-                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                       <div className="bg-[#2c3035] rounded-lg p-3">
-                         <div className="text-[#a2abb3] text-xs mb-1">Duration</div>
-                         <div className="text-white font-bold">{selectedContent.duration}</div>
-                       </div>
-                       <div className="bg-[#2c3035] rounded-lg p-3">
-                         <div className="text-[#a2abb3] text-xs mb-1">Category</div>
-                         <div className="text-white font-bold">{selectedContent.category}</div>
-                       </div>
-                       <div className="bg-[#2c3035] rounded-lg p-3">
-                         <div className="text-[#a2abb3] text-xs mb-1">Series</div>
-                         <div className="text-white font-bold">{selectedContent.series}</div>
-                       </div>
-                       <div className="bg-[#2c3035] rounded-lg p-3">
-                         <div className="text-[#a2abb3] text-xs mb-1">Quality</div>
-                         <div className="text-white font-bold">{selectedContent.videoQuality || 'HD'}</div>
-                       </div>
-                       <div className="bg-[#2c3035] rounded-lg p-3">
-                         <div className="text-[#a2abb3] text-xs mb-1">Rating</div>
-                         <div className="text-white font-bold">{selectedContent.rating || 'TV-G'}</div>
-                       </div>
-                     </div>
-                     <div className="mt-4 text-center">
-                       <div className="text-[#a2abb3] text-sm">Published: {selectedContent.publishDate}</div>
-                     </div>
-                   </div>
-                 )}
-
-                {/* Related Content */}
-                <div>
-                  <h3 className="text-white text-lg font-semibold mb-3">More NASA+ Content</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {nasaShows.slice(0, 3).map(show => (
-                      <div 
-                        key={show.id}
-                        onClick={() => openContent(show)}
-                        className="bg-[#2c3035] rounded-lg p-3 cursor-pointer hover:bg-[#373c42] transition-colors"
-                      >
-                        <div className="text-white font-medium text-sm mb-1">{show.title}</div>
-                        <div className="text-[#a2abb3] text-xs">{show.duration} • {show.series}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-                             {/* Action Buttons */}
-               <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                 <button 
-                   onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
-                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
-                 >
-                   <span>🚀</span>
-                   <span>Watch Full Content on NASA+</span>
-                 </button>
-                 <button 
-                   onClick={closeVideoPlayer}
-                   className="bg-[#2c3035] hover:bg-[#373c42] text-white px-8 py-3 rounded-lg font-medium transition-colors"
-                 >
-                   Close Preview
-                 </button>
-               </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
