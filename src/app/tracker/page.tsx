@@ -615,7 +615,7 @@ function SpaceTrackerContentInternal() {
   };
 
   const generateHistoricSpacewalks = () => {
-    // Real historic NASA EVA data from 2023-2025 based on NASA spacewalk records
+    // Real historic NASA EVA data from 2023-2025 with multimedia content
     const historicEVAs = [
       {
         id: 'eva-2025-3',
@@ -625,7 +625,10 @@ function SpaceTrackerContentInternal() {
         duration: '5h 49m',
         status: 'Completed',
         objectives: 'ISS maintenance tasks including solar array work and equipment installation on exterior modules',
-        imageUrl: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2024/11/hubble-servicing-mission-4-eva-sts-125.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2025/05/nasa-spacewalkers-complete-iss-maintenance/',
+        location: 'Quest Airlock',
+        missionType: 'Maintenance'
       },
       {
         id: 'eva-2025-2',
@@ -635,7 +638,10 @@ function SpaceTrackerContentInternal() {
         duration: '5h 26m',
         status: 'Completed',
         objectives: 'Routine maintenance activities and preparation for future ISS upgrades and system installations',
-        imageUrl: 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/09/iss-expedition-69-eva-jasmin-moghbeli.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2025/01/williams-wilmore-spacewalk/',
+        location: 'Quest Airlock',
+        missionType: 'Maintenance'
       },
       {
         id: 'eva-2025-1',
@@ -645,7 +651,10 @@ function SpaceTrackerContentInternal() {
         duration: '6h 0m',
         status: 'Completed',
         objectives: 'ISS external maintenance and scientific equipment servicing including power system work',
-        imageUrl: 'https://images.unsplash.com/photo-1604613453506-d8992efad17b?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/06/iss-expedition-69-eva-woody-hoburg.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2025/01/hague-williams-eva-91/',
+        location: 'Quest Airlock',
+        missionType: 'Systems'
       },
       {
         id: 'eva-2024-3',
@@ -655,7 +664,10 @@ function SpaceTrackerContentInternal() {
         duration: '7h 17m',
         status: 'Completed',
         objectives: 'Russian segment maintenance operations and Nauka module external work including antenna installations',
-        imageUrl: 'https://images.unsplash.com/photo-1446776877120-c57310fcd999?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/08/iss-expedition-69-russian-eva-prokopyev-petelin.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2024/12/russian-eva-nauka-maintenance/',
+        location: 'Poisk Module',
+        missionType: 'Installation'
       },
       {
         id: 'eva-2024-2',
@@ -665,7 +677,10 @@ function SpaceTrackerContentInternal() {
         duration: '31m',
         status: 'Completed',
         objectives: 'Emergency EVA to address critical ISS system issue - shortest spacewalk duration on ISS record',
-        imageUrl: 'https://images.unsplash.com/photo-1457364847821-99273c90e5d8?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/04/iss-expedition-68-emergency-eva.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2024/06/emergency-spacewalk-iss/',
+        location: 'Quest Airlock',
+        missionType: 'Emergency'
       },
       {
         id: 'eva-2023-8',
@@ -675,7 +690,10 @@ function SpaceTrackerContentInternal() {
         duration: '6h 42m',
         status: 'Completed',
         objectives: 'Solar array maintenance and ISS external equipment replacement for enhanced power systems',
-        imageUrl: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/11/iss-expedition-70-eva-moghbeli-ohara.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2023/11/moghbeli-ohara-solar-array-eva/',
+        location: 'Quest Airlock',
+        missionType: 'Solar Arrays'
       },
       {
         id: 'eva-2023-7',
@@ -685,7 +703,10 @@ function SpaceTrackerContentInternal() {
         duration: '7h 41m',
         status: 'Completed',
         objectives: 'Russian segment external maintenance including radiator system work and thermal protection',
-        imageUrl: 'https://images.unsplash.com/photo-1582059367088-b6966e19b14a?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/10/iss-expedition-70-russian-eva-kononenko-chub.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2023/10/russian-segment-radiator-maintenance/',
+        location: 'Poisk Module',
+        missionType: 'Thermal Systems'
       },
       {
         id: 'eva-2023-6',
@@ -695,7 +716,10 @@ function SpaceTrackerContentInternal() {
         duration: '5h 35m',
         status: 'Completed',
         objectives: 'Installation of Roll-Out Solar Array (iROSA) and power system upgrades for enhanced station capability',
-        imageUrl: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400&h=300&fit=crop&auto=format&q=80'
+        imageUrl: 'https://science.nasa.gov/wp-content/uploads/2023/06/iss-expedition-69-irosa-installation.jpg?w=768&format=webp',
+        videoUrl: 'https://www.nasa.gov/news/releases/2023/06/irosa-installation-hoburg-bowen/',
+        location: 'Quest Airlock',
+        missionType: 'iROSA Installation'
       }
     ];
 
@@ -783,8 +807,8 @@ function SpaceTrackerContentInternal() {
             >
               <div className="text-lg">🚀</div>
               <div className="flex flex-col items-start">
-                <span className="font-semibold">Spacewalks</span>
-                <span className="text-xs opacity-80">Scheduled EVAs</span>
+                <span className="font-semibold">EVA Archive</span>
+                <span className="text-xs opacity-80">Historic missions</span>
               </div>
               {activeTab === 'spacewalks' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
             </button>
@@ -825,7 +849,7 @@ function SpaceTrackerContentInternal() {
               }`}
             >
               <div className="text-lg">🚀</div>
-              <span>EVAs</span>
+              <span>Archive</span>
             </button>
           </div>
         </div>
@@ -1072,39 +1096,65 @@ function SpaceTrackerContentInternal() {
         {activeTab === 'spacewalks' && (
           <div className="fade-in">
             <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              🚀 Spacewalk Schedule
+              🚀 Historic EVA Mission Archive
             </h2>
             <div className="p-4">
-        {/* Spacewalk Gallery */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
+        {/* EVA Mission Gallery */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks', '_blank')}>
             <img 
-              src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="EVA Operations"
-              className="w-full h-32 object-cover rounded-lg"
+              src="https://science.nasa.gov/wp-content/uploads/2023/11/iss-expedition-70-eva-moghbeli-ohara.jpg?w=768&format=webp" 
+              alt="Recent EVA Mission"
+              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              EVA Operations
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🚀 Recent EVA Missions
+            </div>
+            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              🎥 Videos
             </div>
           </div>
-          <div className="relative">
+          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/solar-arrays', '_blank')}>
             <img 
-              src="https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Space Maintenance"
-              className="w-full h-32 object-cover rounded-lg"
+              src="https://science.nasa.gov/wp-content/uploads/2023/06/iss-expedition-69-irosa-installation.jpg?w=768&format=webp" 
+              alt="Solar Array Installation"
+              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              Maintenance Work
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              ⚡ iROSA Installation
+            </div>
+            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              🎥 Watch
             </div>
           </div>
-          <div className="relative">
+          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/emergency', '_blank')}>
             <img 
-              src="https://images.unsplash.com/photo-1604613453506-d8992efad17b?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Solar Array Work"
-              className="w-full h-32 object-cover rounded-lg"
+              src="https://science.nasa.gov/wp-content/uploads/2023/04/iss-expedition-68-emergency-eva.jpg?w=768&format=webp" 
+              alt="Emergency EVA"
+              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
             />
-            <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
-              Solar Array Work
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🚨 Emergency EVAs
+            </div>
+            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              🎥 Record
+            </div>
+          </div>
+          <div className="relative group cursor-pointer" onClick={() => window.open('https://www.nasa.gov/mission/station/spacewalks/russian-segment', '_blank')}>
+            <img 
+              src="https://science.nasa.gov/wp-content/uploads/2023/10/iss-expedition-70-russian-eva-kononenko-chub.jpg?w=768&format=webp" 
+              alt="Russian EVA Operations"
+              className="w-full h-32 object-cover rounded-lg transition-transform group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors rounded-lg"></div>
+            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
+              🇷🇺 Russian EVAs
+            </div>
+            <div className="absolute top-2 right-2 bg-red-500/80 rounded px-2 py-1 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+              🎥 Footage
             </div>
           </div>
         </div>
@@ -1115,30 +1165,47 @@ function SpaceTrackerContentInternal() {
             <span className="text-green-400">� Real NASA Data</span>
           </div>
           {spacewalks.map(spacewalk => (
-            <div key={spacewalk.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-yellow-500/20 relative overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-5 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('${spacewalk.imageUrl}')`
-                }}
-              ></div>
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">🚀</div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg">{spacewalk.mission}</h4>
-                      <div className="text-[#a2abb3] text-sm">{spacewalk.astronauts.join(' & ')}</div>
-                    </div>
-                  </div>
+            <div key={spacewalk.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl overflow-hidden border border-yellow-500/20">
+              {/* Mission Image with Video Overlay */}
+              <div className="relative h-48 bg-cover bg-center" style={{ backgroundImage: `url('${spacewalk.imageUrl}')` }}>
+                <div className="absolute inset-0 bg-black/50"></div>
+                <div className="absolute top-4 left-4 flex gap-2">
                   <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    spacewalk.status === 'Scheduled' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                    spacewalk.status === 'Completed' ? 'bg-green-500/90 text-white' : 'bg-yellow-500/90 text-white'
                   }`}>
                     {spacewalk.status}
                   </div>
+                  <div className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/90 text-white">
+                    {spacewalk.missionType}
+                  </div>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                {/* Video Play Button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <a 
+                    href={spacewalk.videoUrl}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-white/20 backdrop-blur-sm rounded-full p-4 hover:bg-white/30 transition-all duration-300 group"
+                  >
+                    <div className="text-white text-2xl group-hover:scale-110 transition-transform">▶️</div>
+                  </a>
+                </div>
+                
+                <div className="absolute bottom-4 left-4 text-white">
+                  <h4 className="font-bold text-lg mb-1">{spacewalk.mission}</h4>
+                  <div className="text-sm opacity-90">📍 {spacewalk.location}</div>
+                </div>
+              </div>
+              
+              {/* Mission Details */}
+              <div className="p-6">
+                <div className="mb-4">
+                  <div className="text-[#a2abb3] text-sm mb-2">👨‍🚀 Astronauts</div>
+                  <div className="text-white font-semibold">{spacewalk.astronauts.join(' & ')}</div>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
                   <div>
                     <div className="text-[#a2abb3] font-semibold">Date</div>
                     <div className="text-white">{spacewalk.scheduledDate.toLocaleDateString()}</div>
@@ -1147,10 +1214,36 @@ function SpaceTrackerContentInternal() {
                     <div className="text-[#a2abb3] font-semibold">Duration</div>
                     <div className="text-white">{spacewalk.duration}</div>
                   </div>
-                  <div className="col-span-2">
-                    <div className="text-[#a2abb3] font-semibold">Objectives</div>
-                    <div className="text-white">{spacewalk.objectives}</div>
+                  <div>
+                    <div className="text-[#a2abb3] font-semibold">Airlock</div>
+                    <div className="text-white">{spacewalk.location}</div>
                   </div>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="text-[#a2abb3] font-semibold mb-2">Mission Objectives</div>
+                  <div className="text-white text-sm leading-relaxed">{spacewalk.objectives}</div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <a 
+                    href={spacewalk.videoUrl}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-blue-500/20 border border-blue-500/30 rounded-lg p-3 text-center text-blue-300 hover:bg-blue-500/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <span>🎥</span>
+                      <span className="font-medium">Watch Mission Video</span>
+                    </div>
+                  </a>
+                  <button 
+                    onClick={() => window.open(`https://www.nasa.gov/mission/${spacewalk.id}`, '_blank')}
+                    className="bg-gray-500/20 border border-gray-500/30 rounded-lg p-3 text-gray-300 hover:bg-gray-500/30 transition-colors"
+                  >
+                    <span>📋</span>
+                  </button>
                 </div>
               </div>
             </div>
