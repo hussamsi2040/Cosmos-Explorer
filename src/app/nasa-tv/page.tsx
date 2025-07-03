@@ -6,12 +6,12 @@ import { useState, useEffect } from 'react';
 const liveEvents = [
   {
     id: 1,
-    title: "Progress 92 Cargo Ship Launch",
-    time: "Today 3:10 pm",
+    title: "NASA Live: Official Stream of Agency Activities",
+    time: "Live Now",
     status: "LIVE",
-    description: "Watch the Progress 92 cargo ship launch to the International Space Station",
-    videoId: "21X5lGlDOfg", // NASA Live
-    type: "Launch",
+    description: "Official NASA Live stream featuring space missions, launches, and ISS operations",
+    videoId: "DIgkvm2nmHc", // NASA Live Official
+    type: "Live Stream",
     featured: true
   },
   {
@@ -20,7 +20,7 @@ const liveEvents = [
     time: "July 5, 2025 4:45 pm",
     status: "UPCOMING",
     description: "Live coverage of Progress 92 docking with the ISS",
-    videoId: "21X5lGlDOfg", // NASA Live
+    videoId: "DIgkvm2nmHc", // NASA Live Official
     type: "Docking",
     featured: false
   }
@@ -34,7 +34,7 @@ const nasaShows = [
     category: "Documentaries",
     description: "Explore the incredible journey of the James Webb Space Telescope",
     thumbnail: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "James Webb Space Telescope"
   },
   {
@@ -44,7 +44,7 @@ const nasaShows = [
     category: "Kennedy Space Center",
     description: "Discover how NASA scientists are growing food in space",
     thumbnail: "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "Far Out"
   },
   {
@@ -54,7 +54,7 @@ const nasaShows = [
     category: "Astronauts",
     description: "Astronauts share their unique perspective on Earth from space",
     thumbnail: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "Down to Earth"
   },
   {
@@ -64,7 +64,7 @@ const nasaShows = [
     category: "Artemis",
     description: "The complete story of NASA's return to the Moon",
     thumbnail: "https://images.unsplash.com/photo-1612892483236-52d32a0e0ac1?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "Artemis"
   },
   {
@@ -74,7 +74,7 @@ const nasaShows = [
     category: "Aeronautics",
     description: "Revolutionary aircraft seeking to achieve quiet supersonic flight",
     thumbnail: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "Technology"
   },
   {
@@ -84,7 +84,7 @@ const nasaShows = [
     category: "Documentaries",
     description: "Explore Jupiter's mysterious moon Europa and its hidden ocean",
     thumbnail: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=400&h=225&fit=crop&auto=format&q=80",
-    videoId: "21X5lGlDOfg",
+    videoId: "DIgkvm2nmHc",
     series: "Other Worlds"
   }
 ];
