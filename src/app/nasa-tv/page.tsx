@@ -125,34 +125,40 @@ export default function NASATV() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600/20 to-red-600/20 border-b border-blue-500/30 p-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#1a1b1d] text-white">
+      {/* Header - Consistent with app design */}
+      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b border-blue-500/30 p-4">
+        <div className="flex items-center justify-between max-w-[960px] mx-auto">
           <div className="flex items-center gap-4">
             <div className="text-3xl">📺</div>
             <div>
-              <h1 className="text-3xl font-bold text-white">NASA+</h1>
-              <p className="text-blue-300 text-sm">Stream the universe at your fingertips</p>
+              <h1 className="text-white text-[32px] font-bold leading-tight tracking-[-0.015em]">NASA+</h1>
+              <p className="text-[#a2abb3] text-base">Stream the universe at your fingertips</p>
             </div>
           </div>
-                     <div className="flex items-center gap-4">
-             <div className="text-right">
-               <div className="text-white font-semibold">
-                 {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
-               </div>
-               <div className="text-blue-300 text-sm">Eastern Time</div>
-             </div>
-             <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-             <span className="text-red-400 font-semibold">LIVE</span>
-           </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-white font-semibold">
+                {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
+              </div>
+              <div className="text-[#a2abb3] text-sm">Eastern Time</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-red-400 font-semibold">LIVE</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto">
+        <div className="flex flex-wrap justify-between gap-3 p-4">
+          <p className="text-white tracking-light text-[22px] font-bold leading-tight">📺 NASA+ Live Streaming</p>
+        </div>
+
         {/* Featured Video Player */}
-        <div className="mb-8">
-          <div className="relative bg-black rounded-xl overflow-hidden mb-4">
+        <div className="p-4">
+          <div className="relative bg-[#1e2124] rounded-xl overflow-hidden mb-4 border border-[#2c3035]">
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
               <iframe
                 src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
@@ -160,53 +166,53 @@ export default function NASATV() {
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="absolute top-0 left-0 w-full h-full"
+                className="absolute top-0 left-0 w-full h-full rounded-xl"
               />
             </div>
             
             {/* Video Overlay Info */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      selectedVideo.status === 'LIVE' ? 'bg-red-600 text-white' : 
-                      selectedVideo.status === 'UPCOMING' ? 'bg-yellow-600 text-white' : 
-                      'bg-blue-600 text-white'
+                      selectedVideo.status === 'LIVE' ? 'bg-red-500 text-white' : 
+                      selectedVideo.status === 'UPCOMING' ? 'bg-yellow-500 text-white' : 
+                      'bg-blue-500 text-white'
                     }`}>
                       {selectedVideo.status || 'ON DEMAND'}
                     </div>
-                                         <span className="text-blue-300 text-sm">{(selectedVideo as any).type || (selectedVideo as any).category}</span>
+                    <span className="text-[#a2abb3] text-sm">{(selectedVideo as any).type || (selectedVideo as any).category}</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">{selectedVideo.title}</h2>
-                  <p className="text-gray-300 text-sm mb-2">{selectedVideo.description}</p>
+                  <h2 className="text-white text-xl font-bold mb-2">{selectedVideo.title}</h2>
+                  <p className="text-[#a2abb3] text-sm mb-2">{selectedVideo.description}</p>
                   {selectedVideo.time && (
                     <div className="text-blue-400 text-sm font-medium">{selectedVideo.time}</div>
                   )}
                 </div>
-                                 <div className="text-right">
-                   {(selectedVideo as any).duration && (
-                     <div className="text-white font-mono text-lg">{(selectedVideo as any).duration}</div>
-                   )}
-                   <div className="text-gray-400 text-sm">NASA+</div>
-                 </div>
+                <div className="text-right">
+                  {(selectedVideo as any).duration && (
+                    <div className="text-white font-mono text-lg">{(selectedVideo as any).duration}</div>
+                  )}
+                  <div className="text-[#a2abb3] text-sm">NASA+</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Category Navigation */}
-        <div className="mb-6">
-          <h3 className="text-white text-xl font-bold mb-4">Explore NASA+</h3>
+        <div className="p-4">
+          <h3 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Explore NASA+</h3>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {categories.map(category => (
               <button
                 key={category.name}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${
                   selectedCategory === category.name
-                    ? 'bg-blue-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
+                    ? 'bg-blue-500 text-white shadow-lg scale-105'
+                    : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
                 }`}
               >
                 <span>{category.icon}</span>
@@ -218,27 +224,27 @@ export default function NASATV() {
 
         {/* Live Events Section */}
         {selectedCategory === "Live & Upcoming" && (
-          <div className="mb-8">
+          <div className="p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <h3 className="text-white text-xl font-bold">Live & Upcoming Events</h3>
+              <h3 className="text-white text-lg font-semibold">Live & Upcoming Events</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {liveEvents.map(event => (
                 <div 
                   key={event.id}
                   onClick={() => playVideo(event)}
-                  className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-4 border border-gray-700 hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                  className="bg-[#1e2124] rounded-xl p-4 border border-[#2c3035] hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className={`px-3 py-1 rounded-full text-xs font-medium mb-2 ${
-                        event.status === 'LIVE' ? 'bg-red-600 text-white' : 'bg-yellow-600 text-white'
+                        event.status === 'LIVE' ? 'bg-red-500 text-white' : 'bg-yellow-500 text-white'
                       }`}>
                         {event.status}
                       </div>
                       <h4 className="text-white font-semibold text-lg">{event.title}</h4>
-                      <p className="text-gray-400 text-sm mb-2">{event.description}</p>
+                      <p className="text-[#a2abb3] text-sm mb-2">{event.description}</p>
                       <div className="text-blue-400 text-sm font-medium">{event.time}</div>
                     </div>
                     <div className="text-2xl">
@@ -246,8 +252,8 @@ export default function NASATV() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500 text-xs">{event.type}</span>
-                    <button className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs transition-colors">
+                    <span className="text-[#a2abb3] text-xs">{event.type}</span>
+                    <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1 rounded-lg text-xs transition-colors">
                       Watch Now
                     </button>
                   </div>
@@ -258,8 +264,8 @@ export default function NASATV() {
         )}
 
         {/* Content Grid */}
-        <div className="mb-8">
-          <h3 className="text-white text-xl font-bold mb-4">
+        <div className="p-4">
+          <h3 className="text-white text-lg font-semibold mb-4">
             {selectedCategory === "Live & Upcoming" ? "Featured Shows" : selectedCategory}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -267,7 +273,7 @@ export default function NASATV() {
               <div 
                 key={content.id}
                 onClick={() => playVideo(content)}
-                className="bg-gray-900 rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
+                className="bg-[#1e2124] rounded-xl overflow-hidden border border-[#2c3035] hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-[1.02] group"
               >
                 <div className="relative">
                   <img 
@@ -286,10 +292,10 @@ export default function NASATV() {
                 </div>
                 <div className="p-4">
                   <h4 className="text-white font-semibold text-lg mb-2 line-clamp-2">{content.title}</h4>
-                  <p className="text-gray-400 text-sm mb-3 line-clamp-2">{content.description}</p>
+                  <p className="text-[#a2abb3] text-sm mb-3 line-clamp-2">{content.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-blue-400 text-xs">{content.category}</span>
-                    <span className="text-gray-500 text-xs">{content.series}</span>
+                    <span className="text-[#a2abb3] text-xs">{content.series}</span>
                   </div>
                 </div>
               </div>
@@ -297,9 +303,9 @@ export default function NASATV() {
           </div>
         </div>
 
-        {/* Featured Series Section */}
-        <div className="mb-8">
-          <h3 className="text-white text-xl font-bold mb-4">Popular NASA Series</h3>
+        {/* Popular NASA Series */}
+        <div className="p-4">
+          <h3 className="text-white text-lg font-semibold mb-4">Popular NASA Series</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {[
               { name: "Far Out", episodes: 2, icon: "🔬" },
@@ -311,11 +317,11 @@ export default function NASATV() {
               { name: "Elements of Webb", episodes: 13, icon: "🔭" },
               { name: "Why with Nye", episodes: 7, icon: "🧪" }
             ].map(series => (
-              <div key={series.name} className="bg-gray-900 rounded-lg p-3 border border-gray-700 hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-105">
+              <div key={series.name} className="bg-[#1e2124] rounded-xl p-3 border border-[#2c3035] hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:scale-105">
                 <div className="text-center">
                   <div className="text-2xl mb-2">{series.icon}</div>
                   <h4 className="text-white font-medium text-sm mb-1">{series.name}</h4>
-                  <p className="text-gray-400 text-xs">{series.episodes} Episodes</p>
+                  <p className="text-[#a2abb3] text-xs">{series.episodes} Episodes</p>
                 </div>
               </div>
             ))}
@@ -323,34 +329,36 @@ export default function NASATV() {
         </div>
 
         {/* NASA+ Info Footer */}
-        <div className="bg-gradient-to-r from-blue-600/10 to-red-600/10 border border-blue-500/20 rounded-xl p-6">
-          <div className="text-center">
-            <div className="text-3xl mb-3">🚀</div>
-            <h3 className="text-white text-xl font-bold mb-2">NASA+ | Stream the Universe</h3>
-            <p className="text-gray-300 text-sm mb-4">
-              Explore hundreds of videos and live content from NASA's missions, discoveries, and the wonders of space exploration.
-            </p>
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
-              <span>🌍 Free to stream worldwide</span>
-              <span>📱 Available on all devices</span>
-              <span>🔴 Live mission coverage</span>
-              <span>🎬 On-demand documentaries</span>
+        <div className="p-4">
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6">
+            <div className="text-center">
+              <div className="text-3xl mb-3">🚀</div>
+              <h3 className="text-white text-xl font-bold mb-2">NASA+ | Stream the Universe</h3>
+              <p className="text-[#a2abb3] text-sm mb-4">
+                Explore hundreds of videos and live content from NASA's missions, discoveries, and the wonders of space exploration.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#a2abb3]">
+                <span className="flex items-center gap-1">🌍 Free to stream worldwide</span>
+                <span className="flex items-center gap-1">📱 Available on all devices</span>
+                <span className="flex items-center gap-1">🔴 Live mission coverage</span>
+                <span className="flex items-center gap-1">🎬 On-demand documentaries</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Navigation */}
-      <nav className="bg-[#1e2124] border-t border-[#2c3035] px-4 py-3 mt-8">
-        <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-          <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
-          <a className="text-blue-400 text-sm font-medium leading-normal" href="/nasa-tv">NASA TV</a>
-          <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
-          <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
-          <a className="text-white text-sm font-medium leading-normal" href="/explore">Explore</a>
-          <a className="text-white text-sm font-medium leading-normal" href="/games">Games</a>
-        </div>
-      </nav>
+        {/* Bottom Navigation - Consistent with app design */}
+        <nav className="bg-[#1e2124] border-t border-[#2c3035] px-4 py-3 mt-8">
+          <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+            <a className="text-white text-sm font-medium leading-normal hover:text-blue-400 transition-colors" href="/cosmos-explorer">Home</a>
+            <a className="text-blue-400 text-sm font-medium leading-normal" href="/nasa-tv">NASA TV</a>
+            <a className="text-white text-sm font-medium leading-normal hover:text-blue-400 transition-colors" href="/tracker">Tracker</a>
+            <a className="text-white text-sm font-medium leading-normal hover:text-blue-400 transition-colors" href="/events">Events</a>
+            <a className="text-white text-sm font-medium leading-normal hover:text-blue-400 transition-colors" href="/explore">Explore</a>
+            <a className="text-white text-sm font-medium leading-normal hover:text-blue-400 transition-colors" href="/games">Games</a>
+          </div>
+        </nav>
+      </div>
     </div>
   );
 }
