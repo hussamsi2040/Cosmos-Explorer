@@ -22,8 +22,8 @@ interface NASAPlusData {
   error?: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'nasa-plus-content.json');
+const DATA_DIR = path.join(process.cwd(), 'nasa plus');
+const SERIES_FILE = path.join(DATA_DIR, 'plus.nasa.gov_series_.json');
 
 // Fallback data in case no scraped data is available
 const FALLBACK_DATA: NASAPlusData = {
@@ -212,26 +212,87 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
     console.log('📂 Reading NASA+ content from saved data...');
     
     // Check if data file exists
-    if (!fs.existsSync(DATA_FILE)) {
-      console.log('⚠️ No scraped data file found, using fallback data');
-      console.log('💡 Run the daily scraper to generate fresh data: node scripts/daily-nasa-scraper.js');
+    if (!fs.existsSync(SERIES_FILE)) {
+      console.log('⚠️ No series data file found, using fallback data');
       return FALLBACK_DATA;
     }
     
     // Read and parse the data file
-    const fileContent = fs.readFileSync(DATA_FILE, 'utf8');
-    const data: NASAPlusData = JSON.parse(fileContent);
-    
-    // Validate data structure
-    if (!data.shows || !data.liveEvents || !data.series) {
-      throw new Error('Invalid data structure in saved file');
+    const seriesFileContent = fs.readFileSync(SERIES_FILE, 'utf8');
+    const seriesData = JSON.parse(seriesFileContent);
+
+    const seriesRegex = /\[\*\*([^\*]+)\*\* \\\\\n(\d+) Episodes\]\(([^)]+)\)/g;
+    const seriesList = [];
+    let match;
+    while ((match = seriesRegex.exec(seriesData.markdown)) !== null) {
+      seriesList.push({
+        name: match[1].trim(),
+        episodes: parseInt(match[2], 10),
+        url: match[3],
+        icon: '🚀',
+        description: `Explore the ${match[1].trim()} series.`
+      });
     }
+
+    const shows = [];
+    for (const series of seriesList) {
+      const seriesSlug = series.url.split('/').filter(Boolean).pop();
+      const seriesJsonFile = path.join(DATA_DIR, `plus.nasa.gov_series_${seriesSlug}_.json`);
+
+      if (fs.existsSync(seriesJsonFile)) {
+        const showFileContent = fs.readFileSync(seriesJsonFile, 'utf8');
+        const showData = JSON.parse(showFileContent);
+        
+        const showRegex = /\[(\d{2}:\d{2}:\d{2})\]\([^)]+\)\n\n#### \[([^\]]+)\]\(([^)]+)\)\n\n([^…]+)/g;
+        let showMatch;
+        while ((showMatch = showRegex.exec(showData.markdown)) !== null) {
+          shows.push({
+            id: showMatch[2].toLowerCase().replace(/\s+/g, '-'),
+            title: showMatch[2].trim(),
+            duration: showMatch[1],
+            category: series.name,
+            description: showMatch[4].trim(),
+            thumbnail: showData.metadata.ogImage || 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=225&fit=crop&auto=format&q=80',
+            series: series.name,
+            publishDate: '2024',
+            videoQuality: 'HD',
+            rating: 'TV-G',
+            nasaUrl: showMatch[3],
+            scrapedAt: new Date().toISOString()
+          });
+        }
+      }
+    }
+
+    const liveEvents = [
+      {
+        id: 'nasa-live-stream',
+        title: "NASA Live: Official Stream of Agency Activities",
+        time: "Live Now",
+        date: "Today",
+        status: "LIVE",
+        description: "24/7 coverage of NASA missions, ISS operations, launches, and space exploration activities",
+        type: "Live Stream",
+        scrapedAt: new Date().toISOString()
+      },
+    ];
+
+    const result = {
+      ...FALLBACK_DATA,
+      shows,
+      series: seriesList,
+      liveEvents,
+      stats: {
+        totalShows: shows.length,
+        totalLiveEvents: liveEvents.length,
+        totalSeries: seriesList.length,
+      },
+      featuredContent: shows.slice(0, 3),
+      lastUpdated: new Date().toISOString(),
+      timestamp: new Date().toISOString()
+    };
     
-    console.log('✅ Successfully loaded NASA+ content from file');
-    console.log(`📊 Loaded: ${data.stats.totalShows} shows, ${data.stats.totalLiveEvents} events, ${data.stats.totalSeries} series`);
-    console.log(`📅 Last updated: ${new Date(data.lastUpdated).toLocaleString()}`);
-    
-    return data;
+    return result;
     
   } catch (error) {
     console.error('❌ Failed to read NASA+ data from file:', error);
@@ -245,11 +306,11 @@ export async function getNASAPlusContent(): Promise<NASAPlusData> {
  */
 export function getDataAge(): number {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
+    if (!fs.existsSync(SERIES_FILE)) {
       return Infinity;
     }
     
-    const stats = fs.statSync(DATA_FILE);
+    const stats = fs.statSync(SERIES_FILE);
     const ageMs = Date.now() - stats.mtime.getTime();
     return ageMs / (1000 * 60 * 60); // Convert to hours
   } catch (error) {
