@@ -313,42 +313,12 @@ function SpaceTrackerContentInternal() {
   const [spacewalks, setSpacewalks] = useState<any[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('iss');
+  const [activeTab, setActiveTab] = useState('iss');
 
-  // Smooth scroll to section
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-      setActiveSection(sectionId);
-    }
+  // Switch between tabs
+  const switchTab = (tabId: string) => {
+    setActiveTab(tabId);
   };
-
-  // Track scroll position for active section highlighting
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['iss', 'satellites', 'spacewalks'];
-      let currentSection = 'iss';
-      
-      sections.forEach(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 200 && rect.bottom >= 200) {
-            currentSection = section;
-          }
-        }
-      });
-      
-      setActiveSection(currentSection);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Fetch real ISS data with enhanced error handling
   useEffect(() => {
@@ -727,117 +697,107 @@ function SpaceTrackerContentInternal() {
         </div>
       </div>
 
-      {/* Navigation Menu */}
-      <div className="sticky top-0 z-50 bg-[#121416]/95 backdrop-blur-sm border-b border-[#2c3035] px-4 py-3 mb-4">
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex gap-2 justify-center">
-          <button
-            onClick={() => scrollToSection('iss')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              activeSection === 'iss'
-                ? 'bg-blue-500 text-white shadow-lg scale-105'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-lg">🛰️</div>
-            <span>ISS Tracking</span>
-            {activeSection === 'iss' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
-          </button>
-          <button
-            onClick={() => scrollToSection('satellites')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              activeSection === 'satellites'
-                ? 'bg-green-500 text-white shadow-lg scale-105'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-lg">📡</div>
-            <span>Satellite Passes</span>
-            {activeSection === 'satellites' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
-          </button>
-          <button
-            onClick={() => scrollToSection('spacewalks')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              activeSection === 'spacewalks'
-                ? 'bg-yellow-500 text-white shadow-lg scale-105'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-lg">🚀</div>
-            <span>Spacewalks</span>
-            {activeSection === 'spacewalks' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
-          </button>
+            {/* Tab Navigation */}
+      <div className="border-b border-[#2c3035] px-4 mb-6">
+        <div className="flex justify-center">
+          <div className="flex bg-[#1e2124] rounded-lg p-1 gap-1">
+            <button
+              onClick={() => switchTab('iss')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'iss'
+                  ? 'bg-blue-500 text-white shadow-lg transform scale-105'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🛰️</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">ISS Tracking</span>
+                <span className="text-xs opacity-80">Live position & crew</span>
+              </div>
+              {activeTab === 'iss' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+            
+            <button
+              onClick={() => switchTab('satellites')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'satellites'
+                  ? 'bg-green-500 text-white shadow-lg transform scale-105'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">📡</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">Satellite Passes</span>
+                <span className="text-xs opacity-80">Visible satellites</span>
+              </div>
+              {activeTab === 'satellites' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+            
+            <button
+              onClick={() => switchTab('spacewalks')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'spacewalks'
+                  ? 'bg-yellow-500 text-white shadow-lg transform scale-105'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🚀</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">Spacewalks</span>
+                <span className="text-xs opacity-80">Scheduled EVAs</span>
+              </div>
+              {activeTab === 'spacewalks' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+          </div>
         </div>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex gap-1 justify-center">
-          <button
-            onClick={() => scrollToSection('iss')}
-            className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
-              activeSection === 'iss'
-                ? 'bg-blue-500 text-white shadow-lg'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-base">🛰️</div>
-            <span>ISS</span>
-          </button>
-          <button
-            onClick={() => scrollToSection('satellites')}
-            className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
-              activeSection === 'satellites'
-                ? 'bg-green-500 text-white shadow-lg'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-base">📡</div>
-            <span>Satellites</span>
-          </button>
-          <button
-            onClick={() => scrollToSection('spacewalks')}
-            className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
-              activeSection === 'spacewalks'
-                ? 'bg-yellow-500 text-white shadow-lg'
-                : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-            }`}
-          >
-            <div className="text-base">🚀</div>
-            <span>EVAs</span>
-          </button>
+        {/* Mobile Tab Navigation */}
+        <div className="md:hidden mt-4 flex justify-center">
+          <div className="flex bg-[#1e2124] rounded-lg p-1 w-full max-w-sm">
+            <button
+              onClick={() => switchTab('iss')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'iss'
+                  ? 'bg-blue-500 text-white shadow-lg'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🛰️</div>
+              <span>ISS</span>
+            </button>
+            <button
+              onClick={() => switchTab('satellites')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'satellites'
+                  ? 'bg-green-500 text-white shadow-lg'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">📡</div>
+              <span>Satellites</span>
+            </button>
+            <button
+              onClick={() => switchTab('spacewalks')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'spacewalks'
+                  ? 'bg-yellow-500 text-white shadow-lg'
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🚀</div>
+              <span>EVAs</span>
+            </button>
+          </div>
         </div>
-
-                 {/* Section Progress Indicator */}
-         <div className="mt-3 flex justify-center">
-           <div className="flex gap-1">
-             <div className={`w-2 h-1 rounded-full transition-colors duration-300 ${
-               activeSection === 'iss' ? 'bg-blue-500' : 'bg-gray-600'
-             }`}></div>
-             <div className={`w-2 h-1 rounded-full transition-colors duration-300 ${
-               activeSection === 'satellites' ? 'bg-green-500' : 'bg-gray-600'
-             }`}></div>
-             <div className={`w-2 h-1 rounded-full transition-colors duration-300 ${
-               activeSection === 'spacewalks' ? 'bg-yellow-500' : 'bg-gray-600'
-             }`}></div>
-           </div>
-         </div>
-
-         {/* Quick Section Info */}
-         <div className="mt-2 text-center">
-           <div className="text-xs text-[#a2abb3]">
-             {activeSection === 'iss' && '📍 Live position • Current crew • Orbital data'}
-             {activeSection === 'satellites' && '🔍 Visible passes • Agency filter • Timing details'}
-             {activeSection === 'spacewalks' && '🗓️ Scheduled EVAs • Mission objectives • Crew assignments'}
-           </div>
-         </div>
-       </div>
-
-      {/* ISS Location & Crew */}
-      <div id="iss" className="scroll-mt-20">
-        <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-          🛰️ International Space Station
-        </h2>
       </div>
-      <div className="p-4">
+
+      {/* Tab Content */}
+      {activeTab === 'iss' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+            🛰️ International Space Station
+          </h2>
+          <div className="p-4">
         {/* ISS Hero Image */}
         <div className="mb-6 relative">
           <img 
@@ -911,15 +871,17 @@ function SpaceTrackerContentInternal() {
             </div>
           </div>
         </div>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Satellite Tracking */}
-      <div id="satellites" className="scroll-mt-20">
-        <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-          📡 Upcoming Satellite Passes
-        </h2>
-      </div>
-      <div className="p-4">
+      {activeTab === 'satellites' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+            📡 Upcoming Satellite Passes
+          </h2>
+          <div className="p-4">
         {/* Satellite Gallery - Real Photos */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
@@ -1061,15 +1023,17 @@ function SpaceTrackerContentInternal() {
             </div>
           ))}
         </div>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Spacewalk Alerts */}
-      <div id="spacewalks" className="scroll-mt-20">
-        <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-          🚀 Upcoming Spacewalks
-        </h2>
-      </div>
-      <div className="p-4">
+      {activeTab === 'spacewalks' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+            🚀 Upcoming Spacewalks
+          </h2>
+          <div className="p-4">
         {/* Spacewalk Gallery */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
@@ -1151,7 +1115,9 @@ function SpaceTrackerContentInternal() {
             </div>
           ))}
         </div>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
