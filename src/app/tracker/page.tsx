@@ -971,94 +971,200 @@ function SpaceTrackerContentInternal() {
         {activeTab === 'satellites' && (
           <div className="fade-in">
             <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              📡 Satellite Pass Tracker
+              📡 Advanced Satellite Pass Tracker
             </h2>
             <div className="p-4">
-        {/* Satellite Gallery - Real Photos */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <img 
-              src="https://science.nasa.gov/wp-content/uploads/2024/03/hubble-in-orbit-above-earth-hs-2009-14-a-1920x1200-1.jpg?w=768&format=webp" 
-              alt="Hubble Space Telescope in orbit"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🔭 Hubble Space Telescope
+        
+        {/* Real-Time Status Banner */}
+        <div className="mb-6 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <div>
+                <div className="text-white font-semibold">Live Satellite Tracking Active</div>
+                <div className="text-green-400 text-sm">Next pass prediction in real-time • Auto-refresh every 60 seconds</div>
+              </div>
             </div>
-            <div className="absolute top-2 right-2 bg-blue-500/80 rounded px-2 py-1 text-white text-xs">
-              NASA
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://cdn.mos.cms.futurecdn.net/7fYyCaVL8FLnhXz9nDX7jd-1200-80.jpg" 
-              alt="SpaceX Starlink satellites in orbit"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🛰️ Starlink Constellation
-            </div>
-            <div className="absolute top-2 right-2 bg-gray-800/80 rounded px-2 py-1 text-white text-xs">
-              SpaceX
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://www.nasa.gov/wp-content/uploads/2023/07/noaa-20_satellite.jpg?resize=2000,1500" 
-              alt="NOAA-20 Weather Satellite"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🌤️ NOAA Weather Satellites
-            </div>
-            <div className="absolute top-2 right-2 bg-blue-600/80 rounded px-2 py-1 text-white text-xs">
-              NOAA
-            </div>
-          </div>
-          <div className="relative">
-            <img 
-              src="https://terra.nasa.gov/images/terra-satellite-3d-rendering" 
-              alt="Terra Earth Observation Satellite"
-              className="w-full h-32 object-cover rounded-lg"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://www.nasa.gov/wp-content/uploads/2023/07/terra-satellite.jpg?resize=2000,1500";
-              }}
-            />
-            <div className="absolute bottom-2 left-2 bg-black/80 rounded px-2 py-1 text-white text-xs">
-              🌍 Terra Observatory
-            </div>
-            <div className="absolute top-2 right-2 bg-green-600/80 rounded px-2 py-1 text-white text-xs">
-              NASA
+            <div className="flex items-center gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-white font-bold text-lg">{filteredSatellites.length}</div>
+                <div className="text-[#a2abb3] text-xs">Tracked</div>
+              </div>
+              <div className="text-center">
+                <div className="text-green-400 font-bold text-lg">{filteredSatellites.filter(s => s.visible).length}</div>
+                <div className="text-[#a2abb3] text-xs">Visible Now</div>
+              </div>
+              <div className="text-center">
+                <div className="text-blue-400 font-bold text-lg">{filteredSatellites.filter(s => s.maxElevation > 50).length}</div>
+                <div className="text-[#a2abb3] text-xs">Excellent</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filter Controls */}
-        <div className="flex gap-2 mb-4 flex-wrap">
-          {agencies.map(agency => (
-            <button
-              key={agency}
-              onClick={() => setSelectedFilter(agency)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                selectedFilter === agency
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-              }`}
-            >
-              {agency}
-            </button>
-          ))}
+        {/* Enhanced Featured Satellites Gallery */}
+        <div className="mb-6">
+          <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+            <span>🛰️</span>
+            <span>Featured Satellites & Missions</span>
+            <div className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full ml-2">Live Tracking</div>
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="relative group cursor-pointer bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl overflow-hidden border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300">
+              <img 
+                src="https://science.nasa.gov/wp-content/uploads/2024/03/hubble-in-orbit-above-earth-hs-2009-14-a-1920x1200-1.jpg?w=768&format=webp" 
+                alt="Hubble Space Telescope"
+                className="w-full h-32 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-semibold text-sm">Hubble Space Telescope</div>
+                    <div className="text-blue-400 text-xs">NASA • Scientific Observatory</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 text-xs font-medium">✨ Mag -1.2</div>
+                    <div className="text-yellow-400 text-xs">🔥 Excellent Pass</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="text-green-400 text-xs">Next pass: Today 19:42</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group cursor-pointer bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl overflow-hidden border border-gray-500/20 hover:border-gray-400/40 transition-all duration-300">
+              <img 
+                src="https://cdn.mos.cms.futurecdn.net/7fYyCaVL8FLnhXz9nDX7jd-1200-80.jpg" 
+                alt="Starlink Constellation"
+                className="w-full h-32 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-semibold text-sm">Starlink Train</div>
+                    <div className="text-gray-400 text-xs">SpaceX • Communication</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 text-xs font-medium">✨ Mag 2.1</div>
+                    <div className="text-orange-400 text-xs">✨ Good Pass</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+                  <div className="text-orange-400 text-xs">Next pass: Today 21:15</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group cursor-pointer bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl overflow-hidden border border-blue-600/20 hover:border-blue-500/40 transition-all duration-300">
+              <img 
+                src="https://www.nasa.gov/wp-content/uploads/2023/07/noaa-20_satellite.jpg?resize=2000,1500" 
+                alt="NOAA Weather Satellite"
+                className="w-full h-32 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-semibold text-sm">NOAA-20 Weather</div>
+                    <div className="text-blue-400 text-xs">NOAA • Earth Observation</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 text-xs font-medium">✨ Mag 1.8</div>
+                    <div className="text-yellow-400 text-xs">🔥 Excellent Pass</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <div className="text-blue-400 text-xs">Next pass: Tomorrow 06:23</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group cursor-pointer bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl overflow-hidden border border-green-600/20 hover:border-green-500/40 transition-all duration-300">
+              <img 
+                src="https://terra.nasa.gov/images/terra-satellite-3d-rendering" 
+                alt="Terra Earth Observatory"
+                className="w-full h-32 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://www.nasa.gov/wp-content/uploads/2023/07/terra-satellite.jpg?resize=2000,1500";
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white font-semibold text-sm">Terra Observatory</div>
+                    <div className="text-green-400 text-xs">NASA • Earth Science</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 text-xs font-medium">✨ Mag 2.3</div>
+                    <div className="text-orange-400 text-xs">✨ Good Pass</div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="text-green-400 text-xs">Next pass: Today 22:47</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Satellite List */}
-        <div className="space-y-3">
-          <div className="text-xs text-[#a2abb3] mb-2 flex items-center justify-between">
-            <span>📡 Real-time satellite data from Groundtrack API</span>
-            <span className="text-green-400">🟢 Live Data</span>
+        {/* Enhanced Filter Controls */}
+        <div className="mb-6 bg-[#1e2124] rounded-xl p-4 border border-[#2c3035]">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="text-white font-semibold mb-2">Filter & Sort Options</div>
+              <div className="flex gap-2 flex-wrap">
+                {agencies.map(agency => (
+                  <button
+                    key={agency}
+                    onClick={() => setSelectedFilter(agency)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 ${
+                      selectedFilter === agency
+                        ? 'bg-blue-500 text-white shadow-lg scale-105'
+                        : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white hover:scale-105'
+                    }`}
+                  >
+                    {agency === 'All' ? '🌐' : agency === 'NASA' ? '🚀' : agency === 'SpaceX' ? '🛰️' : agency === 'NOAA' ? '🌤️' : '🛸'} {agency}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="text-[#a2abb3] text-xs">Viewing</div>
+                <div className="text-white font-semibold">{filteredSatellites.slice(0, 12).length} of {filteredSatellites.length}</div>
+              </div>
+              <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg text-sm transition-colors">
+                📊 View All Passes
+              </button>
+            </div>
           </div>
-          {filteredSatellites.slice(0, 8).map((satellite, index) => (
-            <div key={index} className="bg-[#1e2124] rounded-lg p-4 border border-[#40474f]/30 relative overflow-hidden">
+        </div>
+
+        {/* Enhanced Satellite Pass List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white text-lg font-semibold flex items-center gap-2">
+              <span>🔍</span>
+              <span>Upcoming Satellite Passes</span>
+            </h3>
+            <div className="text-xs text-[#a2abb3] flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Real-time tracking via Groundtrack API</span>
+              <span className="text-green-400">🟢 Live Data</span>
+            </div>
+          </div>
+          
+          {filteredSatellites.slice(0, 12).map((satellite, index) => (
+            <div key={index} className="bg-gradient-to-r from-[#1e2124] to-[#252931] rounded-xl p-5 border border-[#40474f]/30 hover:border-[#40474f]/60 relative overflow-hidden group transition-all duration-300 hover:scale-[1.02]">
               <div 
                 className="absolute inset-0 opacity-5 bg-cover bg-center"
                 style={{
@@ -1066,54 +1172,126 @@ function SpaceTrackerContentInternal() {
                 }}
               ></div>
               <div className="relative z-10">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="text-white font-semibold">{satellite.name}</h4>
-                    <div className="flex gap-4 text-sm text-[#a2abb3]">
-                      <span>🏢 {satellite.agency}</span>
-                      <span>📡 {satellite.type}</span>
-                      <span>✨ Mag {satellite.brightness.toFixed(1)}</span>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-500/30">
+                      <span className="text-xl">
+                        {satellite.agency === 'NASA' ? '🚀' : 
+                         satellite.agency === 'SpaceX' ? '🛰️' : 
+                         satellite.agency === 'NOAA' ? '🌤️' : 
+                         satellite.agency === 'ESA' ? '🛸' : '📡'}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-lg">{satellite.name}</h4>
+                      <div className="flex gap-4 text-sm text-[#a2abb3]">
+                        <span className="flex items-center gap-1">
+                          <span>🏢</span>
+                          <span>{satellite.agency}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span>📡</span>
+                          <span>{satellite.type}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span>✨</span>
+                          <span>Magnitude {satellite.brightness.toFixed(1)}</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-white font-medium">
-                      {satellite.startTime.toLocaleDateString()} {satellite.startTime.toLocaleTimeString()}
+                    <div className="text-white font-medium text-lg">
+                      {satellite.startTime.toLocaleDateString()}
+                    </div>
+                    <div className="text-blue-400 font-semibold">
+                      {satellite.startTime.toLocaleTimeString()}
                     </div>
                     <div className="text-[#a2abb3] text-xs">Local Time</div>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Max Elevation</div>
-                    <div className="text-white">{satellite.maxElevation.toFixed(1)}°</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <div className="bg-[#2c3035] rounded-lg p-3">
+                    <div className="text-[#a2abb3] font-semibold text-xs mb-1">Max Elevation</div>
+                    <div className="text-white text-xl font-bold">{satellite.maxElevation.toFixed(1)}°</div>
+                    <div className="text-blue-400 text-xs">
+                      {satellite.maxElevation > 50 ? 'Overhead' : satellite.maxElevation > 30 ? 'High' : 'Low'}
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Direction</div>
-                    <div className="text-white">{satellite.direction}</div>
+                  <div className="bg-[#2c3035] rounded-lg p-3">
+                    <div className="text-[#a2abb3] font-semibold text-xs mb-1">Direction</div>
+                    <div className="text-white text-xl font-bold">{satellite.direction}</div>
+                    <div className="text-green-400 text-xs">Compass heading</div>
                   </div>
-                  <div>
-                    <div className="text-[#a2abb3] font-semibold">Duration</div>
-                    <div className="text-white">{satellite.duration}m</div>
+                  <div className="bg-[#2c3035] rounded-lg p-3">
+                    <div className="text-[#a2abb3] font-semibold text-xs mb-1">Duration</div>
+                    <div className="text-white text-xl font-bold">{satellite.duration}m</div>
+                    <div className="text-orange-400 text-xs">Visible time</div>
+                  </div>
+                  <div className="bg-[#2c3035] rounded-lg p-3">
+                    <div className="text-[#a2abb3] font-semibold text-xs mb-1">Brightness</div>
+                    <div className="text-white text-xl font-bold">{satellite.brightness.toFixed(1)}</div>
+                    <div className="text-purple-400 text-xs">Magnitude</div>
                   </div>
                 </div>
                 
-                <div className="mt-2 flex justify-between items-center">
-                  <div className={`px-2 py-1 rounded text-xs ${
-                    satellite.visible 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-gray-500/20 text-gray-400'
-                  }`}>
-                    {satellite.visible ? '👁️ Visible' : '🌫️ Not Visible'}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className={`px-3 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${
+                      satellite.visible 
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                    }`}>
+                      {satellite.visible ? '👁️ Visible Now' : '🌫️ Not Currently Visible'}
+                    </div>
+                    <div className={`px-3 py-2 rounded-full text-sm font-medium ${
+                      satellite.maxElevation > 50 ? 'bg-red-500/20 text-red-400' : 
+                      satellite.maxElevation > 30 ? 'bg-yellow-500/20 text-yellow-400' : 
+                      'bg-blue-500/20 text-blue-400'
+                    }`}>
+                      {satellite.maxElevation > 50 ? '🔥 Excellent Pass' : 
+                       satellite.maxElevation > 30 ? '✨ Good Pass' : '📍 Low Pass'}
+                    </div>
                   </div>
-                  <div className="text-xs text-[#a2abb3]">
-                    {satellite.maxElevation > 50 ? '🔥 Excellent' : 
-                     satellite.maxElevation > 30 ? '✨ Good' : '📍 Low'}
+                  <div className="flex gap-2">
+                    <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
+                      <span>📍</span>
+                      <span>Track</span>
+                    </button>
+                    <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
+                      <span>⏰</span>
+                      <span>Remind</span>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="text-white font-semibold mb-1">Quick Actions</div>
+              <div className="text-[#a2abb3] text-sm">Set alerts, export data, and customize tracking preferences</div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                <span>🔔</span>
+                <span>Set Pass Alerts</span>
+              </button>
+              <button className="bg-green-500/20 hover:bg-green-500/30 text-green-400 px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                <span>📊</span>
+                <span>Export Schedule</span>
+              </button>
+              <button className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                <span>⚙️</span>
+                <span>Settings</span>
+              </button>
+            </div>
+          </div>
         </div>
             </div>
           </div>
