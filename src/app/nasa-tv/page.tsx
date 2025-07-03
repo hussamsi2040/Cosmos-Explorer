@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getCachedNASAPlusContent } from '@/lib/nasa-plus-scraper';
+import { getNASAPlusContent, getDataStatus, type NASAPlusData } from '@/lib/nasa-plus-data-service';
+import CentralVideoPlayer from '@/components/CentralVideoPlayer';
 
 // NASA+ Dynamic Data Types
 interface LiveEvent {
@@ -238,10 +239,11 @@ export default function NASATV() {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [dataStatus, setDataStatus] = useState<any>(null);
   
-  // Content Player State
+  // Central Video Player State
   const [selectedContent, setSelectedContent] = useState<any>(null);
-  const [showContentModal, setShowContentModal] = useState(false);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -312,11 +314,11 @@ export default function NASATV() {
 
   const openContent = (content: any) => {
     setSelectedContent(content);
-    setShowContentModal(true);
+    setShowVideoPlayer(true);
   };
 
-  const closeContentModal = () => {
-    setShowContentModal(false);
+  const closeVideoPlayer = () => {
+    setShowVideoPlayer(false);
     setSelectedContent(null);
   };
 
