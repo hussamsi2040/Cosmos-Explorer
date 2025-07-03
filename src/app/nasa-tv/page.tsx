@@ -103,9 +103,13 @@ const categories = [
 export default function NASATV() {
   const [selectedCategory, setSelectedCategory] = useState("Live & Upcoming");
   const [selectedVideo, setSelectedVideo] = useState(liveEvents[0]);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    setCurrentTime(new Date());
+    
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -132,14 +136,16 @@ export default function NASATV() {
               <p className="text-blue-300 text-sm">Stream the universe at your fingertips</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-white font-semibold">{currentTime.toLocaleTimeString()}</div>
-              <div className="text-blue-300 text-sm">Eastern Time</div>
-            </div>
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span className="text-red-400 font-semibold">LIVE</span>
-          </div>
+                     <div className="flex items-center gap-4">
+             <div className="text-right">
+               <div className="text-white font-semibold">
+                 {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
+               </div>
+               <div className="text-blue-300 text-sm">Eastern Time</div>
+             </div>
+             <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+             <span className="text-red-400 font-semibold">LIVE</span>
+           </div>
         </div>
       </div>
 
