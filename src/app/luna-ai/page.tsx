@@ -287,36 +287,47 @@ function LunaAIContentInternal() {
   };
 
   return (
-    <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-      {/* Page Header */}
-      <div className="flex flex-wrap justify-between gap-3 p-4">
-        <div>
-          <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Luna AI Assistant</p>
-          <p className="text-[#a2abb3] text-sm">Your personal guide to understanding space and the cosmos 🌙</p>
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+      {/* Compact Header */}
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#1a1d21] to-[#252930] border-b border-[#2c3035]/50">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-lg shadow-lg">
+            🌙
+          </div>
+          <div>
+            <h1 className="text-white font-bold text-xl">Luna AI Assistant</h1>
+            <p className="text-[#a2abb3] text-xs">Powered by Advanced AI • Space Education</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs text-[#a2abb3]">Ask me anything about space! 🚀</div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-green-400">Online & Ready</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 p-4">
-        {/* Chat Interface */}
-        <div className="xl:col-span-3">
-          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl border border-blue-500/30 shadow-2xl h-[700px] flex flex-col">
-            {/* Chat Header */}
-            <div className="p-6 border-b border-[#2c3035]/50 flex items-center gap-4 bg-gradient-to-r from-[#1e2124] to-[#252930]">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-lg">
-                🌙
-              </div>
-              <div className="flex-1">
-                <h3 className="text-white font-bold text-lg">Luna AI Assistant</h3>
-                <div className="text-[#a2abb3] text-sm flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-sm"></div>
-                  <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent font-medium">
-                    Online • Powered by Advanced AI
-                  </span>
+      <div className="flex flex-1 min-h-0">
+        {/* Chat Interface - Main Area */}
+        <div className="flex-1 flex flex-col p-4 pr-2">
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl border border-blue-500/30 shadow-2xl flex flex-col h-full">
+            {/* Chat Header - Simplified */}
+            <div className="p-4 border-b border-[#2c3035]/50 flex items-center justify-between bg-gradient-to-r from-[#1e2124] to-[#252930]">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                  🌙
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Chat with Luna</h3>
+                  <div className="text-[#a2abb3] text-xs flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>AI-powered space education</span>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-xs text-[#a2abb3]">Space Education Assistant</div>
-                <div className="text-xs text-blue-400">Ask me anything about space! 🚀</div>
+              <div className="text-xs text-[#a2abb3]">
+                Real-time AI responses 🤖
               </div>
             </div>
 
@@ -408,16 +419,16 @@ function LunaAIContentInternal() {
           </div>
         </div>
 
-        {/* Space Concepts Sidebar */}
-        <div className="space-y-6">
+        {/* Sidebar */}
+        <div className="w-80 flex flex-col p-4 pl-2 space-y-4 overflow-y-auto">
           {/* Quick Start Section */}
-          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
-            <div className="text-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-lg">
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-4 border border-blue-500/30 shadow-xl">
+            <div className="text-center mb-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-lg">
                 🚀
               </div>
-              <h3 className="text-white font-bold text-lg mb-2">Quick Start</h3>
-              <p className="text-[#a2abb3] text-sm">Try these popular space questions!</p>
+              <h3 className="text-white font-bold mb-1">Quick Start</h3>
+              <p className="text-[#a2abb3] text-xs">Popular space questions</p>
             </div>
             <div className="space-y-2">
               {[
@@ -428,7 +439,7 @@ function LunaAIContentInternal() {
                 <button
                   key={index}
                   onClick={() => handleFollowUpClick(question)}
-                  className="w-full text-left p-3 bg-[#2c3035] hover:bg-[#373c42] rounded-lg text-white text-sm transition-all transform hover:scale-105 border border-blue-500/20 hover:border-blue-500/40"
+                  className="w-full text-left p-2 bg-[#2c3035] hover:bg-[#373c42] rounded-lg text-white text-xs transition-all transform hover:scale-105 border border-blue-500/20 hover:border-blue-500/40"
                 >
                   {question}
                 </button>
@@ -437,10 +448,10 @@ function LunaAIContentInternal() {
           </div>
 
           {/* Category Filter */}
-          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
-            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-4 border border-blue-500/30 shadow-xl">
+            <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
               <span>🔍</span>
-              Explore by Category
+              Categories
             </h3>
             <div className="space-y-2">
               {categories.map(category => (
@@ -460,27 +471,27 @@ function LunaAIContentInternal() {
           </div>
 
           {/* Quick Concepts */}
-          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
-            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-4 border border-blue-500/30 shadow-xl">
+            <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
               <span>📚</span>
-              Space Concepts Library
+              Concepts Library
             </h3>
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {filteredConcepts.map(concept => (
                 <button
                   key={concept.id}
                   onClick={() => handleConceptClick(concept)}
-                  className="w-full text-left p-3 bg-[#2c3035] hover:bg-[#373c42] rounded-lg border border-purple-500/20 transition-colors group"
+                  className="w-full text-left p-2 bg-[#2c3035] hover:bg-[#373c42] rounded-lg border border-purple-500/20 transition-colors group"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="text-2xl">{concept.emoji}</div>
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium text-sm group-hover:text-blue-300 transition-colors">
-                        {concept.title}
-                      </h4>
-                      <p className="text-[#a2abb3] text-xs mt-1 line-clamp-2">
-                        {concept.description}
-                      </p>
+                                      <div className="flex items-start gap-2">
+                      <div className="text-lg">{concept.emoji}</div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-medium text-xs group-hover:text-blue-300 transition-colors">
+                          {concept.title}
+                        </h4>
+                        <p className="text-[#a2abb3] text-xs mt-1 line-clamp-2">
+                          {concept.description}
+                        </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           concept.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
