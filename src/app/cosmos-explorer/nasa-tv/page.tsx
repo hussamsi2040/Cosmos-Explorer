@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 // Removed direct import of data service to avoid Node.js modules in browser
 import CentralVideoPlayer from '@/components/CentralVideoPlayer';
 
@@ -245,6 +244,10 @@ export default function NASATV() {
   // Central Video Player State
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  
+  // Series State
+  const [selectedSeries, setSelectedSeries] = useState<any>(null);
+  const [showSeriesView, setShowSeriesView] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -323,6 +326,16 @@ export default function NASATV() {
   const closeVideoPlayer = () => {
     setShowVideoPlayer(false);
     setSelectedContent(null);
+  };
+
+  const openSeries = async (series: any) => {
+    setSelectedSeries(series);
+    setShowSeriesView(true);
+  };
+
+  const closeSeries = () => {
+    setShowSeriesView(false);
+    setSelectedSeries(null);
   };
 
   if (isLoading) {
@@ -541,10 +554,10 @@ export default function NASATV() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).map((series) => (
-                  <Link
+                  <div
                     key={series.slug}
-                    href={`/cosmos-explorer/nasa-tv/${series.slug}`}
-                    className="group relative block"
+                    onClick={() => openSeries(series)}
+                    className="group relative block cursor-pointer"
                   >
                     <div className="relative h-0 pb-[150%] overflow-hidden rounded-lg bg-[#292f38]">
                       <img
@@ -560,7 +573,7 @@ export default function NASATV() {
                     <h3 className="mt-2 text-white text-sm font-semibold line-clamp-2 group-hover:text-red-400 transition-colors">
                       {series.name}
                     </h3>
-                  </Link>
+                  </div>
                 ))}
               </div>
               {(nasaSeries as any[]).filter(series => series.thumbnail && series.slug).length === 0 && (
@@ -570,6 +583,85 @@ export default function NASATV() {
                 </div>
               )}
             </div>
+
+            {/* Series View */}
+            {showSeriesView && selectedSeries && (
+              <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                <div className="bg-[#1e2124] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-white text-2xl font-bold">{selectedSeries.name}</h2>
+                      <button
+                        onClick={closeSeries}
+                        className="text-[#a2abb3] hover:text-white text-2xl"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    
+                    <div className="flex gap-6 mb-6">
+                      <img
+                        src={selectedSeries.thumbnail}
+                        alt={selectedSeries.name}
+                        className="w-48 h-72 object-cover rounded-lg"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1541185934-01b600ea069c?w=400&h=225&fit=crop&auto=format&q=80";
+                        }}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-2xl">{selectedSeries.icon || "📺"}</span>
+                          <span className="text-red-400 text-sm font-semibold">NASA+ Series</span>
+                        </div>
+                        <p className="text-[#a2abb3] text-lg mb-4">{selectedSeries.description}</p>
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="text-white font-semibold">{selectedSeries.episodes} Episodes</span>
+                          <span className="text-[#a2abb3] text-sm">• Available on NASA+</span>
+                        </div>
+                        <button
+                          onClick={() => window.open('https://plus.nasa.gov/', '_blank')}
+                          className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                        >
+                          <span>🚀</span>
+                          <span>Watch on NASA+</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-[#2c3035] pt-6">
+                      <h3 className="text-white text-lg font-semibold mb-4">Related Episodes</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {nasaShows.filter(show => show.series === selectedSeries.name).slice(0, 6).map((episode) => (
+                          <div
+                            key={episode.id}
+                            onClick={() => {
+                              closeSeries();
+                              openContent(episode);
+                            }}
+                            className="bg-[#292f38] rounded-lg overflow-hidden cursor-pointer hover:bg-[#373c42] transition-colors"
+                          >
+                            <img
+                              src={episode.thumbnail}
+                              alt={episode.title}
+                              className="w-full h-24 object-cover"
+                            />
+                            <div className="p-3">
+                              <h4 className="text-white text-sm font-semibold line-clamp-2 mb-1">{episode.title}</h4>
+                              <p className="text-[#a2abb3] text-xs">{episode.duration}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {nasaShows.filter(show => show.series === selectedSeries.name).length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-[#a2abb3]">No episodes available for this series</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Central Video Player */}
             {showVideoPlayer && selectedContent && (
