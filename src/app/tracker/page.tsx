@@ -956,12 +956,7 @@ function SpaceTrackerContentInternal() {
             <div className="p-4">
         {/* ISS Hero Image */}
         <div className="mb-6 relative">
-          <img 
-            src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&h=300&fit=crop&auto=format&q=80" 
-            alt="International Space Station"
-            className="w-full h-48 object-cover rounded-xl"
-          />
-          <div className="absolute bottom-4 left-4 bg-black/70 rounded-lg p-3">
+          <div className="bg-black/70 rounded-lg p-3">
             <div className="text-white font-semibold">📡 LIVE TRACKING</div>
             <div className="text-blue-300 text-sm">Real-time data from Open Notify API</div>
           </div>
