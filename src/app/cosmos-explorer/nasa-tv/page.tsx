@@ -369,21 +369,16 @@ export default function NASATV() {
             <div className="p-4">
               <div className="relative bg-[#1e2124] rounded-xl overflow-hidden mb-4 border border-[#2c3035]">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <div
-                    className="absolute inset-0 bg-cover bg-center rounded-xl cursor-pointer group"
-                    style={{
-                      backgroundImage: "url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=675&fit=crop&auto=format&q=80')"
-                    }}
-                    onClick={openNASAPlus}
-                  >
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                      <div className="bg-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300">
-                        <div className="w-0 h-0 border-l-[24px] border-l-white border-t-[16px] border-t-transparent border-b-[16px] border-b-transparent ml-2"></div>
-                      </div>
-                    </div>
-                    <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                      ● LIVE on NASA+
-                    </div>
+                  <iframe
+                    className="absolute inset-0 w-full h-full rounded-xl"
+                    src="https://www.youtube.com/embed/DIgkvm2nmHc?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1"
+                    title="NASA Live Stream"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                  <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse z-10">
+                    ● LIVE on YouTube
                   </div>
                 </div>
 
@@ -394,25 +389,25 @@ export default function NASATV() {
                         <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
                           LIVE NOW
                         </div>
-                        <span className="text-[#a2abb3] text-sm">Official NASA Stream</span>
+                        <span className="text-[#a2abb3] text-sm">YouTube Live Stream</span>
                       </div>
-                      <h2 className="text-white text-xl font-bold mb-2">NASA+ Official Live Stream</h2>
+                      <h2 className="text-white text-xl font-bold mb-2">NASA Live Stream</h2>
                       <p className="text-[#a2abb3] text-sm mb-2">
-                        24/7 coverage of NASA missions, ISS operations, launches, and space exploration activities
+                        Live coverage of NASA missions, space exploration, and agency activities
                       </p>
                       <div className="mt-3">
                         <button
-                          onClick={openNASAPlus}
+                          onClick={() => window.open('https://www.youtube.com/watch?v=DIgkvm2nmHc', '_blank')}
                           className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
                         >
-                          <span>🚀</span>
-                          <span>Watch Live on NASA+</span>
+                          <span>�</span>
+                          <span>Watch on YouTube</span>
                         </button>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-white font-mono text-lg">24/7</div>
-                      <div className="text-[#a2abb3] text-sm">NASA+</div>
+                      <div className="text-white font-mono text-lg">LIVE</div>
+                      <div className="text-[#a2abb3] text-sm">YouTube</div>
                     </div>
                   </div>
                 </div>
