@@ -262,20 +262,22 @@ export default function NASATV() {
       try {
         console.log('🚀 Fetching dynamic NASA+ content via scraper...');
         
-        // Use the scraper for real NASA+ content
-        const scrapedContent = await getCachedNASAPlusContent();
+        // Use the data service for NASA+ content
+        const nasaData = await getNASAPlusContent();
+        const dataStatusInfo = getDataStatus();
         
         // Also fetch NASA news for additional content
         const news = await fetchNASANews();
 
-        setLiveEvents(scrapedContent.liveEvents);
-        setNasaShows(scrapedContent.shows);
-        setNasaSeries(scrapedContent.series);
+        setLiveEvents(nasaData.liveEvents);
+        setNasaShows(nasaData.shows);
+        setNasaSeries(nasaData.series);
         setNasaNews(news);
+        setDataStatus(dataStatusInfo);
         setLastUpdated(new Date());
         
-        console.log('✅ Dynamic NASA+ content loaded via scraper successfully');
-        console.log(`📊 Loaded: ${scrapedContent.shows.length} shows, ${scrapedContent.liveEvents.length} events, ${scrapedContent.series.length} series`);
+        console.log('✅ NASA+ content loaded from data service successfully');
+        console.log(`📊 Loaded: ${nasaData.shows.length} shows, ${nasaData.liveEvents.length} events, ${nasaData.series.length} series`);
       } catch (error) {
         console.error('Failed to fetch NASA+ data via scraper:', error);
         
@@ -327,8 +329,8 @@ export default function NASATV() {
       <div className="min-h-screen bg-[#1a1b1d] text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <div className="text-white text-lg font-semibold">Scraping NASA+ Content...</div>
-          <div className="text-[#a2abb3] text-sm">Dynamically fetching real data from plus.nasa.gov</div>
+          <div className="text-white text-lg font-semibold">Loading NASA+ Content...</div>
+          <div className="text-[#a2abb3] text-sm">Reading from daily scraped data archives</div>
         </div>
       </div>
     );
@@ -372,15 +374,16 @@ export default function NASATV() {
           )}
         </div>
 
-        {/* Dynamic Content Notice */}
+        {/* Data Source Notice */}
         <div className="p-4">
-          <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-xl p-4 mb-4">
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="text-green-400 text-xl">�</div>
+              <div className="text-blue-400 text-xl">📁</div>
               <div>
-                <div className="text-white font-semibold mb-1">Dynamic NASA+ Content</div>
+                <div className="text-white font-semibold mb-1">Daily Scraped NASA+ Content</div>
                 <div className="text-[#a2abb3] text-sm">
-                  Real-time content from <span className="text-green-400">plus.nasa.gov</span> • Auto-refreshes every 5 minutes • {liveEvents.length} live events • {nasaShows.length} shows available
+                  Content scraped daily from <span className="text-blue-400">plus.nasa.gov</span> • Stored locally for performance • {liveEvents.length} live events • {nasaShows.length} shows available
+                  {dataStatus && <span> • Data {dataStatus.ageString}</span>}
                 </div>
               </div>
             </div>
@@ -635,8 +638,15 @@ export default function NASATV() {
         </nav>
       </div>
 
-      {/* Content Player Modal */}
-      {showContentModal && selectedContent && (
+      {/* Central Video Player */}
+      <CentralVideoPlayer
+        isOpen={showVideoPlayer}
+        content={selectedContent}
+        onClose={closeVideoPlayer}
+      />
+      
+      {/* Legacy Modal - Remove this entire section */}
+      {false && selectedContent && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#1e2124] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#2c3035] shadow-2xl">
             {/* Modal Header */}
@@ -662,7 +672,7 @@ export default function NASATV() {
                   </div>
                 </div>
                 <button 
-                  onClick={closeContentModal}
+                  onClick={closeVideoPlayer}
                   className="text-[#a2abb3] hover:text-white text-2xl p-2 hover:bg-[#2c3035] rounded-lg transition-colors"
                 >
                   ✕
@@ -796,7 +806,7 @@ export default function NASATV() {
                    Browse More NASA+ Content
                  </button>
                  <button 
-                   onClick={closeContentModal}
+                   onClick={closeVideoPlayer}
                    className="bg-[#2c3035] hover:bg-[#373c42] text-white px-8 py-3 rounded-lg font-medium transition-colors"
                  >
                    Close Preview
