@@ -764,7 +764,7 @@ function CosmosExplorerClient() {
               <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
               <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
               <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
-              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Weather</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/nasa-tv">NASA TV</a>
               <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
             </div>
           </div>
