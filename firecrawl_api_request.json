@@ -1,0 +1,74 @@
+{
+  "url": "https://plus.nasa.gov/series/far-out/",
+  "formats": ["html", "markdown"],
+  "includeTags": ["img", "video", "a", "div", "span"],
+  "excludeTags": ["script", "style", "nav", "footer", "header"],
+  "waitFor": 3000,
+  "timeout": 30000,
+  "extractorOptions": {
+    "extractionSchema": {
+      "type": "object",
+      "properties": {
+        "videos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Video episode title or name"
+              },
+              "video_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Direct link to video page (https://plus.nasa.gov/video/...)"
+              },
+              "thumbnail_url": {
+                "type": "string", 
+                "format": "uri",
+                "description": "Thumbnail image URL"
+              },
+              "duration": {
+                "type": "string",
+                "description": "Video duration if available"
+              },
+              "description": {
+                "type": "string",
+                "description": "Video description or summary"
+              }
+            },
+            "required": ["video_url", "thumbnail_url"]
+          }
+        },
+        "series_info": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Series title"
+            },
+            "description": {
+              "type": "string", 
+              "description": "Series description"
+            },
+            "episode_count": {
+              "type": "string",
+              "description": "Total number of episodes"
+            },
+            "series_thumbnail": {
+              "type": "string",
+              "format": "uri",
+              "description": "Main series thumbnail image"
+            }
+          }
+        }
+      }
+    },
+    "mode": "llm-extraction",
+    "extractionPrompt": "Extract all video links and thumbnail images from this NASA+ series page. Look for:\n\n1. Individual video/episode links in format 'https://plus.nasa.gov/video/[name]/'\n2. Thumbnail images associated with each video\n3. Video titles, durations, and descriptions\n4. Series information\n\nFor each video found, extract:\n- video_url: Direct link to the video page\n- thumbnail_url: Associated thumbnail image\n- title: Episode or video title\n- duration: Video length if shown\n- description: Video description\n\nIf no individual videos are found, use the series landing page URL as the video_url and generate a thumbnail_url based on the series name.\n\nEnsure all URLs are complete (include https://plus.nasa.gov if relative)."
+  },
+  "onlyMainContent": true,
+  "removeTags": ["script", "style", "noscript"],
+  "classNamesToInclude": ["video", "episode", "thumbnail", "content", "main"],
+  "classNamesToExclude": ["nav", "footer", "header", "sidebar", "menu"]
+}
