@@ -203,6 +203,7 @@ function CosmicEventsContentInternal() {
   const [selectedMonth, setSelectedMonth] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('launches');
 
   // Fetch real rocket launches from Launch Library 2 API
   useEffect(() => {
@@ -323,64 +324,158 @@ function CosmicEventsContentInternal() {
         <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Cosmic Event Planner</p>
       </div>
 
-      {/* Upcoming Launches */}
-      <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
-      <div className="p-4">
-        <div className="space-y-4">
-          <div className="text-xs text-[#a2abb3] mb-2">
-            🚀 Real-time launch data from Launch Library 2 API
-          </div>
-          {launches?.results?.slice(0, 5).map((launch: any) => (
-            <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20 relative overflow-hidden">
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">🚀</div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
-                      <div className="text-[#a2abb3] text-sm">{launch.rocket?.configuration?.full_name || launch.rocket?.full_name} • {launch.launch_service_provider?.name}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-white font-medium">
-                      {new Date(launch.net).toLocaleDateString()}
-                    </div>
-                    <div className="text-white text-lg font-bold">
-                      {new Date(launch.net).toLocaleTimeString()}
-                    </div>
-                    <div className="text-[#a2abb3] text-xs">
-                      {launch.status?.name || 'Scheduled'}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
-                    <div className="text-white text-sm">{launch.mission?.name || 'Mission Details TBD'}</div>
-                    <div className="text-[#a2abb3] text-xs">{launch.mission?.description?.substring(0, 60)}...</div>
-                  </div>
-                  <div>
-                    <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH PAD</div>
-                    <div className="text-white text-sm">{launch.pad?.name || 'TBD'}</div>
-                    <div className="text-[#a2abb3] text-xs">{launch.pad?.location?.name || 'Location TBD'}</div>
-                  </div>
-                  <div>
-                    <div className="text-[#a2abb3] text-xs font-semibold mb-1">STATUS</div>
-                    <div className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                      launch.status?.name === 'Go' ? 'bg-green-500/20 text-green-400' :
-                      launch.status?.name === 'TBD' ? 'bg-yellow-500/20 text-yellow-400' :
-                      'bg-blue-500/20 text-blue-400'
-                    }`}>
-                      {launch.status?.name || 'Scheduled'}
-                    </div>
-                  </div>
-                </div>
+      {/* Tab Navigation */}
+      <div className="border-b border-[#2c3035] px-4 mb-6">
+        <div className="flex justify-center">
+          <div className="flex bg-[#1e2124] rounded-lg p-1 gap-1">
+            <button 
+              onClick={() => setActiveTab('launches')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'launches' 
+                  ? 'bg-blue-500 text-white shadow-lg transform scale-105' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🚀</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">Rocket Launches</span>
+                <span className="text-xs opacity-80">Live launch data</span>
               </div>
-            </div>
-          ))}
+              {activeTab === 'launches' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+            <button 
+              onClick={() => setActiveTab('events')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'events' 
+                  ? 'bg-blue-500 text-white shadow-lg transform scale-105' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🌙</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">Astronomical Events</span>
+                <span className="text-xs opacity-80">Moon phases & meteors</span>
+              </div>
+              {activeTab === 'events' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+            <button 
+              onClick={() => setActiveTab('weather')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-300 flex items-center gap-3 ${
+                activeTab === 'weather' 
+                  ? 'bg-blue-500 text-white shadow-lg transform scale-105' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🌞</div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">Space Weather</span>
+                <span className="text-xs opacity-80">Solar activity alerts</span>
+              </div>
+              {activeTab === 'weather' && <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>}
+            </button>
+          </div>
+        </div>
+        <div className="md:hidden mt-4 flex justify-center">
+          <div className="flex bg-[#1e2124] rounded-lg p-1 w-full max-w-sm">
+            <button 
+              onClick={() => setActiveTab('launches')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'launches' 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🚀</div>
+              <span>Launches</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('events')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'events' 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🌙</div>
+              <span>Events</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('weather')}
+              className={`flex-1 py-3 rounded-md text-xs font-medium transition-all duration-300 flex flex-col items-center gap-1 ${
+                activeTab === 'weather' 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'text-[#a2abb3] hover:text-white hover:bg-[#2c3035]'
+              }`}
+            >
+              <div className="text-lg">🌞</div>
+              <span>Weather</span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'launches' && (
+        <div>
+          <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
+          <div className="p-4">
+            <div className="space-y-4">
+              <div className="text-xs text-[#a2abb3] mb-2">
+                🚀 Real-time launch data from Launch Library 2 API
+              </div>
+              {launches?.results?.slice(0, 5).map((launch: any) => (
+                <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl">🚀</div>
+                        <div>
+                          <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
+                          <div className="text-[#a2abb3] text-sm">{launch.rocket?.configuration?.full_name || launch.rocket?.full_name} • {launch.launch_service_provider?.name}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white font-medium">
+                          {new Date(launch.net).toLocaleDateString()}
+                        </div>
+                        <div className="text-white text-lg font-bold">
+                          {new Date(launch.net).toLocaleTimeString()}
+                        </div>
+                        <div className="text-[#a2abb3] text-xs">
+                          {launch.status?.name || 'Scheduled'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                      <div>
+                        <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
+                        <div className="text-white text-sm">{launch.mission?.name || 'Mission Details TBD'}</div>
+                        <div className="text-[#a2abb3] text-xs">{launch.mission?.description?.substring(0, 60)}...</div>
+                      </div>
+                      <div>
+                        <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH PAD</div>
+                        <div className="text-white text-sm">{launch.pad?.name || 'TBD'}</div>
+                        <div className="text-[#a2abb3] text-xs">{launch.pad?.location?.name || 'Location TBD'}</div>
+                      </div>
+                      <div>
+                        <div className="text-[#a2abb3] text-xs font-semibold mb-1">STATUS</div>
+                        <div className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                          launch.status?.name === 'Go' ? 'bg-green-500/20 text-green-400' :
+                          launch.status?.name === 'TBD' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {launch.status?.name || 'Scheduled'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Astronomical Events */}
       <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
