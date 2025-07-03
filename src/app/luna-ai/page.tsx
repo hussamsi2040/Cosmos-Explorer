@@ -106,7 +106,7 @@ function LunaAIContentInternal() {
     {
       id: '1',
       type: 'luna',
-      content: 'Hello! I\'m Luna, your AI assistant for space exploration! 🌙 I\'m here to help you understand the wonders of the cosmos. Ask me about planets, stars, rockets, space missions, or any space concept you\'re curious about!',
+      content: 'Hello! I\'m Luna, your AI assistant for space exploration! 🌙 I\'m powered by advanced AI and ready to help you understand the wonders of the cosmos. Ask me about planets, stars, rockets, space missions, black holes, or any space concept you\'re curious about!',
       timestamp: new Date()
     }
   ]);
@@ -139,7 +139,7 @@ function LunaAIContentInternal() {
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
 
     // Generate Luna's response
-    const lunaResponse = generateLunaResponse(inputMessage);
+    const lunaResponse = await generateLunaResponse(inputMessage);
     const lunaMessage: Message = {
       id: (Date.now() + 1).toString(),
       type: 'luna',
@@ -151,7 +151,48 @@ function LunaAIContentInternal() {
     setMessages(prev => [...prev, lunaMessage]);
   };
 
-  const generateLunaResponse = (userInput: string): string => {
+  const generateLunaResponse = async (userInput: string): Promise<string> => {
+    try {
+      // Use OpenRouter API with o4-mini model
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || 'sk-or-v1-demo-key'}`,
+          "HTTP-Referer": "https://cosmic-classroom.vercel.app",
+          "X-Title": "Cosmic Classroom - Luna AI Assistant",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "model": "openai/o4-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are Luna, a friendly AI assistant specializing in space education for the Cosmic Classroom app. You explain space concepts in an engaging, educational way suitable for all ages. Always include interesting facts and use emojis when appropriate. Keep responses informative but conversational, around 2-3 sentences. Focus on space, astronomy, rockets, planets, and space exploration topics."
+            },
+            {
+              "role": "user", 
+              "content": userInput
+            }
+          ],
+          "max_tokens": 200,
+          "temperature": 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || getFallbackResponse(userInput);
+      
+    } catch (error) {
+      console.error('OpenRouter API failed:', error);
+      return getFallbackResponse(userInput);
+    }
+  };
+
+  const getFallbackResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
     
     for (const [key, response] of Object.entries(lunaResponses)) {
@@ -162,11 +203,11 @@ function LunaAIContentInternal() {
     
     // Check for general space terms
     if (input.includes('space') || input.includes('universe') || input.includes('cosmos')) {
-      return 'Space is absolutely incredible! The universe is about 13.8 billion years old and contains over 2 trillion galaxies. Each galaxy has billions of stars, and many of those stars have planets. We\'re literally made of stardust - the heavy elements in our bodies were forged in the cores of ancient stars! What specific aspect of space fascinates you most?';
+      return 'Space is absolutely incredible! The universe is about 13.8 billion years old and contains over 2 trillion galaxies. Each galaxy has billions of stars, and many of those stars have planets. We\'re literally made of stardust - the heavy elements in our bodies were forged in the cores of ancient stars! What specific aspect of space fascinates you most? 🌌';
     }
     
     if (input.includes('astronaut') || input.includes('spacewalk')) {
-      return 'Astronauts are real-life space explorers! They train for years to live and work in microgravity. During spacewalks (EVAs), they wear spacesuits that act like personal spacecraft, protecting them from the vacuum of space and extreme temperatures. Fun fact: spacesuits cost about $500 million each and take 6 hours to put on properly!';
+      return 'Astronauts are real-life space explorers! They train for years to live and work in microgravity. During spacewalks (EVAs), they wear spacesuits that act like personal spacecraft, protecting them from the vacuum of space and extreme temperatures. Fun fact: spacesuits cost about $500 million each and take 6 hours to put on properly! 🚀';
     }
     
     if (input.includes('moon') || input.includes('lunar')) {
@@ -186,8 +227,8 @@ function LunaAIContentInternal() {
     
     setMessages(prev => [...prev, conceptMessage]);
     
-    setTimeout(() => {
-      const response = generateLunaResponse(concept.title);
+    setTimeout(async () => {
+      const response = await generateLunaResponse(concept.title);
       const lunaMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'luna',
