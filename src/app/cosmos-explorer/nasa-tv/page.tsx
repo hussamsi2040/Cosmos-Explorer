@@ -362,54 +362,7 @@ export default function NASATV() {
 
         <div className="px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            {/* Page Header */}
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-4">
-                <div className="text-3xl">📺</div>
-                <div>
-                  <h1 className="text-white text-[32px] font-bold leading-tight tracking-[-0.015em]">NASA+</h1>
-                  <p className="text-[#a2abb3] text-base">Stream the universe • Live from NASA</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-white font-semibold">
-                    {isClient && currentTime ? currentTime.toLocaleTimeString() : '--:--:-- --'}
-                  </div>
-                  <div className="text-[#a2abb3] text-sm">Eastern Time</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="text-red-400 font-semibold">LIVE</span>
-                </div>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-white tracking-light text-[22px] font-bold leading-tight">📺 NASA+ Live Streaming</p>
-              {lastUpdated && (
-                <div className="text-[#a2abb3] text-sm flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span>Updated {lastUpdated.toLocaleTimeString()}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Data Source Notice */}
-            <div className="p-4">
-              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-blue-400 text-xl">📁</div>
-                  <div>
-                    <div className="text-white font-semibold mb-1">Daily Scraped NASA+ Content</div>
-                    <div className="text-[#a2abb3] text-sm">
-                      Content scraped daily from <span className="text-blue-400">plus.nasa.gov</span> • Stored locally for performance • {liveEvents.length} live events • {nasaShows.length} shows available
-                      {dataStatus && <span> • Data {dataStatus.ageString}</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Featured Live Stream */}
             <div className="p-4">
