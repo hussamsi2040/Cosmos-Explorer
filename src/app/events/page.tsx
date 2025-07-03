@@ -716,7 +716,7 @@ function CosmicEventsContentInternal() {
           <div className="relative">
             <img 
               src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Total Solar Eclipse"
+              alt="Total Solar Eclipse Corona"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
@@ -725,8 +725,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Perseid Meteor Shower"
+              src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Meteor Shower with Visible Streaks"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
@@ -735,8 +735,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Jupiter and Mars Conjunction"
+              src="https://images.unsplash.com/photo-1593642533144-3d62aa4783ec?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Jupiter and Saturn Conjunction"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
@@ -745,8 +745,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1518066000714-58c45f1a2c0a?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Full Moon Phases"
+              src="https://images.unsplash.com/photo-1527838832700-5059252407fa?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Moon Phase Sequence"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
@@ -809,16 +809,16 @@ function CosmicEventsContentInternal() {
                 return 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=400&h=250&fit=crop&auto=format&q=80';
               }
               if (eventType.includes('Planetary')) {
-                if (eventName?.includes('Jupiter')) return 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?w=400&h=250&fit=crop&auto=format&q=80';
+                if (eventName?.includes('Jupiter')) return 'https://images.unsplash.com/photo-1593642533144-3d62aa4783ec?w=400&h=250&fit=crop&auto=format&q=80';
                 if (eventName?.includes('Mars')) return 'https://images.unsplash.com/photo-1614732414444-096040ec8ecf?w=400&h=250&fit=crop&auto=format&q=80';
-                if (eventName?.includes('Venus')) return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=250&fit=crop&auto=format&q=80';
-                return 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?w=400&h=250&fit=crop&auto=format&q=80';
+                if (eventName?.includes('Venus')) return 'https://images.unsplash.com/photo-1593642533144-3d62aa4783ec?w=400&h=250&fit=crop&auto=format&q=80';
+                return 'https://images.unsplash.com/photo-1593642533144-3d62aa4783ec?w=400&h=250&fit=crop&auto=format&q=80';
               }
               if (eventType.includes('Lunar')) {
                 if (eventName?.includes('Full')) return 'https://images.unsplash.com/photo-1518066000714-58c45f1a2c0a?w=400&h=250&fit=crop&auto=format&q=80';
-                if (eventName?.includes('New')) return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format&q=80';
-                if (eventName?.includes('Quarter')) return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format&q=80';
-                return 'https://images.unsplash.com/photo-1518066000714-58c45f1a2c0a?w=400&h=250&fit=crop&auto=format&q=80';
+                if (eventName?.includes('New')) return 'https://images.unsplash.com/photo-1509909756405-be0199881695?w=400&h=250&fit=crop&auto=format&q=80';
+                if (eventName?.includes('Quarter')) return 'https://images.unsplash.com/photo-1527838832700-5059252407fa?w=400&h=250&fit=crop&auto=format&q=80';
+                return 'https://images.unsplash.com/photo-1527838832700-5059252407fa?w=400&h=250&fit=crop&auto=format&q=80';
               }
               // Default fallback
               return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop&auto=format&q=80';
@@ -882,9 +882,13 @@ function CosmicEventsContentInternal() {
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Solar Flare"
+              src="https://soho.nascom.nasa.gov/data/realtime/eit_304/1024/latest.jpg" 
+              alt="Solar Corona and Flare Activity"
               className="w-full h-32 object-cover rounded-lg"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=300&h=200&fit=crop&auto=format&q=80";
+              }}
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
               Solar Activity
@@ -892,8 +896,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Aurora Borealis"
+              src="https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Northern Lights Aurora Borealis"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
@@ -902,8 +906,8 @@ function CosmicEventsContentInternal() {
           </div>
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format&q=80" 
-              alt="Geomagnetic Field"
+              src="https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=300&h=200&fit=crop&auto=format&q=80" 
+              alt="Earth's Magnetosphere"
               className="w-full h-32 object-cover rounded-lg"
             />
             <div className="absolute bottom-2 left-2 bg-black/70 rounded px-2 py-1 text-white text-xs">
