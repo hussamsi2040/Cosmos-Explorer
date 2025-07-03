@@ -113,6 +113,7 @@ function LunaAIContentInternal() {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const categories = ['All', 'Astrophysics', 'Planetary Science', 'Space Technology'];
@@ -167,14 +168,14 @@ function LunaAIContentInternal() {
           "messages": [
             {
               "role": "system",
-              "content": "You are Luna, a friendly AI assistant specializing in space education for the Cosmic Classroom app. You explain space concepts in an engaging, educational way suitable for all ages. Always include interesting facts and use emojis when appropriate. Keep responses informative but conversational, around 2-3 sentences. Focus on space, astronomy, rockets, planets, and space exploration topics."
+              "content": "You are Luna, a friendly AI assistant specializing in space education for the Cosmic Classroom app. You explain space concepts in an engaging, educational way suitable for all ages. Always include interesting facts and use emojis when appropriate. Keep responses informative but conversational, around 2-3 sentences. Focus on space, astronomy, rockets, planets, and space exploration topics. After your response, suggest 3 follow-up questions that would help the user learn more about the topic, formatted as: FOLLOW_UP: question1|question2|question3"
             },
             {
               "role": "user", 
               "content": userInput
             }
           ],
-          "max_tokens": 200,
+          "max_tokens": 300,
           "temperature": 0.7
         })
       });
@@ -184,10 +185,23 @@ function LunaAIContentInternal() {
       }
 
       const data = await response.json();
-      return data.choices[0]?.message?.content || getFallbackResponse(userInput);
+      const fullResponse = data.choices[0]?.message?.content || getFallbackResponse(userInput);
+      
+      // Extract follow-up questions if present
+      const followUpMatch = fullResponse.match(/FOLLOW_UP:\s*(.+)$/);
+      if (followUpMatch) {
+        const questions = followUpMatch[1].split('|').map((q: string) => q.trim());
+        setFollowUpQuestions(questions);
+        return fullResponse.replace(/FOLLOW_UP:\s*.+$/, '').trim();
+      }
+      
+      // Set default follow-up questions if none provided
+      setFollowUpQuestions(getDefaultFollowUpQuestions(userInput));
+      return fullResponse;
       
     } catch (error) {
       console.error('OpenRouter API failed:', error);
+      setFollowUpQuestions(getDefaultFollowUpQuestions(userInput));
       return getFallbackResponse(userInput);
     }
   };
@@ -215,6 +229,57 @@ function LunaAIContentInternal() {
     }
     
     return lunaResponses.default;
+  };
+
+  const getDefaultFollowUpQuestions = (userInput: string): string[] => {
+    const input = userInput.toLowerCase();
+    
+    if (input.includes('black hole')) {
+      return [
+        "How are black holes formed?",
+        "What happens if you fall into a black hole?", 
+        "Can black holes evaporate?"
+      ];
+    }
+    
+    if (input.includes('rocket') || input.includes('launch')) {
+      return [
+        "What fuel do rockets use?",
+        "How fast do rockets need to go to reach space?",
+        "What is the most powerful rocket ever built?"
+      ];
+    }
+    
+    if (input.includes('mars') || input.includes('red planet')) {
+      return [
+        "How long does it take to get to Mars?",
+        "Could humans live on Mars?",
+        "What rovers are currently on Mars?"
+      ];
+    }
+    
+    if (input.includes('moon') || input.includes('lunar')) {
+      return [
+        "Why does the Moon have phases?",
+        "How did the Moon form?",
+        "When will humans return to the Moon?"
+      ];
+    }
+    
+    if (input.includes('space station') || input.includes('iss')) {
+      return [
+        "How do astronauts eat in space?",
+        "How long can astronauts stay on the ISS?",
+        "How does the ISS get supplies?"
+      ];
+    }
+    
+    // Default follow-up questions
+    return [
+      "What's the most amazing thing about space?",
+      "How do astronauts train for space missions?",
+      "What are we planning to explore next in space?"
+    ];
   };
 
   const handleConceptClick = (concept: SpaceConcept) => {
@@ -250,6 +315,15 @@ function LunaAIContentInternal() {
     }
   };
 
+  const handleFollowUpClick = (question: string) => {
+    setInputMessage(question);
+    // Auto-send the follow-up question
+    setTimeout(() => {
+      const event = { key: 'Enter', shiftKey: false, preventDefault: () => {} };
+      handleKeyPress(event as any);
+    }, 100);
+  };
+
   return (
     <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
       {/* Page Header */}
@@ -260,21 +334,27 @@ function LunaAIContentInternal() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 p-4">
         {/* Chat Interface */}
-        <div className="lg:col-span-2">
-          <div className="bg-[#1e2124] rounded-xl border border-blue-500/20 h-[600px] flex flex-col">
+        <div className="xl:col-span-3">
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl border border-blue-500/30 shadow-2xl h-[700px] flex flex-col">
             {/* Chat Header */}
-            <div className="p-4 border-b border-[#2c3035] flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg">
+            <div className="p-6 border-b border-[#2c3035]/50 flex items-center gap-4 bg-gradient-to-r from-[#1e2124] to-[#252930]">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-lg">
                 🌙
               </div>
-              <div>
-                <h3 className="text-white font-semibold">Luna AI</h3>
+              <div className="flex-1">
+                <h3 className="text-white font-bold text-lg">Luna AI Assistant</h3>
                 <div className="text-[#a2abb3] text-sm flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  Online • Ready to explore space
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-sm"></div>
+                  <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent font-medium">
+                    Online • Powered by Advanced AI
+                  </span>
                 </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-[#a2abb3]">Space Education Assistant</div>
+                <div className="text-xs text-blue-400">Ask me anything about space! 🚀</div>
               </div>
             </div>
 
@@ -282,10 +362,10 @@ function LunaAIContentInternal() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-lg ${
+                  <div className={`max-w-[85%] p-4 rounded-2xl shadow-lg ${
                     message.type === 'user' 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-[#2c3035] text-white border border-purple-500/20'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-blue-500/20' 
+                      : 'bg-gradient-to-br from-[#2c3035] to-[#373c42] text-white border border-purple-500/30 shadow-purple-500/10'
                   }`}>
                     {message.type === 'luna' && (
                       <div className="flex items-center gap-2 mb-2">
@@ -323,33 +403,83 @@ function LunaAIContentInternal() {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-[#2c3035]">
-              <div className="flex gap-2">
+            <div className="p-4 border-t border-[#2c3035]/50 bg-[#1a1d21]">
+              <div className="flex gap-3">
                 <input
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask Luna about space, planets, rockets, or any cosmic concept..."
-                  className="flex-1 bg-[#2c3035] text-white p-3 rounded-lg border border-blue-500/20 focus:border-blue-500 focus:outline-none"
+                  className="flex-1 bg-[#2c3035] text-white p-4 rounded-xl border border-blue-500/30 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim()}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 disabled:scale-100 shadow-lg"
                 >
-                  Send
+                  Send 🚀
                 </button>
               </div>
+              
+              {/* Follow-up Questions */}
+              {followUpQuestions.length > 0 && (
+                <div className="mt-4">
+                  <div className="text-xs text-[#a2abb3] mb-2 flex items-center gap-2">
+                    <span>💡</span>
+                    <span>Continue exploring with these questions:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {followUpQuestions.map((question, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleFollowUpClick(question)}
+                        className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 text-white text-sm px-4 py-2 rounded-lg border border-purple-500/30 hover:border-purple-500/50 transition-all transform hover:scale-105"
+                      >
+                        {question}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Space Concepts Sidebar */}
         <div className="space-y-6">
+          {/* Quick Start Section */}
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
+            <div className="text-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-lg">
+                🚀
+              </div>
+              <h3 className="text-white font-bold text-lg mb-2">Quick Start</h3>
+              <p className="text-[#a2abb3] text-sm">Try these popular space questions!</p>
+            </div>
+            <div className="space-y-2">
+              {[
+                "How do black holes work?",
+                "What is the International Space Station?",
+                "How far is Mars from Earth?"
+              ].map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleFollowUpClick(question)}
+                  className="w-full text-left p-3 bg-[#2c3035] hover:bg-[#373c42] rounded-lg text-white text-sm transition-all transform hover:scale-105 border border-blue-500/20 hover:border-blue-500/40"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Category Filter */}
-          <div className="bg-[#1e2124] rounded-xl p-4 border border-blue-500/20">
-            <h3 className="text-white font-semibold mb-3">Explore Topics</h3>
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
+            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+              <span>🔍</span>
+              Explore by Category
+            </h3>
             <div className="space-y-2">
               {categories.map(category => (
                 <button
@@ -368,8 +498,11 @@ function LunaAIContentInternal() {
           </div>
 
           {/* Quick Concepts */}
-          <div className="bg-[#1e2124] rounded-xl p-4 border border-blue-500/20">
-            <h3 className="text-white font-semibold mb-3">Quick Concepts</h3>
+          <div className="bg-gradient-to-br from-[#1e2124] to-[#252930] rounded-xl p-6 border border-blue-500/30 shadow-xl">
+            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+              <span>📚</span>
+              Space Concepts Library
+            </h3>
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
               {filteredConcepts.map(concept => (
                 <button
