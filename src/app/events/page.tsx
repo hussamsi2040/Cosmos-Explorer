@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 
 // Real NASA and space APIs
 const LAUNCH_LIBRARY_URL = "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=10";
-const NASA_APOD_URL = "https://api.nasa.gov/planetary/apod";
 const NASA_API_KEY = "DEMO_KEY";
 
 interface Launch {
@@ -53,78 +52,6 @@ export default function CosmicEvents() {
   const [selectedMonth, setSelectedMonth] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [loading, setLoading] = useState(true);
-
-  // Fetch real rocket launches from Launch Library 2 API
-  useEffect(() => {
-    const fetchLaunches = async () => {
-      try {
-        const response = await fetch(LAUNCH_LIBRARY_URL);
-        if (response.ok) {
-          const data = await response.json();
-          const processedLaunches = data.results.map((launch: any) => ({
-            id: launch.id,
-            name: launch.name,
-            rocket: { full_name: launch.rocket.configuration.full_name },
-            launch_service_provider: { name: launch.launch_service_provider.name },
-            net: launch.net,
-            status: { name: launch.status.name },
-            mission: {
-              name: launch.mission?.name || launch.name,
-              description: launch.mission?.description || `Launch mission for ${launch.rocket.configuration.name}`
-            },
-            pad: {
-              name: launch.pad.name,
-              location: { name: launch.pad.location.name }
-            },
-            image: launch.image || getDefaultRocketImage(launch.launch_service_provider.name)
-          }));
-          setLaunches(processedLaunches);
-          console.log('✅ Real rocket launch data loaded from Launch Library 2');
-        }
-      } catch (error) {
-        console.error('Error fetching launch data:', error);
-        setLaunches(getFallbackLaunches());
-      }
-    };
-
-    fetchLaunches();
-  }, []);
-
-  // Fetch real space weather from NOAA
-  useEffect(() => {
-    const fetchSpaceWeather = async () => {
-      try {
-        const response = await fetch('https://services.swpc.noaa.gov/products/alerts.json');
-        if (response.ok) {
-          const data = await response.json();
-          const processedAlerts = data.slice(0, 6).map((alert: any, index: number) => ({
-            id: `noaa-${index}`,
-            type: getAlertType(alert.message || ''),
-            severity: getSeverity(alert.message || ''),
-            title: getAlertTitle(alert.message || ''),
-            description: cleanAlertDescription(alert.message || 'Space weather monitoring active'),
-            issuedAt: new Date(alert.issue_datetime || Date.now()),
-            validUntil: new Date((alert.issue_datetime ? new Date(alert.issue_datetime).getTime() : Date.now()) + 24 * 60 * 60 * 1000),
-            source: 'NOAA SWPC'
-          }));
-          setSpaceWeatherAlerts(processedAlerts);
-          console.log('✅ Real space weather data loaded from NOAA SWPC');
-        }
-      } catch (error) {
-        console.error('Error fetching space weather data:', error);
-        setSpaceWeatherAlerts(getFallbackSpaceWeather());
-      }
-    };
-
-    fetchSpaceWeather();
-  }, []);
-
-  // Generate real astronomical events
-  useEffect(() => {
-    const events = calculateAstronomicalEvents();
-    setAstronomicalEvents(events);
-    setLoading(false);
-  }, []);
 
   // Helper functions
   const getDefaultRocketImage = (provider: string) => {
@@ -252,6 +179,78 @@ export default function CosmicEvents() {
     ];
   };
 
+  // Fetch real rocket launches from Launch Library 2 API
+  useEffect(() => {
+    const fetchLaunches = async () => {
+      try {
+        const response = await fetch(LAUNCH_LIBRARY_URL);
+        if (response.ok) {
+          const data = await response.json();
+          const processedLaunches = data.results.map((launch: any) => ({
+            id: launch.id,
+            name: launch.name,
+            rocket: { full_name: launch.rocket?.configuration?.full_name || 'Unknown Rocket' },
+            launch_service_provider: { name: launch.launch_service_provider?.name || 'Unknown Provider' },
+            net: launch.net,
+            status: { name: launch.status?.name || 'TBD' },
+            mission: {
+              name: launch.mission?.name || launch.name,
+              description: launch.mission?.description || `Launch mission for ${launch.rocket?.configuration?.name || 'rocket'}`
+            },
+            pad: {
+              name: launch.pad?.name || 'TBD',
+              location: { name: launch.pad?.location?.name || 'TBD' }
+            },
+            image: launch.image || getDefaultRocketImage(launch.launch_service_provider?.name || 'Unknown')
+          }));
+          setLaunches(processedLaunches);
+          console.log('✅ Real rocket launch data loaded from Launch Library 2');
+        }
+      } catch (error) {
+        console.error('Error fetching launch data:', error);
+        setLaunches(getFallbackLaunches());
+      }
+    };
+
+    fetchLaunches();
+  }, []);
+
+  // Fetch real space weather from NOAA
+  useEffect(() => {
+    const fetchSpaceWeather = async () => {
+      try {
+        const response = await fetch('https://services.swpc.noaa.gov/products/alerts.json');
+        if (response.ok) {
+          const data = await response.json();
+          const processedAlerts = data.slice(0, 6).map((alert: any, index: number) => ({
+            id: `noaa-${index}`,
+            type: getAlertType(alert.message || ''),
+            severity: getSeverity(alert.message || ''),
+            title: getAlertTitle(alert.message || ''),
+            description: cleanAlertDescription(alert.message || 'Space weather monitoring active'),
+            issuedAt: new Date(alert.issue_datetime || Date.now()),
+            validUntil: new Date((alert.issue_datetime ? new Date(alert.issue_datetime).getTime() : Date.now()) + 24 * 60 * 60 * 1000),
+            source: 'NOAA SWPC'
+          }));
+          setSpaceWeatherAlerts(processedAlerts);
+          console.log('✅ Real space weather data loaded from NOAA SWPC');
+        }
+      } catch (error) {
+        console.error('Error fetching space weather data:', error);
+        setSpaceWeatherAlerts(getFallbackSpaceWeather());
+      }
+    };
+
+    fetchSpaceWeather();
+  }, []);
+
+  // Generate real astronomical events
+  useEffect(() => {
+    const events = calculateAstronomicalEvents();
+    setAstronomicalEvents(events);
+    setLoading(false);
+  }, []);
+
   const months = ['All', 'January', 'February', 'March', 'April', 'May', 'June',
                  'July', 'August', 'September', 'October', 'November', 'December'];
   const eventTypes = ['All', 'Eclipse', 'Meteor Shower', 'Planetary', 'Lunar Phase'];
@@ -306,206 +305,205 @@ export default function CosmicEvents() {
             <div className="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd" clipRule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor"></path>
-                </svg>
-              </div>
-              <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Cosmic Classroom</h2>
+              </svg>
             </div>
-            <div className="flex flex-1 justify-end gap-8">
-              <div className="flex items-center gap-9">
-                <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
-                <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
-                <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
-                <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer/nasa-tv">NASA TV</a>
-                <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
-              </div>
+            <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Cosmic Classroom</h2>
+          </div>
+          <div className="flex flex-1 justify-end gap-8">
+            <div className="flex items-center gap-9">
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Home</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/tracker">Tracker</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/events">Events</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer/nasa-tv">NASA TV</a>
+              <a className="text-white text-sm font-medium leading-normal" href="/cosmos-explorer">Today</a>
             </div>
-          </header>
+          </div>
+        </header>
 
-          <div className="px-40 flex flex-1 justify-center py-5">
-            <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div className="px-40 flex flex-1 justify-center py-5">
+          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+            
+            {/* Page Header */}
+            <div className="flex flex-wrap justify-between gap-3 p-4">
+              <h1 className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">NASA Events & Launches</h1>
+            </div>
+
+            {/* Real Launch Data Section */}
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
+            <div className="p-4">
+              <div className="text-xs text-[#a2abb3] mb-4">🚀 Real-time launch data from Launch Library 2 API</div>
+              <div className="space-y-4">
+                {launches.slice(0, 6).map((launch) => (
+                  <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">🚀</div>
+                          <div>
+                            <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
+                            <div className="text-[#a2abb3] text-sm">{launch.launch_service_provider.name}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">{new Date(launch.net).toLocaleDateString()}</div>
+                          <div className="text-white text-lg font-bold">{new Date(launch.net).toLocaleTimeString()}</div>
+                          <div className="text-[#a2abb3] text-xs">{launch.status.name}</div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                        <div>
+                          <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
+                          <div className="text-white text-sm">{launch.mission.name}</div>
+                          <div className="text-[#a2abb3] text-xs">{launch.mission.description.substring(0, 100)}...</div>
+                        </div>
+                        <div>
+                          <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH PAD</div>
+                          <div className="text-white text-sm">{launch.pad.name}</div>
+                          <div className="text-[#a2abb3] text-xs">{launch.pad.location.name}</div>
+                        </div>
+                        <div>
+                          <div className="text-[#a2abb3] text-xs font-semibold mb-1">ROCKET</div>
+                          <div className="text-white text-sm">{launch.rocket.full_name}</div>
+                          <div className="inline-block px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400 mt-1">
+                            {launch.status.name}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Real Astronomical Events */}
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
+            <div className="p-4">
               
-              {/* Page Header */}
-              <div className="flex flex-wrap justify-between gap-3 p-4">
-                <h1 className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">NASA Events & Launches</h1>
-              </div>
-
-              {/* Real Launch Data Section */}
-              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Upcoming Rocket Launches</h2>
-              <div className="p-4">
-                <div className="text-xs text-[#a2abb3] mb-4">🚀 Real-time launch data from Launch Library 2 API</div>
-                <div className="space-y-4">
-                  {launches.slice(0, 6).map((launch) => (
-                    <div key={launch.id} className="bg-[#1e2124] rounded-xl p-6 border border-orange-500/20 relative overflow-hidden">
-                      <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="text-2xl">🚀</div>
-                            <div>
-                              <h4 className="text-white font-semibold text-lg">{launch.name}</h4>
-                              <div className="text-[#a2abb3] text-sm">{launch.launch_service_provider.name}</div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-white font-medium">{new Date(launch.net).toLocaleDateString()}</div>
-                            <div className="text-white text-lg font-bold">{new Date(launch.net).toLocaleTimeString()}</div>
-                            <div className="text-[#a2abb3] text-xs">{launch.status.name}</div>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                          <div>
-                            <div className="text-[#a2abb3] text-xs font-semibold mb-1">MISSION</div>
-                            <div className="text-white text-sm">{launch.mission.name}</div>
-                            <div className="text-[#a2abb3] text-xs">{launch.mission.description.substring(0, 100)}...</div>
-                          </div>
-                          <div>
-                            <div className="text-[#a2abb3] text-xs font-semibold mb-1">LAUNCH PAD</div>
-                            <div className="text-white text-sm">{launch.pad.name}</div>
-                            <div className="text-[#a2abb3] text-xs">{launch.pad.location.name}</div>
-                          </div>
-                          <div>
-                            <div className="text-[#a2abb3] text-xs font-semibold mb-1">ROCKET</div>
-                            <div className="text-white text-sm">{launch.rocket.full_name}</div>
-                            <div className="inline-block px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400 mt-1">
-                              {launch.status.name}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {/* Month and Type Filters */}
+              <div className="flex gap-2 mb-4 flex-wrap">
+                <div className="flex gap-2">
+                  {months.map(month => (
+                    <button
+                      key={month}
+                      onClick={() => setSelectedMonth(month)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                        selectedMonth === month
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
+                      }`}
+                    >
+                      {month}
+                    </button>
                   ))}
                 </div>
               </div>
 
-              {/* Real Astronomical Events */}
-              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Astronomical Events</h2>
-              <div className="p-4">
-                
-                {/* Month and Type Filters */}
-                <div className="flex gap-2 mb-4 flex-wrap">
-                  <div className="flex gap-2">
-                    {months.map(month => (
-                      <button
-                        key={month}
-                        onClick={() => setSelectedMonth(month)}
-                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                          selectedMonth === month
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-                        }`}
-                      >
-                        {month}
-                      </button>
-                    ))}
+              <div className="flex gap-2 mb-6 flex-wrap">
+                <div className="flex gap-2">
+                  {eventTypes.map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedType(type)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                        selectedType === type
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="text-xs text-[#a2abb3] mb-2 col-span-full">🌙 Real astronomical event calculations and meteor shower dates</div>
+                {filteredEvents.map((event) => (
+                  <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">
+                            {event.type === 'Meteor Shower' ? '☄️' : 
+                             event.type === 'Lunar Phase' ? '🌙' : 
+                             event.type === 'Planetary' ? '🪐' : '✨'}
+                          </div>
+                          <div>
+                            <h4 className="text-white font-semibold">{event.name}</h4>
+                            <div className="text-[#a2abb3] text-sm">{event.type}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">{event.date.toLocaleDateString()}</div>
+                          <div className="text-[#a2abb3] text-sm">{event.date.toLocaleTimeString()}</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="text-white">{event.description}</div>
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          <div>
+                            <span className="text-[#a2abb3] font-semibold">Visibility:</span>
+                            <span className="text-white ml-1">{event.visibility}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#a2abb3] font-semibold">Duration:</span>
+                            <span className="text-white ml-1">{event.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex gap-2 mb-6 flex-wrap">
-                  <div className="flex gap-2">
-                    {eventTypes.map(type => (
-                      <button
-                        key={type}
-                        onClick={() => setSelectedType(type)}
-                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                          selectedType === type
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-[#2c3035] text-[#a2abb3] hover:bg-[#373c42] hover:text-white'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="text-xs text-[#a2abb3] mb-2 col-span-full">🌙 Real astronomical event calculations and meteor shower dates</div>
-                  {filteredEvents.map((event) => (
-                    <div key={event.id} className="bg-gradient-to-br from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-purple-500/20 relative overflow-hidden">
-                      <div className="relative z-10">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="text-2xl">
-                              {event.type === 'Meteor Shower' ? '☄️' : 
-                               event.type === 'Lunar Phase' ? '🌙' : 
-                               event.type === 'Planetary' ? '🪐' : '✨'}
-                            </div>
-                            <div>
-                              <h4 className="text-white font-semibold">{event.name}</h4>
-                              <div className="text-[#a2abb3] text-sm">{event.type}</div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-white font-medium">{event.date.toLocaleDateString()}</div>
-                            <div className="text-[#a2abb3] text-sm">{event.date.toLocaleTimeString()}</div>
-                          </div>
-                        </div>
-                        <div className="space-y-2 text-sm">
-                          <div className="text-white">{event.description}</div>
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div>
-                              <span className="text-[#a2abb3] font-semibold">Visibility:</span>
-                              <span className="text-white ml-1">{event.visibility}</span>
-                            </div>
-                            <div>
-                              <span className="text-[#a2abb3] font-semibold">Duration:</span>
-                              <span className="text-white ml-1">{event.duration}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
-
-              {/* Real Space Weather from NOAA */}
-              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Space Weather Alerts</h2>
-              <div className="p-4">
-                <div className="space-y-4">
-                  <div className="text-xs text-[#a2abb3] mb-2">🌞 Real-time space weather alerts from NOAA Space Weather Prediction Center</div>
-                  {spaceWeatherAlerts.map((alert) => (
-                    <div key={alert.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-red-500/20 relative overflow-hidden">
-                      <div className="relative z-10">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="text-2xl">
-                              {alert.type === 'Solar Flare' ? '☀️' :
-                               alert.type === 'Geomagnetic Storm' ? '🌪️' :
-                               alert.type === 'Aurora Activity' ? '🌌' : '⚠️'}
-                            </div>
-                            <div>
-                              <h4 className="text-white font-semibold text-lg">{alert.title}</h4>
-                              <div className="text-[#a2abb3] text-sm">{alert.type} • {alert.source}</div>
-                            </div>
-                          </div>
-                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            alert.severity === 'High Risk' ? 'bg-red-500/20 text-red-400' :
-                            alert.severity === 'Medium Risk' ? 'bg-yellow-500/20 text-yellow-400' :
-                            'bg-green-500/20 text-green-400'
-                          }`}>
-                            {alert.severity}
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="text-white text-sm">{alert.description}</div>
-                          <div className="grid grid-cols-2 gap-4 text-xs">
-                            <div>
-                              <div className="text-[#a2abb3] font-semibold">Issued</div>
-                              <div className="text-white">{alert.issuedAt.toLocaleString()}</div>
-                            </div>
-                            <div>
-                              <div className="text-[#a2abb3] font-semibold">Valid Until</div>
-                              <div className="text-white">{alert.validUntil.toLocaleString()}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
             </div>
+
+            {/* Real Space Weather from NOAA */}
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Space Weather Alerts</h2>
+            <div className="p-4">
+              <div className="space-y-4">
+                <div className="text-xs text-[#a2abb3] mb-2">🌞 Real-time space weather alerts from NOAA Space Weather Prediction Center</div>
+                {spaceWeatherAlerts.map((alert) => (
+                  <div key={alert.id} className="bg-gradient-to-r from-[#1e2124] to-[#2c3035] rounded-xl p-6 border border-red-500/20 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">
+                            {alert.type === 'Solar Flare' ? '☀️' :
+                             alert.type === 'Geomagnetic Storm' ? '🌪️' :
+                             alert.type === 'Aurora Activity' ? '🌌' : '⚠️'}
+                          </div>
+                          <div>
+                            <h4 className="text-white font-semibold text-lg">{alert.title}</h4>
+                            <div className="text-[#a2abb3] text-sm">{alert.type} • {alert.source}</div>
+                          </div>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          alert.severity === 'High Risk' ? 'bg-red-500/20 text-red-400' :
+                          alert.severity === 'Medium Risk' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-green-500/20 text-green-400'
+                        }`}>
+                          {alert.severity}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="text-white text-sm">{alert.description}</div>
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div>
+                            <div className="text-[#a2abb3] font-semibold">Issued</div>
+                            <div className="text-white">{alert.issuedAt.toLocaleString()}</div>
+                          </div>
+                          <div>
+                            <div className="text-[#a2abb3] font-semibold">Valid Until</div>
+                            <div className="text-white">{alert.validUntil.toLocaleString()}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
